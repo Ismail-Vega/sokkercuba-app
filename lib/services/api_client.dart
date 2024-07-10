@@ -3,26 +3,28 @@ import 'dart:io';
 import 'package:cookie_jar/cookie_jar.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences_android/shared_preferences_android.dart';
 import 'package:shared_preferences_foundation/shared_preferences_foundation.dart';
+
+import '../main.dart';
 
 class ApiClient {
   late Dio _dio;
   late PersistCookieJar _cookieJar;
 
-  ApiClient(String baseUrl) {
+  ApiClient() {
     _dio = Dio(BaseOptions(
-      baseUrl: baseUrl,
+      baseUrl: 'https://sokker.org/api',
       headers: {
         'Accept': 'application/json',
         'Content-Type': 'application/json',
       },
     ));
-    _initCookieJar();
   }
 
-  void _initCookieJar() async {
+  Future<void> initCookieJar() async {
     if (Platform.isAndroid) SharedPreferencesAndroid.registerWith();
     if (Platform.isIOS) SharedPreferencesFoundation.registerWith();
 
@@ -47,12 +49,7 @@ class ApiClient {
             cookies.map((str) => Cookie.fromSetCookieValue(str)).toList());
       }
 
-      if (response.statusCode == 200) {
-        return response;
-      } else {
-        throw Exception(
-            'Failed to send data. Status code: ${response.statusCode}');
-      }
+      return _handleResponse(response);
     } catch (e) {
       if (kDebugMode) {
         print('Exception while sending data: $e');
@@ -64,9 +61,7 @@ class ApiClient {
   Future<dynamic> fetchData(String endpoint,
       {Map<String, String>? headers}) async {
     try {
-      final cookies =
-          await _cookieJar.loadForRequest(Uri.parse(_dio.options.baseUrl));
-      print('Cookies after login: $cookies');
+      /*final cookies = await _cookieJar.loadForRequest(Uri.parse(_dio.options.baseUrl));
 
       String cookiesString = cookies
           .where((cookie) =>
@@ -75,34 +70,41 @@ class ApiClient {
               cookie.name == 'lang' ||
               cookie.name == 'lang_ID')
           .map((cookie) => '${cookie.name}=${cookie.value}')
-          .join('; ');
+          .join('; ');*/
 
       final options = Options(headers: {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
-        'Cookie': cookiesString,
+        'Cookie':
+            'PHPSESSID=48nr9q51o66ko2eju812matp4i; _html_rtl=0; lang=en; lang_ID=2',
         ...headers ?? {}
       });
-
-      print('Cookies in Options: ${options.headers}');
 
       final response = await _dio.get(
         endpoint,
         options: options,
       );
 
-      print('fetchData Response: $response');
-
-      if (response.statusCode == 200) {
-        return response.data;
-      } else {
-        throw Exception(
-            'Failed to fetch data. Status code: ${response.statusCode}');
-      }
+      return _handleResponse(response);
     } catch (e) {
-      print('Exception while fetching current data: $e');
+      if (kDebugMode) {
+        print('Exception while fetching current data: $e');
+      }
 
       rethrow;
+    }
+  }
+
+  Future<dynamic> _handleResponse(Response response) async {
+    if (response.statusCode == 200) {
+      return response;
+    } else if (response.statusCode == 401) {
+      // Redirect to login screen on 401
+      navigatorKey.currentState
+          ?.pushNamedAndRemoveUntil('/login', (Route<dynamic> route) => false);
+    } else {
+      throw Exception(
+          'Failed to handle response. Status code: ${response.statusCode}');
     }
   }
 }

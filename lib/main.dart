@@ -1,22 +1,25 @@
 import 'dart:convert';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:sokkercuba/screens/home/welcome_screen.dart';
 import 'package:sokkercuba/screens/login_screen.dart';
-import 'package:sokkercuba/screens/welcome_screen.dart';
 import 'package:sokkercuba/state/app_state.dart';
 import 'package:sokkercuba/state/app_state_notifier.dart';
 
 import 'components/responsive_drawer.dart';
+import 'screens/scouting/scouting_screen.dart';
+import 'screens/xtreme/xtreme_screen.dart';
+import 'services/api_client.dart';
 
 GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Load the initial state from SharedPreferences
   final prefs = await SharedPreferences.getInstance();
   final stateString = prefs.getString('appState');
   AppState initialState = AppState(
@@ -27,23 +30,45 @@ void main() async {
     loading: false,
     loggedIn: false,
     user: null,
+    userStats: null,
     juniors: null,
     cweek: null,
     tsummary: null,
     players: null,
     training: null,
   );
+
   if (stateString != null) {
     initialState = AppState.fromJson(jsonDecode(stateString));
   }
 
-  runApp(Sokkercuba(initialState: initialState));
+  final apiClient = ApiClient();
+  bool isLoggedIn = false;
+  await apiClient.initCookieJar();
+
+  try {
+    final currentResponse = await apiClient.fetchData('/current');
+    if (currentResponse != null) {
+      isLoggedIn = true;
+    }
+  } catch (e) {
+    if (kDebugMode) {
+      print('Exception while checking api auth: $e');
+    }
+  }
+
+  runApp(Sokkercuba(
+    initialState: initialState,
+    isLoggedIn: isLoggedIn,
+  ));
 }
 
 class Sokkercuba extends StatefulWidget {
   final AppState initialState;
+  final bool isLoggedIn;
 
-  const Sokkercuba({super.key, required this.initialState});
+  const Sokkercuba(
+      {super.key, required this.initialState, required this.isLoggedIn});
 
   @override
   State<Sokkercuba> createState() {
@@ -69,24 +94,47 @@ class _SokkercubaState extends State<Sokkercuba> {
         navigatorKey: navigatorKey,
         title: 'Sokkercuba App',
         theme: ThemeData.light(),
-        darkTheme: ThemeData.dark(),
+        darkTheme: ThemeData.dark().copyWith(
+          primaryColor: Colors.blue[900],
+          appBarTheme: const AppBarTheme(
+            backgroundColor: Colors.blueAccent,
+          ),
+          buttonTheme: const ButtonThemeData(
+            buttonColor: Colors.blue,
+          ),
+          drawerTheme: const DrawerThemeData(
+            backgroundColor: Colors.blueAccent,
+          ),
+        ),
         themeMode: _themeMode,
         home: ResponsiveDrawer(
           setSelectedTheme: _setSelectedTheme,
-          child: const WelcomeScreen(),
+          child:
+              widget.isLoggedIn ? const WelcomeScreen() : const LoginScreen(),
         ),
         onGenerateRoute: _generateRoute,
-        initialRoute: '/login',
+        initialRoute: '/',
       ),
     );
   }
 
   Route<dynamic> _generateRoute(RouteSettings settings) {
     switch (settings.name) {
+      case '/':
+        return MaterialPageRoute(
+            builder: (context) => ResponsiveDrawer(
+                setSelectedTheme: _setSelectedTheme,
+                child: const WelcomeScreen()));
+      case '/xtreme':
+        return MaterialPageRoute(
+            builder: (context) => ResponsiveDrawer(
+                setSelectedTheme: _setSelectedTheme, child: const Xtreme()));
+      case '/scouting':
+        return MaterialPageRoute(
+            builder: (context) => ResponsiveDrawer(
+                setSelectedTheme: _setSelectedTheme, child: const Scouting()));
       case '/login':
         return MaterialPageRoute(builder: (context) => const LoginScreen());
-      case '/':
-        return MaterialPageRoute(builder: (context) => const WelcomeScreen());
       /*case '/about':
         return MaterialPageRoute(builder: (context) => AboutPage());
       case '/contact':
@@ -97,8 +145,6 @@ class _SokkercubaState extends State<Sokkercuba> {
         return MaterialPageRoute(builder: (context) => AddonPrivacyPage());*/
       /*case '/signup':
         return MaterialPageRoute(builder: (context) => SignUp());
-      case '/xtreme':
-        return MaterialPageRoute(builder: (context) => XtremePage());
       case '/squad':
         return MaterialPageRoute(builder: (context) => TeamPage());
       case '/training':
@@ -106,7 +152,10 @@ class _SokkercubaState extends State<Sokkercuba> {
       case '/update':
         return MaterialPageRoute(builder: (context) => UpdatePage());*/
       default:
-        return MaterialPageRoute(builder: (context) => const WelcomeScreen());
+        return MaterialPageRoute(
+            builder: (context) => ResponsiveDrawer(
+                setSelectedTheme: _setSelectedTheme,
+                child: const WelcomeScreen()));
     }
   }
 }

@@ -35,3 +35,47 @@ const kTextFieldDecoration = InputDecoration(
   errorStyle: TextStyle(color: Colors.red),
   floatingLabelBehavior: FloatingLabelBehavior.always,
 );
+
+enum SkillsLevels {
+  tragic,
+  hopeless,
+  unsatisfactory,
+  poor,
+  weak,
+  average,
+  adequate,
+  good,
+  solid,
+  veryGood,
+  excellent,
+  formidable,
+  outstanding,
+  incredible,
+  brilliant,
+  magical,
+  unearthly,
+  divine,
+  superdivine
+}
+
+const List<String> skillsLevelsList = [
+  'Tragic',
+  'Hopeless',
+  'Unsatisfactory',
+  'Poor',
+  'Weak',
+  'Average',
+  'Adequate',
+  'Good',
+  'Solid',
+  'Very Good',
+  'Excellent',
+  'Formidable',
+  'Outstanding',
+  'Incredible',
+  'Brilliant',
+  'Magical',
+  'Unearthly',
+  'Divine',
+  'Superdivine'
+];

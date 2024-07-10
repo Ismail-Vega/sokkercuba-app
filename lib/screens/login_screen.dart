@@ -5,7 +5,9 @@ import 'package:provider/provider.dart';
 import 'package:sokkercuba/utils/constants.dart';
 import 'package:sokkercuba/widgets/rounded_button.dart';
 
+import '../models/team/team_stats.dart';
 import '../models/team/user.dart';
+import '../models/tsummary/tsummary.dart';
 import '../services/api_client.dart';
 import '../state/app_state.dart';
 import '../state/app_state_notifier.dart';
@@ -38,33 +40,48 @@ class _LoginScreenState extends State<LoginScreen> {
       _toggleSpinner(true);
 
       try {
-        final sokkerApiClient = ApiClient('https://sokker.org/api');
-        final response = await sokkerApiClient.sendData(
+        final apiClient = ApiClient();
+        await apiClient.initCookieJar();
+        final response = await apiClient.sendData(
           '/auth/login',
           {'login': login, 'password': password, 'remember': true},
         );
 
         if (response.statusCode == 200) {
-          // Login successful, fetch user data
-          final userDataResponse = await sokkerApiClient.fetchData('/current');
-          print('userDataResponse: ${userDataResponse.toString()}');
+          final userDataResponse = await apiClient.fetchData('/current');
 
-          if (userDataResponse != null && mounted) {
-            // Retrieve the value using the key
-            // final userData = jsonDecode(userDataResponse);
+          if (userDataResponse != null) {
             final user = User.fromJson(userDataResponse);
-            final appStateNotifier =
-                Provider.of<AppStateNotifier>(context, listen: false);
 
-            appStateNotifier.dispatch(StoreAction(
-              StoreActionTypes.setUser,
-              user,
-            ));
-            print('userDataResponse: ${user.toJson()}');
+            List<Future<dynamic>> requests = [
+              apiClient.fetchData('/team/${user.team.id}/stats'),
+              apiClient.fetchData('/training/summary'),
+            ];
 
-            Navigator.pushNamed(context, '/');
+            List<dynamic> responses = await Future.wait(requests);
+
+            var userStatsResponse = responses[0];
+            var tsummaryResponse = responses[1];
+
+            if (userStatsResponse != null &&
+                tsummaryResponse != null &&
+                mounted) {
+              final userStats = UserStats.fromJson(userStatsResponse);
+              final tsummary = TSummary.fromJson(userStatsResponse);
+
+              final appStateNotifier =
+                  Provider.of<AppStateNotifier>(context, listen: false);
+
+              appStateNotifier.dispatch(
+                  StoreAction(StoreActionTypes.setUserStats, userStats));
+              appStateNotifier
+                  .dispatch(StoreAction(StoreActionTypes.setSummary, tsummary));
+              appStateNotifier
+                  .dispatch(StoreAction(StoreActionTypes.setUser, user));
+
+              Navigator.pushNamed(context, '/');
+            }
           } else {
-            // Handle error in fetching user data
             Fluttertoast.showToast(
                 msg: "Failed to fetch user data!",
                 toastLength: Toast.LENGTH_SHORT,
@@ -85,7 +102,6 @@ class _LoginScreenState extends State<LoginScreen> {
               fontSize: 16.0);
         }
       } catch (e) {
-        print('try catch error: ${e.toString()}');
         Fluttertoast.showToast(
             msg: "Incorrect login info, please try again!",
             toastLength: Toast.LENGTH_SHORT,
