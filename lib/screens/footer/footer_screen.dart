@@ -25,10 +25,10 @@ class Footer extends StatelessWidget {
                 },
               ),
               FooterLink(
-                text: "Addon Privacy",
-                icon: Icons.policy,
+                text: "Contact",
+                icon: Icons.contact_mail,
                 onTap: () {
-                  Navigator.pushNamed(context, '/addon/privacy');
+                  Navigator.pushNamed(context, '/contact');
                 },
               ),
               // Add more links here

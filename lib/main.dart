@@ -11,6 +11,7 @@ import 'package:sokkercuba/state/app_state.dart';
 import 'package:sokkercuba/state/app_state_notifier.dart';
 
 import 'components/responsive_drawer.dart';
+import 'screens/contact/contact_screen.dart';
 import 'screens/scouting/scouting_screen.dart';
 import 'screens/xtreme/xtreme_screen.dart';
 import 'services/api_client.dart';
@@ -133,6 +134,10 @@ class _SokkercubaState extends State<Sokkercuba> {
         return MaterialPageRoute(
             builder: (context) => ResponsiveDrawer(
                 setSelectedTheme: _setSelectedTheme, child: const Scouting()));
+      case '/contact':
+        return MaterialPageRoute(
+            builder: (context) => ResponsiveDrawer(
+                setSelectedTheme: _setSelectedTheme, child: const Contact()));
       case '/login':
         return MaterialPageRoute(builder: (context) => const LoginScreen());
       /*case '/about':
