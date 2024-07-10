@@ -12,14 +12,27 @@ class DrawerContent extends StatelessWidget {
   Widget build(BuildContext context) {
     return ListView(
       children: [
-        DrawerHeader(
-          decoration: const BoxDecoration(
-            image: DecorationImage(
-              image: AssetImage('assets/logo.jpg'),
-              fit: BoxFit.cover,
+        Stack(
+          children: [
+            DrawerHeader(
+              decoration: const BoxDecoration(
+                image: DecorationImage(
+                  image: AssetImage('images/logo.jpg'),
+                  fit: BoxFit.cover,
+                ),
+              ),
+              child: Container(),
             ),
-          ),
-          child: Container(),
+            Positioned(
+              top: 0,
+              right: 0,
+              child: CloseButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+            ),
+          ],
         ),
         for (var item in drawerPublicItems)
           NavBarItem(
@@ -42,14 +55,6 @@ class DrawerContent extends StatelessWidget {
               Navigator.pushNamed(context, item.path);
             },
           ),
-        const Divider(),
-        SwitchListTile(
-          title: const Text('Dark Mode'),
-          value: Theme.of(context).brightness == Brightness.dark,
-          onChanged: (value) {
-            setSelectedTheme(value ? ThemeMode.dark : ThemeMode.light);
-          },
-        ),
       ],
     );
   }

@@ -33,8 +33,13 @@ final drawerPublicItems = [
 final drawerPrivateItems = [
   NavBarItemModel(
     path: '/squad',
-    value: 'Team',
+    value: 'Squad',
     icon: Icons.people,
+  ),
+  NavBarItemModel(
+    path: '/juniors',
+    value: 'Juniors',
+    icon: Icons.supervisor_account,
   ),
   NavBarItemModel(
     path: '/training',
