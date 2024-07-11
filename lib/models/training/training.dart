@@ -1,57 +1,31 @@
 import 'package:json_annotation/json_annotation.dart';
 
-import '../common/code_name.dart';
-import '../common/day.dart';
-import '../player/injury.dart';
-import '../player/player_value.dart';
-import '../player/skills.dart';
-import '../player/skills_change.dart';
-import 'games.dart';
+import '../player/player_info.dart';
+import 'training_report.dart';
 
 part 'training.g.dart';
 
 @JsonSerializable()
-class Report {
-  final int age;
-  final int week;
-  final Day day;
-  final Skills skills;
-  final SkillsChange skillsChange;
-  final CodeName type;
-  final CodeName kind;
-  final PlayerValue playerValue;
-  final Games games;
-  final int intensity;
-  final CodeName? formation;
-  final Injury injury;
+class PlayerTrainingReport {
+  final int id;
+  final PlayerInfo player;
+  final TrainingReport report;
 
-  Report({
-    required this.age,
-    required this.week,
-    required this.day,
-    required this.skills,
-    required this.skillsChange,
-    required this.type,
-    required this.kind,
-    required this.playerValue,
-    required this.games,
-    required this.intensity,
-    required this.formation,
-    required this.injury,
-  });
+  PlayerTrainingReport(
+      {required this.id, required this.player, required this.report});
 
-  factory Report.fromJson(Map<String, dynamic> json) => _$ReportFromJson(json);
-  Map<String, dynamic> toJson() => _$ReportToJson(this);
+  factory PlayerTrainingReport.fromJson(Map<String, dynamic> json) =>
+      _$PlayerTrainingReportFromJson(json);
+  Map<String, dynamic> toJson() => _$PlayerTrainingReportToJson(this);
 }
 
 @JsonSerializable()
-class Training {
-  final int id;
-  final List<Report> reports;
+class SquadTraining {
+  final List<PlayerTrainingReport> players;
 
-  Training({required this.id, required this.reports});
+  SquadTraining({required this.players});
 
-  factory Training.fromJson(Map<String, dynamic> json) =>
-      _$TrainingFromJson(json);
-  Map<String, dynamic> toJson() => _$TrainingToJson(this);
+  factory SquadTraining.fromJson(Map<String, dynamic> json) =>
+      _$SquadTrainingFromJson(json);
+  Map<String, dynamic> toJson() => _$SquadTrainingToJson(this);
 }

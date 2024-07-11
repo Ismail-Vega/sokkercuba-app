@@ -79,3 +79,20 @@ const List<String> skillsLevelsList = [
   'Divine',
   'Superdivine'
 ];
+
+const String userUrl = '/current';
+const String juniorsUrl = '/junior';
+const String cweekUrl = '/training';
+const String tsummaryUrl = '/training/summary';
+
+String getPlayerFullReportURL(String playerId) {
+  return '/training/$playerId/report';
+}
+
+String getTeamPlayersURL(int teamId) {
+  return '/player?filter[team]=$teamId&filter[limit]=200&filter[offset]=0';
+}
+
+String getTeamStatsURL(int teamId) {
+  return '/team/$teamId/stats';
+}

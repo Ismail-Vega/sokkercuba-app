@@ -5,10 +5,9 @@ import 'package:provider/provider.dart';
 import 'package:sokkercuba/utils/constants.dart';
 import 'package:sokkercuba/widgets/rounded_button.dart';
 
-import '../models/team/team_stats.dart';
 import '../models/team/user.dart';
-import '../models/tsummary/tsummary.dart';
 import '../services/api_client.dart';
+import '../services/fetch_all_data.dart';
 import '../state/app_state.dart';
 import '../state/app_state_notifier.dart';
 
@@ -42,6 +41,7 @@ class _LoginScreenState extends State<LoginScreen> {
       try {
         final apiClient = ApiClient();
         await apiClient.initCookieJar();
+
         final response = await apiClient.sendData(
           '/auth/login',
           {'login': login, 'password': password, 'remember': true},
@@ -52,34 +52,34 @@ class _LoginScreenState extends State<LoginScreen> {
 
           if (userDataResponse != null) {
             final user = User.fromJson(userDataResponse);
+            final allDataResponse = await fetchAllData(apiClient, user);
 
-            List<Future<dynamic>> requests = [
-              apiClient.fetchData('/team/${user.team.id}/stats'),
-              apiClient.fetchData('/training/summary'),
-            ];
-
-            List<dynamic> responses = await Future.wait(requests);
-
-            var userStatsResponse = responses[0];
-            var tsummaryResponse = responses[1];
-
-            if (userStatsResponse != null &&
-                tsummaryResponse != null &&
-                mounted) {
-              final userStats = UserStats.fromJson(userStatsResponse);
-              final tsummary = TSummary.fromJson(userStatsResponse);
-
+            if (allDataResponse['code'] == 200 && mounted) {
               final appStateNotifier =
                   Provider.of<AppStateNotifier>(context, listen: false);
 
-              appStateNotifier.dispatch(
-                  StoreAction(StoreActionTypes.setUserStats, userStats));
-              appStateNotifier
-                  .dispatch(StoreAction(StoreActionTypes.setSummary, tsummary));
-              appStateNotifier
-                  .dispatch(StoreAction(StoreActionTypes.setUser, user));
+              final filteredPayload = {
+                'userStats': allDataResponse['userStats'],
+                'juniors': allDataResponse['juniors'],
+                'cweek': allDataResponse['cweek'],
+                'tsummary': allDataResponse['tsummary'],
+                'players': allDataResponse['players'],
+                'training': allDataResponse['training'],
+              };
+
+              appStateNotifier.dispatch(StoreAction(
+                  StoreActionTypes.setAll, AppState.fromJson(filteredPayload)));
 
               Navigator.pushNamed(context, '/');
+            } else {
+              Fluttertoast.showToast(
+                  msg: "Failed to fetch all data!",
+                  toastLength: Toast.LENGTH_SHORT,
+                  gravity: ToastGravity.BOTTOM,
+                  timeInSecForIosWeb: 1,
+                  backgroundColor: Colors.red,
+                  textColor: Colors.white,
+                  fontSize: 16.0);
             }
           } else {
             Fluttertoast.showToast(
@@ -93,7 +93,7 @@ class _LoginScreenState extends State<LoginScreen> {
           }
         } else {
           Fluttertoast.showToast(
-              msg: "There was an error while login you in!",
+              msg: "There was an error while logging you in!",
               toastLength: Toast.LENGTH_SHORT,
               gravity: ToastGravity.BOTTOM,
               timeInSecForIosWeb: 1,

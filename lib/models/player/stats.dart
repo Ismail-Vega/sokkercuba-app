@@ -1,22 +1,20 @@
 import 'package:json_annotation/json_annotation.dart';
 
+import 'cards.dart';
+
 part 'stats.g.dart';
 
 @JsonSerializable()
 class Stats {
-  int cards;
-  int yellow;
-  int red;
-  int goals;
   int assists;
+  Cards cards;
+  int goals;
   int matches;
 
   Stats({
-    required this.cards,
-    required this.yellow,
-    required this.red,
-    required this.goals,
     required this.assists,
+    required this.cards,
+    required this.goals,
     required this.matches,
   });
 

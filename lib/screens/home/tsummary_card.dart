@@ -3,7 +3,6 @@ import 'package:provider/provider.dart';
 
 import '../../models/tsummary/tsummary.dart';
 import '../../state/app_state_notifier.dart';
-import '../../utils/mock_tsummary.dart';
 
 class TSummaryCard extends StatelessWidget {
   const TSummaryCard({super.key});
@@ -11,7 +10,11 @@ class TSummaryCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final appState = Provider.of<AppStateNotifier>(context).state;
-    final tsummary = appState.tsummary ?? mockTSummary;
+    final tsummary = appState.tsummary;
+
+    if (tsummary == null) {
+      return const SizedBox.shrink();
+    }
 
     List<Week> weeks = tsummary.weeks;
 

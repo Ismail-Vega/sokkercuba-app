@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 
 import '../../state/app_state_notifier.dart';
 import '../../utils/constants.dart';
+import '../../utils/format_numbers.dart';
 
 class SquadSummaryCard extends StatelessWidget {
   const SquadSummaryCard({super.key});
@@ -37,7 +38,7 @@ class SquadSummaryCard extends StatelessWidget {
             Row(children: <Widget>[
               const Text('Total value: '),
               Text(
-                  '${userStats.players.totalValue.value} ${userStats.players.totalValue.currency}',
+                  '${formatNumber(userStats.players.totalValue.value)} ${userStats.players.totalValue.currency}',
                   style: const TextStyle(
                       fontSize: 16, fontWeight: FontWeight.bold)),
             ]),

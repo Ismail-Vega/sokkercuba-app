@@ -13,6 +13,7 @@ import 'package:sokkercuba/state/app_state_notifier.dart';
 import 'components/responsive_drawer.dart';
 import 'screens/contact/contact_screen.dart';
 import 'screens/scouting/scouting_screen.dart';
+import 'screens/squad/squad_screen.dart';
 import 'screens/xtreme/xtreme_screen.dart';
 import 'services/api_client.dart';
 
@@ -108,11 +109,11 @@ class _SokkercubaState extends State<Sokkercuba> {
           ),
         ),
         themeMode: _themeMode,
-        home: ResponsiveDrawer(
-          setSelectedTheme: _setSelectedTheme,
-          child:
-              widget.isLoggedIn ? const WelcomeScreen() : const LoginScreen(),
-        ),
+        home: widget.isLoggedIn
+            ? ResponsiveDrawer(
+                setSelectedTheme: _setSelectedTheme,
+                child: const WelcomeScreen())
+            : const LoginScreen(),
         onGenerateRoute: _generateRoute,
         initialRoute: '/',
       ),
@@ -138,20 +139,21 @@ class _SokkercubaState extends State<Sokkercuba> {
         return MaterialPageRoute(
             builder: (context) => ResponsiveDrawer(
                 setSelectedTheme: _setSelectedTheme, child: const Contact()));
+      case '/squad':
+        return MaterialPageRoute(
+            builder: (context) => ResponsiveDrawer(
+                setSelectedTheme: _setSelectedTheme,
+                child: const SquadScreen()));
       case '/login':
         return MaterialPageRoute(builder: (context) => const LoginScreen());
       /*case '/about':
         return MaterialPageRoute(builder: (context) => AboutPage());
-      case '/contact':
-        return MaterialPageRoute(builder: (context) => ContactPage());
       case '/addon':
         return MaterialPageRoute(builder: (context) => AddonPage());
       case '/addon/privacy':
         return MaterialPageRoute(builder: (context) => AddonPrivacyPage());*/
       /*case '/signup':
         return MaterialPageRoute(builder: (context) => SignUp());
-      case '/squad':
-        return MaterialPageRoute(builder: (context) => TeamPage());
       case '/training':
         return MaterialPageRoute(builder: (context) => TrainingPage());
       case '/update':

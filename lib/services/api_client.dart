@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:cookie_jar/cookie_jar.dart';
 import 'package:dio/dio.dart';
+import 'package:dio_cookie_manager/dio_cookie_manager.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
@@ -18,10 +19,17 @@ class ApiClient {
     _dio = Dio(BaseOptions(
       baseUrl: 'https://sokker.org/api',
       headers: {
-        'Accept': 'application/json',
+        'Accept': '*/*',
         'Content-Type': 'application/json',
+        'Connection': 'keep-alive',
+        'Accept-Encoding': 'gzip, deflate, br'
       },
     ));
+    _init();
+  }
+
+  Future<void> _init() async {
+    await initCookieJar();
   }
 
   Future<void> initCookieJar() async {
@@ -32,16 +40,13 @@ class ApiClient {
     final cookiePath = '${appDocDir.path}/.cookies';
 
     _cookieJar = PersistCookieJar(storage: FileStorage(cookiePath));
+    _dio.interceptors.add(CookieManager(_cookieJar));
   }
 
   Future<dynamic> sendData(String endpoint, dynamic data,
       {Map<String, String>? headers}) async {
     try {
-      final response = await _dio.post(
-        endpoint,
-        data: data,
-        options: Options(headers: headers),
-      );
+      final response = await _dio.post(endpoint, data: data);
       final cookies = response.headers.map['set-cookie'];
 
       if (cookies != null && endpoint == '/auth/login') {
@@ -54,29 +59,22 @@ class ApiClient {
       if (kDebugMode) {
         print('Exception while sending data: $e');
       }
-      rethrow;
     }
   }
 
   Future<dynamic> fetchData(String endpoint,
       {Map<String, String>? headers}) async {
     try {
-      /*final cookies = await _cookieJar.loadForRequest(Uri.parse(_dio.options.baseUrl));
+      final cookies =
+          await _cookieJar.loadForRequest(Uri.parse(_dio.options.baseUrl));
 
-      String cookiesString = cookies
-          .where((cookie) =>
-              cookie.name == 'PHPSESSID' ||
-              cookie.name == '_html_rtl' ||
-              cookie.name == 'lang' ||
-              cookie.name == 'lang_ID')
-          .map((cookie) => '${cookie.name}=${cookie.value}')
-          .join('; ');*/
+      String cookiesString =
+          cookies.map((cookie) => '${cookie.name}=${cookie.value}').join('; ');
 
       final options = Options(headers: {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
-        'Cookie':
-            'PHPSESSID=48nr9q51o66ko2eju812matp4i; _html_rtl=0; lang=en; lang_ID=2',
+        'Cookie': cookiesString,
         ...headers ?? {}
       });
 
@@ -88,7 +86,7 @@ class ApiClient {
       return _handleResponse(response);
     } catch (e) {
       if (kDebugMode) {
-        print('Exception while fetching current data: $e');
+        print('Exception while fetching data: $e');
       }
 
       rethrow;

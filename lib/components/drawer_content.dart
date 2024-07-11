@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import '../models/navigation/nav_bar_item_model.dart';
+import '../services/api_client.dart';
+import '../state/app_state.dart';
+import '../state/app_state_notifier.dart';
 import '../widgets/nav_bar_item.dart';
 
 class DrawerContent extends StatelessWidget {
@@ -55,6 +59,38 @@ class DrawerContent extends StatelessWidget {
               Navigator.pushNamed(context, item.path);
             },
           ),
+        const Divider(),
+        NavBarItem(
+          icon: Icons.logout,
+          path: '/login',
+          value: 'Logout',
+          onTap: () async {
+            final appStateNotifier =
+                Provider.of<AppStateNotifier>(context, listen: false);
+
+            try {
+              appStateNotifier
+                  .dispatch(StoreAction(StoreActionTypes.setLoading, true));
+
+              final apiClient = ApiClient();
+              await apiClient.initCookieJar();
+
+              final response = await apiClient.sendData('/auth/logout', {});
+
+              if (response.statusCode == 200 && context.mounted) {
+                Navigator.pushNamed(context, '/login');
+              }
+            } catch (error) {
+              if (context.mounted) {
+                Navigator.pushNamed(context, '/login');
+              }
+              throw Exception('Failed to logout: $error');
+            } finally {
+              appStateNotifier
+                  .dispatch(StoreAction(StoreActionTypes.setLoading, false));
+            }
+          },
+        ),
       ],
     );
   }

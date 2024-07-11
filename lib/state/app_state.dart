@@ -1,9 +1,9 @@
-import '../models/cweek/cweek.dart';
 import '../models/juniors/juniors.dart';
 import '../models/squad/squad.dart';
 import '../models/team/team_stats.dart';
 import '../models/team/user.dart';
 import '../models/training/training.dart';
+import '../models/training/training_history.dart';
 import '../models/tsummary/tsummary.dart';
 
 class AppState {
@@ -16,10 +16,10 @@ class AppState {
   final User? user;
   final UserStats? userStats;
   final Juniors? juniors;
-  final CWeek? cweek;
+  final SquadTraining? cweek;
   final TSummary? tsummary;
   final Squad? players;
-  final List<Training>? training;
+  final SquadTrainingHistory? training;
 
   AppState({
     this.error = false,
@@ -47,10 +47,10 @@ class AppState {
     User? user,
     UserStats? userStats,
     Juniors? juniors,
-    CWeek? cweek,
+    SquadTraining? cweek,
     TSummary? tsummary,
     Squad? players,
-    List<Training>? training,
+    SquadTrainingHistory? training,
   }) {
     return AppState(
       error: error ?? this.error,
@@ -101,7 +101,7 @@ class AppState {
       'cweek': cweek?.toJson(),
       'tsummary': tsummary?.toJson(),
       'players': players?.toJson(),
-      'training': training?.map((e) => e.toJson()).toList(),
+      'training': training?.toJson(),
     };
   }
 
@@ -119,12 +119,13 @@ class AppState {
           : null,
       juniors:
           json['juniors'] != null ? Juniors.fromJson(json['juniors']) : null,
-      cweek: json['cweek'] != null ? CWeek.fromJson(json['cweek']) : null,
+      cweek:
+          json['cweek'] != null ? SquadTraining.fromJson(json['cweek']) : null,
       tsummary:
           json['tsummary'] != null ? TSummary.fromJson(json['tsummary']) : null,
       players: json['players'] != null ? Squad.fromJson(json['players']) : null,
       training: json['training'] != null
-          ? (json['training'] as List).map((e) => Training.fromJson(e)).toList()
+          ? SquadTrainingHistory.fromJson(json['training'])
           : null,
     );
   }

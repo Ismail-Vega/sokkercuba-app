@@ -7,6 +7,8 @@ part of 'user.dart';
 // **************************************************************************
 
 User _$UserFromJson(Map<String, dynamic> json) => User(
+      json['hasSubscription'] as bool?,
+      json['subscriptionNextPayment'] as bool?,
       id: (json['id'] as num).toInt(),
       name: json['name'] as String,
       team: Team.fromJson(json['team'] as Map<String, dynamic>),
@@ -46,4 +48,6 @@ Map<String, dynamic> _$UserToJson(User instance) => <String, dynamic>{
       'firstLogin': instance.firstLogin,
       'lock': instance.lock,
       'settings': instance.settings,
+      'hasSubscription': instance.hasSubscription,
+      'subscriptionNextPayment': instance.subscriptionNextPayment,
     };

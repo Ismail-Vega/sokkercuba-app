@@ -28,8 +28,12 @@ class User {
   final bool firstLogin;
   final Lock lock;
   final Settings settings;
+  final bool? hasSubscription;
+  final bool? subscriptionNextPayment;
 
-  User({
+  User(
+    this.hasSubscription,
+    this.subscriptionNextPayment, {
     required this.id,
     required this.name,
     required this.team,
