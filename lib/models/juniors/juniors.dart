@@ -1,6 +1,6 @@
 import 'package:json_annotation/json_annotation.dart';
 
-import '../player/full_name.dart';
+import '../player/player_name.dart';
 
 part 'juniors.g.dart';
 
@@ -9,7 +9,7 @@ class Junior {
   final int id;
   final int teamId;
   final String name;
-  final FullName fullName;
+  final PlayerName fullName;
   final int skill;
   final int age;
   final int weeksLeft;

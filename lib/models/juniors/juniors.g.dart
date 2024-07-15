@@ -10,7 +10,7 @@ Junior _$JuniorFromJson(Map<String, dynamic> json) => Junior(
       id: (json['id'] as num).toInt(),
       teamId: (json['teamId'] as num).toInt(),
       name: json['name'] as String,
-      fullName: FullName.fromJson(json['fullName'] as Map<String, dynamic>),
+      fullName: PlayerName.fromJson(json['fullName'] as Map<String, dynamic>),
       skill: (json['skill'] as num).toInt(),
       age: (json['age'] as num).toInt(),
       weeksLeft: (json['weeksLeft'] as num).toInt(),

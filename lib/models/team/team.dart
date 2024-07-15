@@ -8,13 +8,13 @@ part 'team.g.dart';
 @JsonSerializable()
 class Team {
   int id;
-  String name;
-  int rank;
-  String emblem;
-  CodeName country;
-  TeamColors colors;
-  int nationalType;
-  bool bankrupt;
+  String? name;
+  int? rank;
+  String? emblem;
+  CodeName? country;
+  TeamColors? colors;
+  int? nationalType;
+  bool? bankrupt;
 
   Team({
     required this.id,

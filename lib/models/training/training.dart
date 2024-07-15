@@ -9,7 +9,7 @@ part 'training.g.dart';
 class PlayerTrainingReport {
   final int id;
   final PlayerInfo player;
-  final TrainingReport report;
+  final List<TrainingReport> report;
 
   PlayerTrainingReport(
       {required this.id, required this.player, required this.report});

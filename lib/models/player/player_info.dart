@@ -4,8 +4,8 @@ import '../common/code_name.dart';
 import '../team/team.dart';
 import 'characteristics.dart';
 import 'face.dart';
-import 'full_name.dart';
 import 'injury.dart';
+import 'player_name.dart';
 import 'player_value.dart';
 import 'player_wage.dart';
 import 'skills.dart';
@@ -15,20 +15,20 @@ part 'player_info.g.dart';
 
 @JsonSerializable()
 class PlayerInfo {
-  final FullName name;
+  final PlayerName name;
   final CodeName? formation;
-  final dynamic number;
+  final int? number;
   final Team team;
   final CodeName country;
-  final PlayerValue value;
-  final dynamic previousValue;
-  final Wage wage;
+  final PlayerValue? value;
+  final PlayerValue? previousValue;
+  final Wage? wage;
   final Characteristics characteristics;
   final Skills skills;
   final Stats stats;
   final Stats nationalStats;
   final Face face;
-  final int youthTeamId;
+  final int? youthTeamId;
   final Injury injury;
   final bool nationalSharing;
 

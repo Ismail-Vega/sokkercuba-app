@@ -11,7 +11,9 @@ PlayerTrainingReport _$PlayerTrainingReportFromJson(
     PlayerTrainingReport(
       id: (json['id'] as num).toInt(),
       player: PlayerInfo.fromJson(json['player'] as Map<String, dynamic>),
-      report: TrainingReport.fromJson(json['report'] as Map<String, dynamic>),
+      report: (json['report'] as List<dynamic>)
+          .map((e) => TrainingReport.fromJson(e as Map<String, dynamic>))
+          .toList(),
     );
 
 Map<String, dynamic> _$PlayerTrainingReportToJson(

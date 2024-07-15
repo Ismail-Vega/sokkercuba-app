@@ -7,16 +7,22 @@ part of 'player_info.dart';
 // **************************************************************************
 
 PlayerInfo _$PlayerInfoFromJson(Map<String, dynamic> json) => PlayerInfo(
-      name: FullName.fromJson(json['name'] as Map<String, dynamic>),
+      name: PlayerName.fromJson(json['name'] as Map<String, dynamic>),
       formation: json['formation'] == null
           ? null
           : CodeName.fromJson(json['formation'] as Map<String, dynamic>),
-      number: json['number'],
+      number: (json['number'] as num?)?.toInt(),
       team: Team.fromJson(json['team'] as Map<String, dynamic>),
       country: CodeName.fromJson(json['country'] as Map<String, dynamic>),
-      value: PlayerValue.fromJson(json['value'] as Map<String, dynamic>),
-      previousValue: json['previousValue'],
-      wage: Wage.fromJson(json['wage'] as Map<String, dynamic>),
+      value: json['value'] == null
+          ? null
+          : PlayerValue.fromJson(json['value'] as Map<String, dynamic>),
+      previousValue: json['previousValue'] == null
+          ? null
+          : PlayerValue.fromJson(json['previousValue'] as Map<String, dynamic>),
+      wage: json['wage'] == null
+          ? null
+          : Wage.fromJson(json['wage'] as Map<String, dynamic>),
       characteristics: Characteristics.fromJson(
           json['characteristics'] as Map<String, dynamic>),
       skills: Skills.fromJson(json['skills'] as Map<String, dynamic>),
@@ -24,7 +30,7 @@ PlayerInfo _$PlayerInfoFromJson(Map<String, dynamic> json) => PlayerInfo(
       nationalStats:
           Stats.fromJson(json['nationalStats'] as Map<String, dynamic>),
       face: Face.fromJson(json['face'] as Map<String, dynamic>),
-      youthTeamId: (json['youthTeamId'] as num).toInt(),
+      youthTeamId: (json['youthTeamId'] as num?)?.toInt(),
       injury: Injury.fromJson(json['injury'] as Map<String, dynamic>),
       nationalSharing: json['nationalSharing'] as bool,
     );
