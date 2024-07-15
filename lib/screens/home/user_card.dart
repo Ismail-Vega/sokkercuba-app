@@ -24,7 +24,7 @@ class UserCard extends StatelessWidget {
           children: [
             Row(mainAxisAlignment: MainAxisAlignment.center, children: <Widget>[
               AnimatedTextKit(animatedTexts: [
-                WavyAnimatedText(user.team.name,
+                WavyAnimatedText(user.team.name ?? '',
                     textStyle: const TextStyle(
                       fontSize: 24.0,
                       fontWeight: FontWeight.w900,
@@ -36,7 +36,7 @@ class UserCard extends StatelessWidget {
             Text('Owner: ${user.name}',
                 style: Theme.of(context).textTheme.labelMedium),
             const SizedBox(height: 8),
-            Text('Country: ${user.team.country.name}'),
+            Text('Country: ${user.team.country?.name ?? ''}'),
             const SizedBox(height: 8),
             Text('Language: ${user.settings.locale.toUpperCase()}'),
           ],

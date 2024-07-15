@@ -82,10 +82,10 @@ const List<String> skillsLevelsList = [
 
 const String userUrl = '/current';
 const String juniorsUrl = '/junior';
-const String cweekUrl = '/training';
+const String trainingUrl = '/training';
 const String tsummaryUrl = '/training/summary';
 
-String getPlayerFullReportURL(String playerId) {
+String getPlayerFullReportURL(int playerId) {
   return '/training/$playerId/report';
 }
 

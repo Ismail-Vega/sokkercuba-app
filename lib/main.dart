@@ -6,7 +6,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sokkercuba/screens/home/welcome_screen.dart';
-import 'package:sokkercuba/screens/login_screen.dart';
+import 'package:sokkercuba/screens/login/login_screen.dart';
 import 'package:sokkercuba/state/app_state.dart';
 import 'package:sokkercuba/state/app_state_notifier.dart';
 
@@ -34,7 +34,6 @@ void main() async {
     user: null,
     userStats: null,
     juniors: null,
-    cweek: null,
     tsummary: null,
     players: null,
     training: null,

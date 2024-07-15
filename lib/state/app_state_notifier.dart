@@ -57,9 +57,6 @@ class AppStateNotifier extends ChangeNotifier {
       case StoreActionTypes.setJuniors:
         _state = _state.copyWith(juniors: action.payload);
         break;
-      case StoreActionTypes.setWeek:
-        _state = _state.copyWith(cweek: action.payload);
-        break;
       case StoreActionTypes.setSummary:
         _state = _state.copyWith(tsummary: action.payload);
         break;

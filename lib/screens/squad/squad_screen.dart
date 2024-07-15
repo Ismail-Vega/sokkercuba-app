@@ -48,8 +48,9 @@ class _SquadScreenState extends State<SquadScreen> {
             '/player?filter[team]=${user.team.id}&filter[limit]=200&filter[offset]=0',
           );
 
-          if (squadResponse.statusCode == 200 && mounted) {
-            final squad = Squad.fromJson(squadResponse.data);
+          if (squadResponse != null && mounted) {
+            final squad = Squad.fromJson(squadResponse);
+
             final appStateNotifier =
                 Provider.of<AppStateNotifier>(context, listen: false);
             appStateNotifier

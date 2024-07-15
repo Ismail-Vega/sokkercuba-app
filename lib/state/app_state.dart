@@ -3,7 +3,6 @@ import '../models/squad/squad.dart';
 import '../models/team/team_stats.dart';
 import '../models/team/user.dart';
 import '../models/training/training.dart';
-import '../models/training/training_history.dart';
 import '../models/tsummary/tsummary.dart';
 
 class AppState {
@@ -16,10 +15,9 @@ class AppState {
   final User? user;
   final UserStats? userStats;
   final Juniors? juniors;
-  final SquadTraining? cweek;
   final TSummary? tsummary;
   final Squad? players;
-  final SquadTrainingHistory? training;
+  final SquadTraining? training;
 
   AppState({
     this.error = false,
@@ -31,7 +29,6 @@ class AppState {
     this.user,
     this.userStats,
     this.juniors,
-    this.cweek,
     this.tsummary,
     this.players,
     this.training,
@@ -47,10 +44,9 @@ class AppState {
     User? user,
     UserStats? userStats,
     Juniors? juniors,
-    SquadTraining? cweek,
     TSummary? tsummary,
     Squad? players,
-    SquadTrainingHistory? training,
+    SquadTraining? training,
   }) {
     return AppState(
       error: error ?? this.error,
@@ -61,11 +57,23 @@ class AppState {
       loggedIn: loggedIn ?? this.loggedIn,
       user: user ?? this.user,
       userStats: userStats ?? this.userStats,
-      juniors: juniors ?? this.juniors,
-      cweek: cweek ?? this.cweek,
       tsummary: tsummary ?? this.tsummary,
-      players: players ?? this.players,
-      training: training ?? this.training,
+      juniors: Juniors(
+        juniors: [
+          ...(this.juniors?.juniors ?? []),
+          ...(juniors?.juniors ?? []),
+        ],
+      ),
+      players: Squad(players: [
+        ...(this.players?.players ?? []),
+        ...(players?.players ?? []),
+      ], total: players?.total ?? this.players?.total ?? 0),
+      training: SquadTraining(
+        players: [
+          ...(this.training?.players ?? []),
+          ...(training?.players ?? []),
+        ],
+      ),
     );
   }
 
@@ -79,11 +87,23 @@ class AppState {
       loggedIn: payload['loggedIn'] ?? loggedIn,
       user: payload['user'] ?? user,
       userStats: payload['userStats'] ?? userStats,
-      juniors: payload['juniors'] ?? juniors,
-      cweek: payload['cweek'] ?? cweek,
       tsummary: payload['tsummary'] ?? tsummary,
-      players: payload['players'] ?? players,
-      training: payload['training'] ?? training,
+      juniors: Juniors(
+        juniors: [
+          ...(juniors?.juniors ?? []),
+          ...(payload['juniors']?['juniors'] ?? []),
+        ],
+      ),
+      players: Squad(players: [
+        ...(players?.players ?? []),
+        ...(payload['players']?['players'] ?? []),
+      ], total: payload['training']['total'] ?? players?.total),
+      training: SquadTraining(
+        players: [
+          ...(training?.players ?? []),
+          ...(payload['training']?['players'] ?? []),
+        ],
+      ),
     );
   }
 
@@ -97,9 +117,8 @@ class AppState {
       'loggedIn': loggedIn,
       'user': user?.toJson(),
       'userStats': userStats?.toJson(),
-      'juniors': juniors?.toJson(),
-      'cweek': cweek?.toJson(),
       'tsummary': tsummary?.toJson(),
+      'juniors': juniors?.toJson(),
       'players': players?.toJson(),
       'training': training?.toJson(),
     };
@@ -119,13 +138,11 @@ class AppState {
           : null,
       juniors:
           json['juniors'] != null ? Juniors.fromJson(json['juniors']) : null,
-      cweek:
-          json['cweek'] != null ? SquadTraining.fromJson(json['cweek']) : null,
       tsummary:
           json['tsummary'] != null ? TSummary.fromJson(json['tsummary']) : null,
       players: json['players'] != null ? Squad.fromJson(json['players']) : null,
       training: json['training'] != null
-          ? SquadTrainingHistory.fromJson(json['training'])
+          ? SquadTraining.fromJson(json['training'])
           : null,
     );
   }
@@ -149,7 +166,6 @@ enum StoreActionTypes {
   setUser,
   setUserStats,
   setJuniors,
-  setWeek,
   setSummary,
   setTeam,
   setTraining,

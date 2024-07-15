@@ -77,7 +77,7 @@ class DrawerContent extends StatelessWidget {
 
               final response = await apiClient.sendData('/auth/logout', {});
 
-              if (response.statusCode == 200 && context.mounted) {
+              if (response !=null && context.mounted) {
                 Navigator.pushNamed(context, '/login');
               }
             } catch (error) {

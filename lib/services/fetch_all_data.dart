@@ -1,13 +1,6 @@
 import 'dart:async';
 
-import 'package:dio/dio.dart';
-
-import '../models/juniors/juniors.dart';
-import '../models/squad/squad.dart';
-import '../models/team/team_stats.dart';
 import '../models/team/user.dart';
-import '../models/training/training.dart';
-import '../models/tsummary/tsummary.dart';
 import '../utils/constants.dart';
 import 'api_client.dart';
 
@@ -19,79 +12,73 @@ Future<Map<String, dynamic>> fetchAllData(
 
     final List<Future<dynamic>> initialPromises = [
       apiClient.fetchData(juniorsUrl),
-      apiClient.fetchData(cweekUrl),
+      apiClient.fetchData(trainingUrl),
       apiClient.fetchData(tsummaryUrl),
       apiClient.fetchData(getTeamPlayersURL(teamId)),
       apiClient.fetchData(getTeamStatsURL(teamId))
     ];
 
     final responses = await Future.wait(initialPromises);
-    final juniors = Juniors.fromJson(responses[0]);
-    final cweek = SquadTraining.fromJson(responses[1]);
-    final tsummary = TSummary.fromJson(responses[2]);
-    final players = Squad.fromJson(responses[3]);
-    final teamStats = UserStats.fromJson(responses[4]);
+    final juniors = responses[0];
+    final training = responses[1];
+    final tsummary = responses[2];
+    final playersData = responses[3];
+    final teamStats = responses[4];
 
     if (!plus) {
       return {
         'juniors': juniors,
-        'cweek': cweek,
         'tsummary': tsummary,
-        'players': players,
-        'training': cweekToTrainingData(cweek.players),
+        'players': playersData,
+        'training': training,
         'userStats': teamStats,
         'code': 200,
       };
     }
 
-    final trainingReports = await getTrainingReports(apiClient, cweek.players);
+    final filledTrainingReports =
+        await fillTrainingReports(apiClient, training['players']);
 
     return {
       'juniors': juniors,
-      'cweek': cweek,
       'tsummary': tsummary,
-      'players': players,
-      'training': trainingReports,
+      'players': playersData,
+      'training': filledTrainingReports,
       'userStats': teamStats,
       'code': 200,
     };
   } catch (error) {
+    print('error in fetchAll: ${error.toString()}');
     return {'code': '500', 'error': error.toString()};
   }
 }
 
-Future<Object> getTrainingReports(ApiClient apiClient, dynamic players) async {
-  if (players == null || players.length == 0) {
+Future<Object> fillTrainingReports(ApiClient apiClient, dynamic players) async {
+  if (players == null || players.isEmpty) {
     return [];
   }
 
-  final List<Future<Response>> fullReportPromises =
-      players.map<Future<Response>>((player) {
+  // Fetch full reports for all players
+  final List<Future<dynamic>> fullReportPromises =
+      players.map<Future<dynamic>>((player) {
     return apiClient.fetchData(getPlayerFullReportURL(player['id']));
   }).toList();
 
+  // Await all the full report promises
   final tResponse = await Future.wait(fullReportPromises);
 
-  return tResponse.asMap().entries.map((entry) {
-    final reports = entry.value.data['reports'];
-    reports.removeLast();
+  // Process the responses and create PlayerTrainingReport objects
+  final playerTrainingReports = tResponse.asMap().entries.map((entry) {
+    final reports = entry.value['reports'] ?? [];
 
+    // Create a PlayerTrainingReport instance
     return {
       'id': players[entry.key]['id'],
       'player': players[entry.key]['player'],
-      'reports': reports.toList(),
+      'report': reports,
     };
   }).toList();
-}
 
-List<Map<String, dynamic>> cweekToTrainingData(dynamic players) {
-  if (players == null || players.length == 0) return [];
-
-  return players.map<Map<String, dynamic>>((item) {
-    return {
-      'id': item['id'],
-      'player': item['player'],
-      'reports': [item['report']]
-    };
-  }).toList();
+  // Return SquadTraining instance
+  return {'players': playerTrainingReports};
 }

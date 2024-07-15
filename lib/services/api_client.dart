@@ -2,7 +2,6 @@ import 'dart:io';
 
 import 'package:cookie_jar/cookie_jar.dart';
 import 'package:dio/dio.dart';
-import 'package:dio_cookie_manager/dio_cookie_manager.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
@@ -19,10 +18,8 @@ class ApiClient {
     _dio = Dio(BaseOptions(
       baseUrl: 'https://sokker.org/api',
       headers: {
-        'Accept': '*/*',
+        'Accept': 'application/json',
         'Content-Type': 'application/json',
-        'Connection': 'keep-alive',
-        'Accept-Encoding': 'gzip, deflate, br'
       },
     ));
     _init();
@@ -40,21 +37,38 @@ class ApiClient {
     final cookiePath = '${appDocDir.path}/.cookies';
 
     _cookieJar = PersistCookieJar(storage: FileStorage(cookiePath));
-    _dio.interceptors.add(CookieManager(_cookieJar));
   }
 
   Future<dynamic> sendData(String endpoint, dynamic data,
       {Map<String, String>? headers}) async {
     try {
-      final response = await _dio.post(endpoint, data: data);
-      final cookies = response.headers.map['set-cookie'];
+      final cookies =
+          await _cookieJar.loadForRequest(Uri.parse(_dio.options.baseUrl));
 
-      if (cookies != null && endpoint == '/auth/login') {
-        await _cookieJar.saveFromResponse(Uri.parse('https://sokker.org'),
-            cookies.map((str) => Cookie.fromSetCookieValue(str)).toList());
+      String cookiesString =
+          cookies.map((cookie) => '${cookie.name}=${cookie.value}').join('; ');
+
+      final options = Options(
+        headers: {
+          'Cookie': cookiesString,
+          //'Cookie':             'PHPSESSID=1jij5r4r1a7s8u37cd8lhqcegk; lang=en; lang_ID=2; _html_rtl=0',
+        },
+      );
+
+      final isLogout = endpoint == '/auth/logout';
+
+      final response = await _dio.post(endpoint,
+          data: data, options: isLogout ? options : null);
+
+      final setCookies = response.headers.map['set-cookie'];
+      print('post cookies: $setCookies');
+
+      if (setCookies != null && endpoint == '/auth/login') {
+        await _cookieJar.saveFromResponse(Uri.parse('https://sokker.org/api'),
+            setCookies.map((str) => Cookie.fromSetCookieValue(str)).toList());
       }
 
-      return _handleResponse(response);
+      return response;
     } catch (e) {
       if (kDebugMode) {
         print('Exception while sending data: $e');
@@ -71,38 +85,36 @@ class ApiClient {
       String cookiesString =
           cookies.map((cookie) => '${cookie.name}=${cookie.value}').join('; ');
 
-      final options = Options(headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json',
-        'Cookie': cookiesString,
-        ...headers ?? {}
-      });
-
-      final response = await _dio.get(
-        endpoint,
-        options: options,
+      print('fetch cookies: $cookiesString');
+      final options = Options(
+        headers: {
+          'Cookie': cookiesString,
+          //'Cookie':             'PHPSESSID=1jij5r4r1a7s8u37cd8lhqcegk; lang=en; lang_ID=2; _html_rtl=0',
+        },
       );
 
+      final response = await _dio.get(endpoint, options: options);
       return _handleResponse(response);
     } catch (e) {
       if (kDebugMode) {
         print('Exception while fetching data: $e');
       }
-
-      rethrow;
+      return null;
     }
   }
 
   Future<dynamic> _handleResponse(Response response) async {
     if (response.statusCode == 200) {
-      return response;
+      return response.data;
     } else if (response.statusCode == 401) {
-      // Redirect to login screen on 401
       navigatorKey.currentState
           ?.pushNamedAndRemoveUntil('/login', (Route<dynamic> route) => false);
+      return null;
     } else {
-      throw Exception(
-          'Failed to handle response. Status code: ${response.statusCode}');
+      if (kDebugMode) {
+        print('Failed to handle response. Status code: ${response.statusCode}');
+      }
+      return null;
     }
   }
 }
