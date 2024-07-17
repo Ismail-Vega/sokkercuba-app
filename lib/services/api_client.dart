@@ -61,7 +61,6 @@ class ApiClient {
           data: data, options: isLogout ? options : null);
 
       final setCookies = response.headers.map['set-cookie'];
-      print('post cookies: $setCookies');
 
       if (setCookies != null && endpoint == '/auth/login') {
         await _cookieJar.saveFromResponse(Uri.parse('https://sokker.org/api'),
@@ -85,7 +84,6 @@ class ApiClient {
       String cookiesString =
           cookies.map((cookie) => '${cookie.name}=${cookie.value}').join('; ');
 
-      print('fetch cookies: $cookiesString');
       final options = Options(
         headers: {
           'Cookie': cookiesString,
