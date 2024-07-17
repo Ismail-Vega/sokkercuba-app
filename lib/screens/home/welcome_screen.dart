@@ -42,17 +42,27 @@ class _WelcomeScreenState extends State<WelcomeScreen>
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.blue[900],
-      body: const Column(
-        children: [
-          UserCard(),
-          SizedBox(height: 8),
-          SquadSummaryCard(),
-          SizedBox(height: 8),
-          TSummaryCard(),
-        ],
-      ),
+    return DefaultTextStyle(
+      style: Theme.of(context).textTheme.bodyMedium!,
+      child: LayoutBuilder(
+          builder: (BuildContext context, BoxConstraints viewportConstraints) {
+        return SingleChildScrollView(
+          child: ConstrainedBox(
+            constraints: BoxConstraints(
+              minHeight: viewportConstraints.maxHeight,
+            ),
+            child: const Column(
+              children: [
+                UserCard(),
+                SizedBox(height: 8),
+                SquadSummaryCard(),
+                SizedBox(height: 8),
+                TSummaryCard(),
+              ],
+            ),
+          ),
+        );
+      }),
     );
   }
 }
