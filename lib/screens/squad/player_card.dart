@@ -5,7 +5,7 @@ import '../../models/squad/squad.dart';
 import '../../state/app_state_notifier.dart';
 import '../../utils/constants.dart';
 import '../../utils/format_numbers.dart';
-import '../../utils/get_player_report.dart';
+import '../../utils/get_training_data.dart';
 import '../../utils/skills_checker.dart';
 
 class PlayerCard extends StatelessWidget {
@@ -43,9 +43,11 @@ class PlayerCard extends StatelessWidget {
     final theme = Theme.of(context);
     final Color textSpanColor =
         theme.brightness == Brightness.dark ? Colors.white : Colors.black;
-    final training = Provider.of<AppStateNotifier>(context).state.training;
+    final stateProvider = Provider.of<AppStateNotifier>(context);
+    final week = stateProvider.state.user?.today.week;
+    final training = stateProvider.state.training;
     final players = training?.players;
-    final report = getPlayerTrainingReportById(players, player.id);
+    final report = getPlayerTrainingReport(players, player.id, week);
 
     return Card(
       color: Colors.blueAccent,
@@ -104,7 +106,7 @@ class PlayerCard extends StatelessWidget {
                       _buildSkillCell('Tact disc:',
                           '${skillsLevelsList[player.info.skills.tacticalDiscipline]} [${player.info.skills.tacticalDiscipline}]',
                           color: getSkillChangeColor(
-                              report?[0].skillsChange.tacticalDiscipline)),
+                              report, 'tacticalDiscipline')),
                       const TableCell(
                         child: Padding(
                           padding: EdgeInsets.all(4.0),
@@ -115,8 +117,7 @@ class PlayerCard extends StatelessWidget {
                       ),
                       _buildSkillCell('Form:',
                           '${skillsLevelsList[player.info.skills.form]} [${player.info.skills.form}]',
-                          color: getSkillChangeColor(
-                              report?[0].skillsChange.form)),
+                          color: getSkillChangeColor(report, 'form')),
                     ]),
                     TableRow(children: [
                       _buildSkillCell('Height:',
@@ -244,8 +245,7 @@ class PlayerCard extends StatelessWidget {
                     TableRow(children: [
                       _buildSkillCell('stamina:',
                           '${skillsLevelsList[player.info.skills.stamina]} [${player.info.skills.stamina}]',
-                          color: getSkillChangeColor(
-                              report?[0].skillsChange.stamina)),
+                          color: getSkillChangeColor(report, 'stamina')),
                       const TableCell(
                         child: Padding(
                           padding: EdgeInsets.all(4.0),
@@ -256,14 +256,12 @@ class PlayerCard extends StatelessWidget {
                       ),
                       _buildSkillCell('keeper:',
                           '${skillsLevelsList[player.info.skills.keeper]} [${player.info.skills.keeper}]',
-                          color: getSkillChangeColor(
-                              report?[0].skillsChange.keeper)),
+                          color: getSkillChangeColor(report, 'keeper')),
                     ]),
                     TableRow(children: [
                       _buildSkillCell('pace:',
                           '${skillsLevelsList[player.info.skills.pace]} [${player.info.skills.pace}]',
-                          color: getSkillChangeColor(
-                              report?[0].skillsChange.pace)),
+                          color: getSkillChangeColor(report, 'pace')),
                       const TableCell(
                         child: Padding(
                           padding: EdgeInsets.all(4.0),
@@ -274,14 +272,12 @@ class PlayerCard extends StatelessWidget {
                       ),
                       _buildSkillCell('defender:',
                           '${skillsLevelsList[player.info.skills.defending]} [${player.info.skills.defending}]',
-                          color: getSkillChangeColor(
-                              report?[0].skillsChange.defending)),
+                          color: getSkillChangeColor(report, 'defending')),
                     ]),
                     TableRow(children: [
                       _buildSkillCell('technique:',
                           '${skillsLevelsList[player.info.skills.technique]} [${player.info.skills.technique}]',
-                          color: getSkillChangeColor(
-                              report?[0].skillsChange.technique)),
+                          color: getSkillChangeColor(report, 'skills')),
                       const TableCell(
                         child: Padding(
                           padding: EdgeInsets.all(4.0),
@@ -292,14 +288,12 @@ class PlayerCard extends StatelessWidget {
                       ),
                       _buildSkillCell('playmaker:',
                           '${skillsLevelsList[player.info.skills.playmaking]} [${player.info.skills.playmaking}]',
-                          color: getSkillChangeColor(
-                              report?[0].skillsChange.playmaking)),
+                          color: getSkillChangeColor(report, 'playmaking')),
                     ]),
                     TableRow(children: [
                       _buildSkillCell('passing:',
                           '${skillsLevelsList[player.info.skills.passing]} [${player.info.skills.passing}]',
-                          color: getSkillChangeColor(
-                              report?[0].skillsChange.passing)),
+                          color: getSkillChangeColor(report, 'passing')),
                       const TableCell(
                         child: Padding(
                           padding: EdgeInsets.all(4.0),
@@ -310,8 +304,7 @@ class PlayerCard extends StatelessWidget {
                       ),
                       _buildSkillCell('striker:',
                           '${skillsLevelsList[player.info.skills.striker]} [${player.info.skills.striker}]',
-                          color: getSkillChangeColor(
-                              report?[0].skillsChange.striker)),
+                          color: getSkillChangeColor(report, 'striker')),
                     ]),
                   ],
                 ),

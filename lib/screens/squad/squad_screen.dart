@@ -3,10 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:provider/provider.dart';
 
-import '../../models/squad/squad.dart';
 import '../../services/api_client.dart';
-import '../../state/app_state.dart';
+import '../../state/actions.dart';
 import '../../state/app_state_notifier.dart';
+import '../../utils/is_date_today.dart';
 import 'player_card.dart';
 
 class SquadScreen extends StatefulWidget {
@@ -40,19 +40,19 @@ class _SquadScreenState extends State<SquadScreen> {
       await apiClient.initCookieJar();
 
       if (mounted) {
-        final user =
-            Provider.of<AppStateNotifier>(context, listen: false).state.user;
+        final appStateNotifier =
+            Provider.of<AppStateNotifier>(context, listen: false);
+        final user = appStateNotifier.state.user;
 
-        if (user != null) {
+        if (user != null && !isDateToday(user.today.date.value)) {
+          final stateSquad = appStateNotifier.state.players;
           final squadResponse = await apiClient.fetchData(
             '/player?filter[team]=${user.team.id}&filter[limit]=200&filter[offset]=0',
           );
 
           if (squadResponse != null && mounted) {
-            final squad = Squad.fromJson(squadResponse);
+            final squad = setSquadData(stateSquad, squadResponse);
 
-            final appStateNotifier =
-                Provider.of<AppStateNotifier>(context, listen: false);
             appStateNotifier
                 .dispatch(StoreAction(StoreActionTypes.setTeam, squad));
           }
@@ -77,10 +77,9 @@ class _SquadScreenState extends State<SquadScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final squad = Provider.of<AppStateNotifier>(context, listen: false)
-        .state
-        .players
-        ?.players;
+    final appStateNotifier =
+        Provider.of<AppStateNotifier>(context, listen: false);
+    final squad = appStateNotifier.state.players?.players;
 
     if (showSpinner) {
       return const Center(child: CircularProgressIndicator());
