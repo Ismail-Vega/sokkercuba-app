@@ -1,21 +1,19 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:modal_progress_hud_nsn/modal_progress_hud_nsn.dart';
 import 'package:provider/provider.dart';
-import 'package:sokkercuba/utils/constants.dart';
-import 'package:sokkercuba/widgets/rounded_button.dart';
 
-import '../../models/juniors/juniors.dart';
-import '../../models/squad/squad.dart';
 import '../../models/team/team_stats.dart';
 import '../../models/team/user.dart';
-import '../../models/training/training.dart';
 import '../../models/tsummary/tsummary.dart';
 import '../../services/api_client.dart';
 import '../../services/fetch_all_data.dart';
-import '../../state/app_state.dart';
+import '../../state/actions.dart';
 import '../../state/app_state_notifier.dart';
+import '../../utils/constants.dart';
 import '../../utils/is_date_today.dart';
+import '../../widgets/rounded_button.dart';
 
 class LoginScreen extends StatefulWidget {
   static const String id = 'login_screen';
@@ -54,8 +52,14 @@ class _LoginScreenState extends State<LoginScreen> {
         );
 
         if (response.statusCode == 200 && mounted) {
-          final stateUser =
-              Provider.of<AppStateNotifier>(context, listen: false).state.user;
+          final appStateNotifier =
+              Provider.of<AppStateNotifier>(context, listen: false);
+          final stateUser = appStateNotifier.state.user;
+
+          appStateNotifier
+              .dispatch(StoreAction(StoreActionTypes.setLogin, true));
+          appStateNotifier
+              .dispatch(StoreAction(StoreActionTypes.setUsername, login));
 
           if (stateUser != null && isDateToday(stateUser.today.date.value)) {
             Navigator.pushNamed(context, '/');
@@ -67,17 +71,14 @@ class _LoginScreenState extends State<LoginScreen> {
               final allDataResponse = await fetchAllData(apiClient, user);
 
               if (allDataResponse['code'] == 200 && mounted) {
-                final appStateNotifier =
-                    Provider.of<AppStateNotifier>(context, listen: false);
-
                 final filteredPayload = {
+                  'teamId': userDataResponse['team']?['id'],
                   'user': User.fromJson(userDataResponse),
                   'userStats': UserStats.fromJson(allDataResponse['userStats']),
-                  'juniors': Juniors.fromJson(allDataResponse['juniors']),
+                  'juniors': allDataResponse['juniors'],
                   'tsummary': TSummary.fromJson(allDataResponse['tsummary']),
-                  'players': Squad.fromJson(allDataResponse['players']),
-                  'training':
-                      SquadTraining.fromJson(allDataResponse['training']),
+                  'players': allDataResponse['players'],
+                  'training': allDataResponse['training'],
                 };
 
                 appStateNotifier.dispatch(
@@ -108,7 +109,6 @@ class _LoginScreenState extends State<LoginScreen> {
                 textColor: Colors.white,
                 fontSize: 16.0);
           } else {
-            print('we got a forbidden error here!');
             Fluttertoast.showToast(
                 msg: "There was an error while logging you in!",
                 toastLength: Toast.LENGTH_SHORT,
@@ -120,7 +120,9 @@ class _LoginScreenState extends State<LoginScreen> {
           }
         }
       } catch (e) {
-        print('we got a catch error here!: $e');
+        if (kDebugMode) {
+          print('catch: $e');
+        }
         Fluttertoast.showToast(
             msg: "There was an error while logging you in!",
             toastLength: Toast.LENGTH_SHORT,

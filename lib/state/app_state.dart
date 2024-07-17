@@ -4,6 +4,7 @@ import '../models/team/team_stats.dart';
 import '../models/team/user.dart';
 import '../models/training/training.dart';
 import '../models/tsummary/tsummary.dart';
+import 'actions.dart';
 
 class AppState {
   final bool error;
@@ -58,22 +59,9 @@ class AppState {
       user: user ?? this.user,
       userStats: userStats ?? this.userStats,
       tsummary: tsummary ?? this.tsummary,
-      juniors: Juniors(
-        juniors: [
-          ...(this.juniors?.juniors ?? []),
-          ...(juniors?.juniors ?? []),
-        ],
-      ),
-      players: Squad(players: [
-        ...(this.players?.players ?? []),
-        ...(players?.players ?? []),
-      ], total: players?.total ?? this.players?.total ?? 0),
-      training: SquadTraining(
-        players: [
-          ...(this.training?.players ?? []),
-          ...(training?.players ?? []),
-        ],
-      ),
+      juniors: juniors ?? this.juniors,
+      players: players ?? this.players,
+      training: training ?? this.training,
     );
   }
 
@@ -88,22 +76,9 @@ class AppState {
       user: payload['user'] ?? user,
       userStats: payload['userStats'] ?? userStats,
       tsummary: payload['tsummary'] ?? tsummary,
-      juniors: Juniors(
-        juniors: [
-          ...(juniors?.juniors ?? []),
-          ...(payload['juniors']?['juniors'] ?? []),
-        ],
-      ),
-      players: Squad(players: [
-        ...(players?.players ?? []),
-        ...(payload['players']?['players'] ?? []),
-      ], total: payload['training']['total'] ?? players?.total),
-      training: SquadTraining(
-        players: [
-          ...(training?.players ?? []),
-          ...(payload['training']?['players'] ?? []),
-        ],
-      ),
+      juniors: setJuniorsData(juniors, payload['juniors']),
+      players: setSquadData(players, payload['players']),
+      training: payload['training'] ?? training,
     );
   }
 
@@ -146,28 +121,4 @@ class AppState {
           : null,
     );
   }
-}
-
-class StoreAction {
-  final StoreActionTypes type;
-  final dynamic payload;
-  final bool notify;
-
-  StoreAction(this.type, this.payload, {this.notify = true});
-}
-
-enum StoreActionTypes {
-  setError,
-  setErrorMsg,
-  setUsername,
-  setTeamId,
-  setLoading,
-  setLogin,
-  setUser,
-  setUserStats,
-  setJuniors,
-  setSummary,
-  setTeam,
-  setTraining,
-  setAll,
 }

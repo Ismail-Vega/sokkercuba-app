@@ -44,10 +44,12 @@ class PlayerCard extends StatelessWidget {
     final Color textSpanColor =
         theme.brightness == Brightness.dark ? Colors.white : Colors.black;
     final stateProvider = Provider.of<AppStateNotifier>(context);
-    final week = stateProvider.state.user?.today.week;
+    final today = stateProvider.state.user?.today;
+    final week = today != null ? today.week : 1;
     final training = stateProvider.state.training;
     final players = training?.players;
-    final report = getPlayerTrainingReport(players, player.id, week);
+    final trainingWeek = (today?.day ?? 0) < 5 ? week - 1 : week;
+    final report = getPlayerTrainingReport(players, player.id, trainingWeek);
 
     return Card(
       color: Colors.blueAccent,

@@ -5,17 +5,17 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:sokkercuba/screens/home/welcome_screen.dart';
-import 'package:sokkercuba/screens/login/login_screen.dart';
-import 'package:sokkercuba/state/app_state.dart';
-import 'package:sokkercuba/state/app_state_notifier.dart';
 
 import 'components/responsive_drawer.dart';
 import 'screens/contact/contact_screen.dart';
+import 'screens/home/welcome_screen.dart';
+import 'screens/login/login_screen.dart';
 import 'screens/scouting/scouting_screen.dart';
 import 'screens/squad/squad_screen.dart';
 import 'screens/xtreme/xtreme_screen.dart';
 import 'services/api_client.dart';
+import 'state/app_state.dart';
+import 'state/app_state_notifier.dart';
 
 GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
@@ -44,13 +44,15 @@ void main() async {
   }
 
   final apiClient = ApiClient();
-  bool isLoggedIn = false;
+  bool isLoggedIn = initialState.loggedIn;
   await apiClient.initCookieJar();
 
   try {
     final currentResponse = await apiClient.fetchData('/current');
     if (currentResponse != null) {
       isLoggedIn = true;
+    } else {
+      isLoggedIn = false;
     }
   } catch (e) {
     if (kDebugMode) {
@@ -58,26 +60,26 @@ void main() async {
     }
   }
 
-  runApp(Sokkercuba(
+  runApp(SokkerPro(
     initialState: initialState,
     isLoggedIn: isLoggedIn,
   ));
 }
 
-class Sokkercuba extends StatefulWidget {
+class SokkerPro extends StatefulWidget {
   final AppState initialState;
   final bool isLoggedIn;
 
-  const Sokkercuba(
+  const SokkerPro(
       {super.key, required this.initialState, required this.isLoggedIn});
 
   @override
-  State<Sokkercuba> createState() {
-    return _SokkercubaState();
+  State<SokkerPro> createState() {
+    return _SokkerProState();
   }
 }
 
-class _SokkercubaState extends State<Sokkercuba> {
+class _SokkerProState extends State<SokkerPro> {
   ThemeMode _themeMode = ThemeMode.dark;
 
   void _setSelectedTheme(ThemeMode mode) {
@@ -93,7 +95,7 @@ class _SokkercubaState extends State<Sokkercuba> {
       child: MaterialApp(
         builder: FToastBuilder(),
         navigatorKey: navigatorKey,
-        title: 'Sokkercuba App',
+        title: 'Sokker Pro App',
         theme: ThemeData.light(),
         darkTheme: ThemeData.dark().copyWith(
           primaryColor: Colors.blue[900],
@@ -145,18 +147,10 @@ class _SokkercubaState extends State<Sokkercuba> {
                 child: const SquadScreen()));
       case '/login':
         return MaterialPageRoute(builder: (context) => const LoginScreen());
-      /*case '/about':
-        return MaterialPageRoute(builder: (context) => AboutPage());
-      case '/addon':
-        return MaterialPageRoute(builder: (context) => AddonPage());
-      case '/addon/privacy':
-        return MaterialPageRoute(builder: (context) => AddonPrivacyPage());*/
-      /*case '/signup':
-        return MaterialPageRoute(builder: (context) => SignUp());
+/*
       case '/training':
         return MaterialPageRoute(builder: (context) => TrainingPage());
-      case '/update':
-        return MaterialPageRoute(builder: (context) => UpdatePage());*/
+*/
       default:
         return MaterialPageRoute(
             builder: (context) => ResponsiveDrawer(

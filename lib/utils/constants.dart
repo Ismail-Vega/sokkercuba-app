@@ -96,3 +96,7 @@ String getTeamPlayersURL(int teamId) {
 String getTeamStatsURL(int teamId) {
   return '/team/$teamId/stats';
 }
+
+String getJuniorGraphUrl(int juniorId) {
+  return '/junior/$juniorId/graph';
+}

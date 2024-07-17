@@ -1,6 +1,8 @@
 import 'dart:async';
 
 import '../models/team/user.dart';
+import '../models/training/training.dart';
+import '../state/actions.dart';
 import '../utils/constants.dart';
 import 'api_client.dart';
 
@@ -26,18 +28,28 @@ Future<Map<String, dynamic>> fetchAllData(
     final teamStats = responses[4];
 
     if (!plus) {
+      final trainingPlayers = training['players'] ?? [];
+      Map<String, PlayerTrainingReport> players = {};
+
+      if (trainingPlayers != null && trainingPlayers.isEmpty) {
+        for (var player in trainingPlayers) {
+          String key = '${player.id}_${player.report.week}';
+          players[key] = player;
+        }
+      }
+
       return {
         'juniors': juniors,
         'tsummary': tsummary,
         'players': playersData,
-        'training': training,
+        'training': SquadTraining(players: players),
         'userStats': teamStats,
         'code': 200,
       };
     }
 
     final filledTrainingReports =
-        await fillTrainingReports(apiClient, training['players']);
+        await fillTrainingReports(apiClient, training);
 
     return {
       'juniors': juniors,
@@ -48,37 +60,6 @@ Future<Map<String, dynamic>> fetchAllData(
       'code': 200,
     };
   } catch (error) {
-    print('error in fetchAll: ${error.toString()}');
     return {'code': '500', 'error': error.toString()};
   }
-}
-
-Future<Object> fillTrainingReports(ApiClient apiClient, dynamic players) async {
-  if (players == null || players.isEmpty) {
-    return [];
-  }
-
-  // Fetch full reports for all players
-  final List<Future<dynamic>> fullReportPromises =
-      players.map<Future<dynamic>>((player) {
-    return apiClient.fetchData(getPlayerFullReportURL(player['id']));
-  }).toList();
-
-  // Await all the full report promises
-  final tResponse = await Future.wait(fullReportPromises);
-
-  // Process the responses and create PlayerTrainingReport objects
-  final playerTrainingReports = tResponse.asMap().entries.map((entry) {
-    final reports = entry.value['reports'] ?? [];
-
-    // Create a PlayerTrainingReport instance
-    return {
-      'id': players[entry.key]['id'],
-      'player': players[entry.key]['player'],
-      'report': reports,
-    };
-  }).toList();
-
-  // Return SquadTraining instance
-  return {'players': playerTrainingReports};
 }
