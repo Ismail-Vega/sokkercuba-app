@@ -27,11 +27,15 @@ Map<String, dynamic> _$JuniorToJson(Junior instance) => <String, dynamic>{
     };
 
 Juniors _$JuniorsFromJson(Map<String, dynamic> json) => Juniors(
-      juniors: (json['juniors'] as List<dynamic>)
-          .map((e) => Junior.fromJson(e as Map<String, dynamic>))
+      juniors: (json['juniors'] as List<dynamic>?)
+          ?.map((e) => Junior.fromJson(e as Map<String, dynamic>))
+          .toList(),
+      prevJuniors: (json['prevJuniors'] as List<dynamic>?)
+          ?.map((e) => Junior.fromJson(e as Map<String, dynamic>))
           .toList(),
     );
 
 Map<String, dynamic> _$JuniorsToJson(Juniors instance) => <String, dynamic>{
       'juniors': instance.juniors,
+      'prevJuniors': instance.prevJuniors,
     };

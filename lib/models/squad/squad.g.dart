@@ -20,13 +20,17 @@ Map<String, dynamic> _$TeamPlayerToJson(TeamPlayer instance) =>
     };
 
 Squad _$SquadFromJson(Map<String, dynamic> json) => Squad(
-      players: (json['players'] as List<dynamic>)
-          .map((e) => TeamPlayer.fromJson(e as Map<String, dynamic>))
+      players: (json['players'] as List<dynamic>?)
+          ?.map((e) => TeamPlayer.fromJson(e as Map<String, dynamic>))
           .toList(),
-      total: (json['total'] as num).toInt(),
+      prevPlayers: (json['prevPlayers'] as List<dynamic>?)
+          ?.map((e) => TeamPlayer.fromJson(e as Map<String, dynamic>))
+          .toList(),
+      total: (json['total'] as num?)?.toInt(),
     );
 
 Map<String, dynamic> _$SquadToJson(Squad instance) => <String, dynamic>{
       'players': instance.players,
+      'prevPlayers': instance.prevPlayers,
       'total': instance.total,
     };

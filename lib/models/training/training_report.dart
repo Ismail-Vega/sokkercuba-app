@@ -42,4 +42,39 @@ class TrainingReport {
       _$TrainingReportFromJson(json);
 
   Map<String, dynamic> toJson() => _$TrainingReportToJson(this);
+
+  int? getSkillChange(String skill) {
+    switch (skill) {
+      case 'form':
+        return skillsChange.form;
+      case 'tacticalDiscipline':
+        return skillsChange.tacticalDiscipline;
+      case 'teamwork':
+        return skillsChange.teamwork;
+      case 'experience':
+        return skillsChange.experience;
+      case 'stamina':
+        return skillsChange.stamina;
+      case 'keeper':
+        return skillsChange.keeper;
+      case 'playmaking':
+        return skillsChange.playmaking;
+      case 'passing':
+        return skillsChange.passing;
+      case 'technique':
+        return skillsChange.technique;
+      case 'defending':
+        return skillsChange.defending;
+      case 'striker':
+        return skillsChange.striker;
+      case 'pace':
+        return skillsChange.pace;
+      case 'down':
+        return skillsChange.down;
+      case 'up':
+        return skillsChange.up;
+      default:
+        return null;
+    }
+  }
 }

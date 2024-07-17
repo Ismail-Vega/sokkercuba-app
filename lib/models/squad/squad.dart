@@ -23,11 +23,13 @@ class TeamPlayer {
 
 @JsonSerializable()
 class Squad {
-  final List<TeamPlayer> players;
-  final int total;
+  final List<TeamPlayer>? players;
+  final List<TeamPlayer>? prevPlayers;
+  final int? total;
 
   Squad({
     required this.players,
+    required this.prevPlayers,
     required this.total,
   });
 

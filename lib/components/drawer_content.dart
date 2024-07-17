@@ -3,7 +3,7 @@ import 'package:provider/provider.dart';
 
 import '../models/navigation/nav_bar_item_model.dart';
 import '../services/api_client.dart';
-import '../state/app_state.dart';
+import '../state/actions.dart';
 import '../state/app_state_notifier.dart';
 import '../widgets/nav_bar_item.dart';
 
@@ -21,7 +21,7 @@ class DrawerContent extends StatelessWidget {
             DrawerHeader(
               decoration: const BoxDecoration(
                 image: DecorationImage(
-                  image: AssetImage('images/logo.jpg'),
+                  image: AssetImage('assets/images/logo/logo.jpg'),
                   fit: BoxFit.cover,
                 ),
               ),
@@ -77,7 +77,7 @@ class DrawerContent extends StatelessWidget {
 
               final response = await apiClient.sendData('/auth/logout', {});
 
-              if (response !=null && context.mounted) {
+              if (response != null && context.mounted) {
                 Navigator.pushNamed(context, '/login');
               }
             } catch (error) {

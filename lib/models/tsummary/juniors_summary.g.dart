@@ -1,17 +1,19 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'juniors.dart';
+part of 'juniors_summary.dart';
 
 // **************************************************************************
 // JsonSerializableGenerator
 // **************************************************************************
 
-Juniors _$JuniorsFromJson(Map<String, dynamic> json) => Juniors(
+JuniorsSummary _$JuniorsSummaryFromJson(Map<String, dynamic> json) =>
+    JuniorsSummary(
       number: (json['number'] as num).toInt(),
       skillsUp: (json['skillsUp'] as num).toInt(),
     );
 
-Map<String, dynamic> _$JuniorsToJson(Juniors instance) => <String, dynamic>{
+Map<String, dynamic> _$JuniorsSummaryToJson(JuniorsSummary instance) =>
+    <String, dynamic>{
       'number': instance.number,
       'skillsUp': instance.skillsUp,
     };

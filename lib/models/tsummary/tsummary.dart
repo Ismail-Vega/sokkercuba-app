@@ -1,7 +1,7 @@
 import 'package:json_annotation/json_annotation.dart';
 
 import '../common/date_value.dart';
-import 'juniors.dart';
+import 'juniors_summary.dart';
 import 'stats.dart';
 
 part 'tsummary.g.dart';
@@ -32,7 +32,7 @@ class Week {
   final GameDay gameDay;
   final int week;
   final Stats stats;
-  final Juniors juniors;
+  final JuniorsSummary juniors;
 
   Week({
     required this.gameDay,

@@ -26,7 +26,7 @@ Week _$WeekFromJson(Map<String, dynamic> json) => Week(
       gameDay: GameDay.fromJson(json['gameDay'] as Map<String, dynamic>),
       week: (json['week'] as num).toInt(),
       stats: Stats.fromJson(json['stats'] as Map<String, dynamic>),
-      juniors: Juniors.fromJson(json['juniors'] as Map<String, dynamic>),
+      juniors: JuniorsSummary.fromJson(json['juniors'] as Map<String, dynamic>),
     );
 
 Map<String, dynamic> _$WeekToJson(Week instance) => <String, dynamic>{

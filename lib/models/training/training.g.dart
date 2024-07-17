@@ -11,9 +11,7 @@ PlayerTrainingReport _$PlayerTrainingReportFromJson(
     PlayerTrainingReport(
       id: (json['id'] as num).toInt(),
       player: PlayerInfo.fromJson(json['player'] as Map<String, dynamic>),
-      report: (json['report'] as List<dynamic>)
-          .map((e) => TrainingReport.fromJson(e as Map<String, dynamic>))
-          .toList(),
+      report: TrainingReport.fromJson(json['report'] as Map<String, dynamic>),
     );
 
 Map<String, dynamic> _$PlayerTrainingReportToJson(
@@ -26,12 +24,11 @@ Map<String, dynamic> _$PlayerTrainingReportToJson(
 
 SquadTraining _$SquadTrainingFromJson(Map<String, dynamic> json) =>
     SquadTraining(
-      players: (json['players'] as List<dynamic>)
-          .map((e) => PlayerTrainingReport.fromJson(e as Map<String, dynamic>))
-          .toList(),
+      players: SquadTraining._playerTrainingReportMapFromJson(
+          json['players'] as Map<String, dynamic>?),
     );
 
 Map<String, dynamic> _$SquadTrainingToJson(SquadTraining instance) =>
     <String, dynamic>{
-      'players': instance.players,
+      'players': SquadTraining._playerTrainingReportMapToJson(instance.players),
     };

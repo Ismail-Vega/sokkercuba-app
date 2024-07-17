@@ -30,9 +30,10 @@ class Junior {
 
 @JsonSerializable()
 class Juniors {
-  final List<Junior> juniors;
+  final List<Junior>? juniors;
+  final List<Junior>? prevJuniors;
 
-  Juniors({required this.juniors});
+  Juniors({required this.juniors, required this.prevJuniors});
 
   factory Juniors.fromJson(Map<String, dynamic> json) =>
       _$JuniorsFromJson(json);
