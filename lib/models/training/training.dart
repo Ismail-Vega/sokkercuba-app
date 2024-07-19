@@ -9,7 +9,7 @@ part 'training.g.dart';
 class PlayerTrainingReport {
   final int id;
   final PlayerInfo player;
-  final TrainingReport report;
+  final List<TrainingReport> report;
 
   PlayerTrainingReport(
       {required this.id, required this.player, required this.report});
@@ -21,10 +21,7 @@ class PlayerTrainingReport {
 
 @JsonSerializable()
 class SquadTraining {
-  @JsonKey(
-      fromJson: _playerTrainingReportMapFromJson,
-      toJson: _playerTrainingReportMapToJson)
-  final Map<String, PlayerTrainingReport> players;
+  final List<PlayerTrainingReport>? players;
 
   SquadTraining({required this.players});
 
@@ -32,18 +29,4 @@ class SquadTraining {
       _$SquadTrainingFromJson(json);
 
   Map<String, dynamic> toJson() => _$SquadTrainingToJson(this);
-
-  static Map<String, PlayerTrainingReport> _playerTrainingReportMapFromJson(
-      Map<String, dynamic>? json) {
-    if (json == null) {
-      return {};
-    }
-    return json.map((key, value) => MapEntry(
-        key, PlayerTrainingReport.fromJson(value as Map<String, dynamic>)));
-  }
-
-  static Map<String, dynamic> _playerTrainingReportMapToJson(
-      Map<String, PlayerTrainingReport> map) {
-    return map.map((key, value) => MapEntry(key, value.toJson()));
-  }
 }

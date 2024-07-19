@@ -7,6 +7,7 @@ import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'components/responsive_drawer.dart';
+import 'models/team/user.dart';
 import 'screens/contact/contact_screen.dart';
 import 'screens/home/welcome_screen.dart';
 import 'screens/login/login_screen.dart';
@@ -46,11 +47,13 @@ void main() async {
   final apiClient = ApiClient();
   bool isLoggedIn = initialState.loggedIn;
   await apiClient.initCookieJar();
+  User? user;
 
   try {
     final currentResponse = await apiClient.fetchData('/current');
     if (currentResponse != null) {
       isLoggedIn = true;
+      user = User.fromJson(currentResponse);
     } else {
       isLoggedIn = false;
     }
@@ -63,15 +66,20 @@ void main() async {
   runApp(SokkerPro(
     initialState: initialState,
     isLoggedIn: isLoggedIn,
+    userData: user,
   ));
 }
 
 class SokkerPro extends StatefulWidget {
   final AppState initialState;
   final bool isLoggedIn;
+  final User? userData;
 
   const SokkerPro(
-      {super.key, required this.initialState, required this.isLoggedIn});
+      {super.key,
+      required this.initialState,
+      required this.isLoggedIn,
+      this.userData});
 
   @override
   State<SokkerPro> createState() {
@@ -113,7 +121,7 @@ class _SokkerProState extends State<SokkerPro> {
         home: widget.isLoggedIn
             ? ResponsiveDrawer(
                 setSelectedTheme: _setSelectedTheme,
-                child: const WelcomeScreen())
+                child: WelcomeScreen(user: widget.userData))
             : const LoginScreen(),
         onGenerateRoute: _generateRoute,
         initialRoute: '/',
