@@ -6,7 +6,6 @@ import 'package:provider/provider.dart';
 import '../../services/api_client.dart';
 import '../../state/actions.dart';
 import '../../state/app_state_notifier.dart';
-import '../../utils/is_date_today.dart';
 import 'player_card.dart';
 
 class SquadScreen extends StatefulWidget {
@@ -44,7 +43,7 @@ class _SquadScreenState extends State<SquadScreen> {
             Provider.of<AppStateNotifier>(context, listen: false);
         final user = appStateNotifier.state.user;
 
-        if (user != null && !isDateToday(user.today.date.value)) {
+        if (user != null) {
           final stateSquad = appStateNotifier.state.players;
           final squadResponse = await apiClient.fetchData(
             '/player?filter[team]=${user.team.id}&filter[limit]=200&filter[offset]=0',
