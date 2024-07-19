@@ -68,7 +68,8 @@ class _LoginScreenState extends State<LoginScreen> {
 
             if (userDataResponse != null) {
               final user = User.fromJson(userDataResponse);
-              final allDataResponse = await fetchAllData(apiClient, user);
+              final allDataResponse =
+                  await fetchAllData(apiClient, user, appStateNotifier.state);
 
               if (allDataResponse['code'] == 200 && mounted) {
                 final filteredPayload = {
@@ -85,6 +86,15 @@ class _LoginScreenState extends State<LoginScreen> {
                     StoreAction(StoreActionTypes.setAll, filteredPayload));
 
                 Navigator.pushNamed(context, '/');
+              } else {
+                Fluttertoast.showToast(
+                  msg: "Failed to fetch all data!",
+                  toastLength: Toast.LENGTH_SHORT,
+                  gravity: ToastGravity.BOTTOM,
+                  timeInSecForIosWeb: 1,
+                  backgroundColor: Colors.red,
+                  textColor: Colors.white,
+                  fontSize: 16.0);
               }
             } else {
               Fluttertoast.showToast(
@@ -95,7 +105,6 @@ class _LoginScreenState extends State<LoginScreen> {
                   backgroundColor: Colors.red,
                   textColor: Colors.white,
                   fontSize: 16.0);
-              if (mounted) Navigator.pushNamed(context, '/');
             }
           }
         } else {
