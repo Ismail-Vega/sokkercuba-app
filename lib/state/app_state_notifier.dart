@@ -27,6 +27,18 @@ class AppStateNotifier extends ChangeNotifier {
   Future<void> _saveState() async {
     final prefs = await SharedPreferences.getInstance();
     prefs.setString('appState', jsonEncode(_state.toJson()));
+    _handleWeekChange();
+  }
+
+  void _handleWeekChange() {
+    final week = _state.user?.today.week;
+    final day = _state.user?.today.day;
+    if (week != null && day != null) {
+      final trainingWeek = day < 5 ? week - 1 : week;
+      _state.players?.players.forEach((player) {
+        player.skillsHistory?[trainingWeek] = player.info;
+      });
+    }
   }
 
   void dispatch(StoreAction action) {
@@ -43,6 +55,9 @@ class AppStateNotifier extends ChangeNotifier {
       case StoreActionTypes.setTeamId:
         _state = _state.copyWith(teamId: action.payload);
         break;
+      case StoreActionTypes.setTrainingWeek:
+        _state = _state.copyWith(trainingWeek: action.payload);
+        break;
       case StoreActionTypes.setLoading:
         _state = _state.copyWith(loading: action.payload);
         break;
@@ -57,6 +72,9 @@ class AppStateNotifier extends ChangeNotifier {
         break;
       case StoreActionTypes.setJuniors:
         _state = _state.copyWith(juniors: action.payload);
+        break;
+      case StoreActionTypes.setJuniorsTraining:
+        _state = _state.copyWith(juniorsTraining: action.payload);
         break;
       case StoreActionTypes.setSummary:
         _state = _state.copyWith(tsummary: action.payload);
