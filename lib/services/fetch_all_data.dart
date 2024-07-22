@@ -1,13 +1,14 @@
 import 'dart:async';
 
+import 'package:sokker_pro/state/app_state.dart';
+
 import '../models/team/user.dart';
-import '../models/training/training.dart';
 import '../state/actions.dart';
 import '../utils/constants.dart';
 import 'api_client.dart';
 
 Future<Map<String, dynamic>> fetchAllData(
-    ApiClient apiClient, User user) async {
+    ApiClient apiClient, User user, AppState state) async {
   try {
     final teamId = user.team.id;
     final plus = user.plus;
@@ -28,28 +29,19 @@ Future<Map<String, dynamic>> fetchAllData(
     final teamStats = responses[4];
 
     if (!plus) {
-      final trainingPlayers = training['players'] ?? [];
-      Map<String, PlayerTrainingReport> players = {};
-
-      if (trainingPlayers != null && trainingPlayers.isEmpty) {
-        for (var player in trainingPlayers) {
-          String key = '${player.id}_${player.report.week}';
-          players[key] = player;
-        }
-      }
-
       return {
         'juniors': juniors,
         'tsummary': tsummary,
         'players': playersData,
-        'training': SquadTraining(players: players),
+        'training': training,
         'userStats': teamStats,
         'code': 200,
       };
     }
 
+    final stateTraining = state.training;
     final filledTrainingReports =
-        await fillTrainingReports(apiClient, training);
+        await fillTrainingReports(apiClient, training, stateTraining);
 
     return {
       'juniors': juniors,

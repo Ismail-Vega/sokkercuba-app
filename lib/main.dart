@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:sokker_pro/screens/training/training_screen.dart';
 
 import 'components/responsive_drawer.dart';
 import 'models/team/user.dart';
@@ -155,10 +156,10 @@ class _SokkerProState extends State<SokkerPro> {
                 child: const SquadScreen()));
       case '/login':
         return MaterialPageRoute(builder: (context) => const LoginScreen());
-/*
       case '/training':
-        return MaterialPageRoute(builder: (context) => TrainingPage());
-*/
+        return MaterialPageRoute(
+            builder: (context) => ResponsiveDrawer(
+                setSelectedTheme: _setSelectedTheme, child: const Training()));
       default:
         return MaterialPageRoute(
             builder: (context) => ResponsiveDrawer(

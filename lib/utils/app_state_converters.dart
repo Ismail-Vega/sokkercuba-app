@@ -1,5 +1,5 @@
 import '../models/juniors/juniors.dart';
-import '../models/squad/squad.dart';
+import '../models/player/player.dart';
 import '../models/training/training.dart';
 
 List<Junior> parseJuniors(List<dynamic> payload) =>
