@@ -61,25 +61,35 @@ Juniors setJuniorsData(Juniors? stateJuniors, Map<String, dynamic> data) {
 Squad setSquadData(Squad? stateSquad, Map<String, dynamic> data) {
   final totalData = data['total'] ?? 0;
   final playersData = parsePlayers(data['players'] ?? []);
-  final currentPlayersIds = playersData.map((player) => player.id).toSet();
   final List<TeamPlayer> players = stateSquad?.players ?? [];
+  final newPlayersIds = playersData.map((player) => player.id).toSet();
   final List<TeamPlayer> prevPlayers = stateSquad?.prevPlayers ?? [];
   final prevPlayersIds = prevPlayers.map((player) => player.id).toSet();
 
-  final leftPlayers = players
-      .where((player) => !currentPlayersIds.contains(player.id))
-      .toList();
-  final currentPlayers =
-      players.where((player) => currentPlayersIds.contains(player.id)).toList();
-  final newPrevPlayers = [
-    ...prevPlayers,
-    ...leftPlayers.where((player) => !prevPlayersIds.contains(player.id))
-  ];
+  final List<TeamPlayer> newPrevPlayers = [...prevPlayers];
+  final List<TeamPlayer> currentPlayers = [];
+
+  for (final player in players) {
+    if (newPlayersIds.contains(player.id)) {
+      currentPlayers.add(player);
+    } else if (!prevPlayersIds.contains(player.id)) {
+      newPrevPlayers.add(player);
+    }
+  }
+
+  final currentPlayersIds = currentPlayers.map((player) => player.id).toSet();
+
+  for (final player in playersData) {
+    if (!currentPlayersIds.contains(player.id)) {
+      currentPlayers.add(player);
+    }
+  }
 
   return Squad(
-      players: currentPlayers.isEmpty ? playersData : currentPlayers,
-      prevPlayers: newPrevPlayers,
-      total: totalData);
+    players: currentPlayers,
+    prevPlayers: newPrevPlayers,
+    total: totalData,
+  );
 }
 
 Future<SquadTraining?> setTrainingData(ApiClient apiClient, bool plus,
