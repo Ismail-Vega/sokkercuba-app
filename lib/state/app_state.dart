@@ -1,11 +1,11 @@
 import '../models/juniors/juniors.dart';
 import '../models/juniors/juniors_training.dart';
+import '../models/news/news.dart';
 import '../models/squad/squad.dart';
 import '../models/team/team_stats.dart';
 import '../models/team/user.dart';
 import '../models/training/training.dart';
 import '../models/tsummary/tsummary.dart';
-import 'actions.dart';
 
 class AppState {
   final bool error;
@@ -16,6 +16,7 @@ class AppState {
   final bool loading;
   final bool loggedIn;
   final User? user;
+  final News? news;
   final UserStats? userStats;
   final Juniors? juniors;
   final JuniorsTraining? juniorsTraining;
@@ -32,6 +33,7 @@ class AppState {
     this.loading = false,
     this.loggedIn = false,
     this.user,
+    this.news,
     this.userStats,
     this.juniors,
     this.juniorsTraining,
@@ -49,6 +51,7 @@ class AppState {
     bool? loading,
     bool? loggedIn,
     User? user,
+    News? news,
     UserStats? userStats,
     Juniors? juniors,
     JuniorsTraining? juniorsTraining,
@@ -65,6 +68,7 @@ class AppState {
       loading: loading ?? this.loading,
       loggedIn: loggedIn ?? this.loggedIn,
       user: user ?? this.user,
+      news: news ?? this.news,
       userStats: userStats ?? this.userStats,
       tsummary: tsummary ?? this.tsummary,
       juniors: juniors ?? this.juniors,
@@ -84,11 +88,12 @@ class AppState {
       loading: payload['loading'] ?? loading,
       loggedIn: payload['loggedIn'] ?? loggedIn,
       user: payload['user'] ?? user,
+      news: payload['news'] ?? news,
       userStats: payload['userStats'] ?? userStats,
       tsummary: payload['tsummary'] ?? tsummary,
-      juniors: setJuniorsData(juniors, payload['juniors']),
+      juniors: payload['juniors'] ?? juniors,
       juniorsTraining: payload['juniorsTraining'] ?? juniorsTraining,
-      players: setSquadData(players, payload['players']),
+      players: payload['players'] ?? players,
       training: payload['training'] ?? training,
     );
   }
@@ -103,6 +108,7 @@ class AppState {
       'loading': loading,
       'loggedIn': loggedIn,
       'user': user?.toJson(),
+      'news': news?.toJson(),
       'userStats': userStats?.toJson(),
       'tsummary': tsummary?.toJson(),
       'juniors': juniors?.toJson(),
@@ -122,6 +128,7 @@ class AppState {
       loading: json['loading'] ?? false,
       loggedIn: json['loggedIn'] ?? false,
       user: json['user'] != null ? User.fromJson(json['user']) : null,
+      news: json['news'] != null ? News.fromJson(json['news']) : null,
       userStats: json['userStats'] != null
           ? UserStats.fromJson(json['userStats'])
           : null,

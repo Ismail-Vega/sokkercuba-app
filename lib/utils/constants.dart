@@ -100,3 +100,9 @@ String getTeamStatsURL(int teamId) {
 String getJuniorGraphUrl(int juniorId) {
   return '/junior/$juniorId/graph';
 }
+
+const newsUrl = '/news?filter[limit]=200';
+
+String getJuniorNewsURL(int newsId) {
+  return '/news/$newsId';
+}

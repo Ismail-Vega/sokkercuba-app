@@ -26,8 +26,8 @@ Map<String, dynamic> _$PlayerTrainingReportToJson(
 
 SquadTraining _$SquadTrainingFromJson(Map<String, dynamic> json) =>
     SquadTraining(
-      players: (json['players'] as List<dynamic>?)
-          ?.map((e) => PlayerTrainingReport.fromJson(e as Map<String, dynamic>))
+      players: (json['players'] as List<dynamic>)
+          .map((e) => PlayerTrainingReport.fromJson(e as Map<String, dynamic>))
           .toList(),
     );
 

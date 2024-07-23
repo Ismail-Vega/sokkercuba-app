@@ -1,10 +1,13 @@
 import '../models/juniors/juniors.dart';
+import '../models/news/news.dart';
+import '../models/news/news_item.dart';
 import '../models/player/player.dart';
 import '../models/player/player_info.dart';
 import '../models/squad/squad.dart';
 import '../models/training/training.dart';
 import '../models/training/training_report.dart';
 import '../services/api_client.dart';
+import '../services/fetch_juniors_news.dart';
 import '../utils/app_state_converters.dart';
 import '../utils/constants.dart';
 
@@ -79,12 +82,56 @@ Squad setSquadData(Squad? stateSquad, Map<String, dynamic> data) {
       total: totalData);
 }
 
-Future<SquadTraining?> fillTrainingReports(
-    ApiClient apiClient, dynamic data, SquadTraining? stateData) async {
+Future<SquadTraining?> setTrainingData(ApiClient apiClient, bool plus,
+    int? week, SquadTraining? stateData, dynamic data) async {
   final players = data['players'] ?? [];
 
   if (players.isEmpty) {
     return stateData;
+  }
+
+  final training = stateData ?? SquadTraining(players: []);
+
+  if (training.players.isNotEmpty) {
+    int checkIndex = training.players.indexWhere((player) {
+      if (player.report.isNotEmpty) {
+        return player.report[0].week == week;
+      }
+      return false;
+    });
+
+    if (checkIndex != -1) {
+      return stateData;
+    }
+  }
+
+  if (!plus) {
+    for (var player in players) {
+      final report = TrainingReport.fromJson(player['report']);
+
+      final playerTrainingReport = PlayerTrainingReport(
+        id: player['id'],
+        player: PlayerInfo.fromJson(player['player']),
+        report: [report],
+      );
+
+      if (training.players.isNotEmpty) {
+        int tIndex = training.players
+            .indexWhere((tplayer) => tplayer.id == player['id']);
+
+        if (tIndex != -1) {
+          if (training.players[tIndex].report[0].week != week) {
+            training.players[tIndex].report.insert(0, report);
+          }
+        } else {
+          training.players.add(playerTrainingReport);
+        }
+      } else {
+        training.players.add(playerTrainingReport);
+      }
+    }
+
+    return training;
   }
 
   final List<Future<dynamic>> fullReportPromises =
@@ -93,14 +140,13 @@ Future<SquadTraining?> fillTrainingReports(
   }).toList();
 
   final tResponse = await Future.wait(fullReportPromises);
-  final training = stateData ?? SquadTraining(players: []);
 
   for (int i = 0; i < tResponse.length; i++) {
     final player = players[i];
     final reports = tResponse[i]['reports'] ?? [];
     bool playerFound = false;
 
-    for (var statePlayerReport in training.players!) {
+    for (var statePlayerReport in training.players) {
       if (statePlayerReport.id == player['id']) {
         playerFound = true;
 
@@ -130,9 +176,31 @@ Future<SquadTraining?> fillTrainingReports(
         report: newReports,
       );
 
-      training.players!.add(playerTrainingReport);
+      training.players.add(playerTrainingReport);
     }
   }
 
   return training;
+}
+
+Future<News> setNewsData(
+    ApiClient apiClient, News? stateNews, Map<String, dynamic> data) async {
+  final newsData = parseNews(data['news'] ?? []);
+  final List<NewsItem> currentNews = stateNews?.news ?? [];
+  final currentNewsIds = currentNews.map((item) => item.id).toSet();
+
+  final incomingNews = newsData
+      .where(
+        (item) =>
+            !currentNewsIds.contains(item.id) && item.kind == 'youth_school',
+      )
+      .toList();
+
+  final newNews = [...currentNews, ...incomingNews];
+  final newJuniors = await getJuniorNews(apiClient, incomingNews);
+
+  return News(
+      news: currentNews.isEmpty ? newsData : newNews,
+      juniors: newJuniors,
+      total: currentNews.isEmpty ? newsData.length : newNews.length);
 }

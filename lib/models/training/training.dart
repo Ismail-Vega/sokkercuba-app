@@ -21,7 +21,7 @@ class PlayerTrainingReport {
 
 @JsonSerializable()
 class SquadTraining {
-  final List<PlayerTrainingReport>? players;
+  final List<PlayerTrainingReport> players;
 
   SquadTraining({required this.players});
 

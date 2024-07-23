@@ -4,9 +4,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:modal_progress_hud_nsn/modal_progress_hud_nsn.dart';
 import 'package:provider/provider.dart';
 
-import '../../models/team/team_stats.dart';
 import '../../models/team/user.dart';
-import '../../models/tsummary/tsummary.dart';
 import '../../services/api_client.dart';
 import '../../services/fetch_all_data.dart';
 import '../../state/actions.dart';
@@ -75,11 +73,12 @@ class _LoginScreenState extends State<LoginScreen> {
                 final filteredPayload = {
                   'teamId': userDataResponse['team']?['id'],
                   'user': User.fromJson(userDataResponse),
-                  'userStats': UserStats.fromJson(allDataResponse['userStats']),
+                  'userStats': allDataResponse['userStats'],
                   'juniors': allDataResponse['juniors'],
-                  'tsummary': TSummary.fromJson(allDataResponse['tsummary']),
+                  'tsummary': allDataResponse['tsummary'],
                   'players': allDataResponse['players'],
                   'training': allDataResponse['training'],
+                  'news': allDataResponse['news'],
                 };
 
                 appStateNotifier.dispatch(
@@ -88,13 +87,13 @@ class _LoginScreenState extends State<LoginScreen> {
                 Navigator.pushNamed(context, '/');
               } else {
                 Fluttertoast.showToast(
-                  msg: "Failed to fetch all data!",
-                  toastLength: Toast.LENGTH_SHORT,
-                  gravity: ToastGravity.BOTTOM,
-                  timeInSecForIosWeb: 1,
-                  backgroundColor: Colors.red,
-                  textColor: Colors.white,
-                  fontSize: 16.0);
+                    msg: "Failed to fetch all data!",
+                    toastLength: Toast.LENGTH_SHORT,
+                    gravity: ToastGravity.BOTTOM,
+                    timeInSecForIosWeb: 1,
+                    backgroundColor: Colors.red,
+                    textColor: Colors.white,
+                    fontSize: 16.0);
               }
             } else {
               Fluttertoast.showToast(
