@@ -75,6 +75,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   'user': User.fromJson(userDataResponse),
                   'userStats': allDataResponse['userStats'],
                   'juniors': allDataResponse['juniors'],
+                  'juniorsTraining': allDataResponse['juniorsTraining'],
                   'tsummary': allDataResponse['tsummary'],
                   'players': allDataResponse['players'],
                   'training': allDataResponse['training'],

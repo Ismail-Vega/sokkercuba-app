@@ -8,6 +8,7 @@ import '../models/tsummary/tsummary.dart';
 import '../state/actions.dart';
 import '../utils/constants.dart';
 import 'api_client.dart';
+import 'fetch_juniors_training.dart';
 
 Future<Map<String, dynamic>> fetchAllData(
     ApiClient apiClient, User user, AppState state) async {
@@ -33,6 +34,8 @@ Future<Map<String, dynamic>> fetchAllData(
     final playersData = setSquadData(state.players, responses[3]);
     final teamStats = UserStats.fromJson(responses[4]);
     final news = await setNewsData(apiClient, state.news, responses[5]);
+    final juniorsTraining =
+        await getJuniorsTraining(apiClient, responses[0]['juniors']);
 
     return {
       'juniors': juniors,
@@ -40,6 +43,7 @@ Future<Map<String, dynamic>> fetchAllData(
       'players': playersData,
       'training': training,
       'userStats': teamStats,
+      'juniorsTraining': juniorsTraining,
       'news': news,
       'code': 200,
     };
