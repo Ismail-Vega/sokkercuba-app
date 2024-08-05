@@ -4,13 +4,11 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:modal_progress_hud_nsn/modal_progress_hud_nsn.dart';
 import 'package:provider/provider.dart';
 
-import '../../models/team/user.dart';
 import '../../services/api_client.dart';
 import '../../services/fetch_all_data.dart';
 import '../../state/actions.dart';
 import '../../state/app_state_notifier.dart';
 import '../../utils/constants.dart';
-import '../../utils/is_date_today.dart';
 import '../../widgets/rounded_button.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -52,61 +50,26 @@ class _LoginScreenState extends State<LoginScreen> {
         if (response.statusCode == 200 && mounted) {
           final appStateNotifier =
               Provider.of<AppStateNotifier>(context, listen: false);
-          final stateUser = appStateNotifier.state.user;
+          final result = await fetchAllData(apiClient, appStateNotifier);
 
-          appStateNotifier
-              .dispatch(StoreAction(StoreActionTypes.setLogin, true));
-          appStateNotifier
-              .dispatch(StoreAction(StoreActionTypes.setUsername, login));
-
-          if (stateUser != null && isDateToday(stateUser.today.date.value)) {
-            Navigator.pushNamed(context, '/');
+          if (result['code'] == 200 && result['success'] == true) {
+            appStateNotifier
+                .dispatch(StoreAction(StoreActionTypes.setLogin, true));
+            appStateNotifier
+                .dispatch(StoreAction(StoreActionTypes.setUsername, login));
           } else {
-            final userDataResponse = await apiClient.fetchData('/current');
-
-            if (userDataResponse != null) {
-              final user = User.fromJson(userDataResponse);
-              final allDataResponse =
-                  await fetchAllData(apiClient, user, appStateNotifier.state);
-
-              if (allDataResponse['code'] == 200 && mounted) {
-                final filteredPayload = {
-                  'teamId': userDataResponse['team']?['id'],
-                  'user': User.fromJson(userDataResponse),
-                  'userStats': allDataResponse['userStats'],
-                  'juniors': allDataResponse['juniors'],
-                  'juniorsTraining': allDataResponse['juniorsTraining'],
-                  'tsummary': allDataResponse['tsummary'],
-                  'players': allDataResponse['players'],
-                  'training': allDataResponse['training'],
-                  'news': allDataResponse['news'],
-                };
-
-                appStateNotifier.dispatch(
-                    StoreAction(StoreActionTypes.setAll, filteredPayload));
-
-                Navigator.pushNamed(context, '/');
-              } else {
-                Fluttertoast.showToast(
-                    msg: "Failed to fetch all data!",
-                    toastLength: Toast.LENGTH_SHORT,
-                    gravity: ToastGravity.BOTTOM,
-                    timeInSecForIosWeb: 1,
-                    backgroundColor: Colors.red,
-                    textColor: Colors.white,
-                    fontSize: 16.0);
-              }
-            } else {
-              Fluttertoast.showToast(
-                  msg: "Failed to fetch all data!",
-                  toastLength: Toast.LENGTH_SHORT,
-                  gravity: ToastGravity.BOTTOM,
-                  timeInSecForIosWeb: 1,
-                  backgroundColor: Colors.red,
-                  textColor: Colors.white,
-                  fontSize: 16.0);
-            }
+            Fluttertoast.showToast(
+                msg: "Failed to fetch all data!",
+                toastLength: Toast.LENGTH_SHORT,
+                gravity: ToastGravity.BOTTOM,
+                timeInSecForIosWeb: 1,
+                backgroundColor: Colors.red,
+                textColor: Colors.white,
+                fontSize: 16.0);
           }
+
+          if (!mounted) return;
+          Navigator.pushNamed(context, '/');
         } else {
           if (response.statusCode == 401) {
             Fluttertoast.showToast(

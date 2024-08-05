@@ -3,41 +3,75 @@ import 'package:provider/provider.dart';
 
 import '../models/navigation/nav_bar_item_model.dart';
 import '../services/api_client.dart';
+import '../services/fetch_all_data.dart';
 import '../state/actions.dart';
 import '../state/app_state_notifier.dart';
 import '../widgets/nav_bar_item.dart';
 
-class DrawerContent extends StatelessWidget {
+class DrawerContent extends StatefulWidget {
   final void Function(ThemeMode) setSelectedTheme;
 
   const DrawerContent({super.key, required this.setSelectedTheme});
 
   @override
+  State<DrawerContent> createState() => _DrawerContentState();
+}
+
+class _DrawerContentState extends State<DrawerContent> {
+  bool isLoading = false;
+
+  Future<void> _updateData(BuildContext context) async {
+    setState(() {
+      isLoading = true;
+    });
+
+    final apiClient = ApiClient();
+    await apiClient.initCookieJar();
+
+    if (!context.mounted) return;
+
+    final appStateNotifier =
+        Provider.of<AppStateNotifier>(context, listen: false);
+
+    await fetchAllData(apiClient, appStateNotifier);
+
+    if (!context.mounted) return;
+    Navigator.pushNamed(context, '/');
+
+    setState(() {
+      isLoading = false;
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     return ListView(
       children: [
-        Stack(
-          children: [
-            DrawerHeader(
-              decoration: const BoxDecoration(
-                image: DecorationImage(
-                  image: AssetImage('assets/images/logo/logo.jpg'),
-                  fit: BoxFit.cover,
+        AppBar(
+          automaticallyImplyLeading: false,
+          title: Container(
+            padding:
+                const EdgeInsets.all(24.0), // Add padding to the entire AppBar
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text('Navigation'),
+                TextButton.icon(
+                  icon: const Icon(Icons.update, color: Colors.white),
+                  label: const Text(
+                    'Update my data',
+                    style: TextStyle(color: Colors.white),
+                  ),
+                  onPressed: () async {
+                    await _updateData(context);
+                  },
                 ),
-              ),
-              child: Container(),
+              ],
             ),
-            Positioned(
-              top: 0,
-              right: 0,
-              child: CloseButton(
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-              ),
-            ),
-          ],
+          ),
         ),
+        if (isLoading) const LinearProgressIndicator(),
+        const Divider(),
         for (var item in drawerPublicItems)
           NavBarItem(
             icon: item.icon,
