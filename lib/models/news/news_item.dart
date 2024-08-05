@@ -11,7 +11,7 @@ class NewsItem {
   final int type;
   final String kind;
   final String title;
-  final List<dynamic> titleProperties;
+  final dynamic titleProperties;
   final NewsDate date;
   final bool unread;
   final List<NewsBlock> blocks;

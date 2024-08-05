@@ -12,7 +12,7 @@ NewsItem _$NewsItemFromJson(Map<String, dynamic> json) => NewsItem(
       type: (json['type'] as num).toInt(),
       kind: json['kind'] as String,
       title: json['title'] as String,
-      titleProperties: json['titleProperties'] as List<dynamic>,
+      titleProperties: json['titleProperties'],
       date: NewsDate.fromJson(json['date'] as Map<String, dynamic>),
       unread: json['unread'] as bool,
       blocks: (json['blocks'] as List<dynamic>)

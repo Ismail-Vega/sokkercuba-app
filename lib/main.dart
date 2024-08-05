@@ -11,6 +11,7 @@ import 'components/responsive_drawer.dart';
 import 'models/team/user.dart';
 import 'screens/contact/contact_screen.dart';
 import 'screens/home/welcome_screen.dart';
+import 'screens/juniors/juniors_screen.dart';
 import 'screens/login/login_screen.dart';
 import 'screens/scouting/scouting_screen.dart';
 import 'screens/squad/squad_screen.dart';
@@ -46,17 +47,15 @@ void main() async {
   }
 
   final apiClient = ApiClient();
-  bool isLoggedIn = initialState.loggedIn;
   await apiClient.initCookieJar();
-  User? user;
 
   try {
     final currentResponse = await apiClient.fetchData('/current');
     if (currentResponse != null) {
-      isLoggedIn = true;
-      user = User.fromJson(currentResponse);
+      initialState = initialState.copyWith(
+          loggedIn: true, user: User.fromJson(currentResponse));
     } else {
-      isLoggedIn = false;
+      initialState = initialState.copyWith(loggedIn: false);
     }
   } catch (e) {
     if (kDebugMode) {
@@ -64,23 +63,13 @@ void main() async {
     }
   }
 
-  runApp(SokkerPro(
-    initialState: initialState,
-    isLoggedIn: isLoggedIn,
-    userData: user,
-  ));
+  runApp(SokkerPro(initialState: initialState));
 }
 
 class SokkerPro extends StatefulWidget {
   final AppState initialState;
-  final bool isLoggedIn;
-  final User? userData;
 
-  const SokkerPro(
-      {super.key,
-      required this.initialState,
-      required this.isLoggedIn,
-      this.userData});
+  const SokkerPro({super.key, required this.initialState});
 
   @override
   State<SokkerPro> createState() {
@@ -101,36 +90,45 @@ class _SokkerProState extends State<SokkerPro> {
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
       create: (_) => AppStateNotifier(widget.initialState),
-      child: MaterialApp(
-        builder: FToastBuilder(),
-        navigatorKey: navigatorKey,
-        title: 'Sokker Pro App',
-        theme: ThemeData.light(),
-        darkTheme: ThemeData.dark().copyWith(
-          primaryColor: Colors.blue[900],
-          appBarTheme: const AppBarTheme(
-            backgroundColor: Colors.blueAccent,
-          ),
-          buttonTheme: const ButtonThemeData(
-            buttonColor: Colors.blue,
-          ),
-          drawerTheme: const DrawerThemeData(
-            backgroundColor: Colors.blueAccent,
-          ),
-        ),
-        themeMode: _themeMode,
-        home: widget.isLoggedIn
-            ? ResponsiveDrawer(
-                setSelectedTheme: _setSelectedTheme,
-                child: WelcomeScreen(user: widget.userData))
-            : const LoginScreen(),
-        onGenerateRoute: _generateRoute,
-        initialRoute: '/',
+      child: Consumer<AppStateNotifier>(
+        builder: (context, appStateNotifier, child) {
+          final appState = appStateNotifier.state;
+
+          return MaterialApp(
+            builder: FToastBuilder(),
+            navigatorKey: navigatorKey,
+            title: 'Sokker Pro App',
+            theme: ThemeData.light(),
+            darkTheme: ThemeData.dark().copyWith(
+              primaryColor: Colors.blue[900],
+              appBarTheme: const AppBarTheme(
+                backgroundColor: Colors.blueAccent,
+              ),
+              buttonTheme: const ButtonThemeData(
+                buttonColor: Colors.blue,
+              ),
+              drawerTheme: const DrawerThemeData(
+                backgroundColor: Colors.blueAccent,
+              ),
+            ),
+            themeMode: _themeMode,
+            home: appState.loggedIn
+                ? ResponsiveDrawer(
+                    setSelectedTheme: _setSelectedTheme,
+                    child: WelcomeScreen(user: appState.user),
+                  )
+                : const LoginScreen(),
+            onGenerateRoute: (settings) {
+              return _generateRoute(settings, appState);
+            },
+            initialRoute: '/',
+          );
+        },
       ),
     );
   }
 
-  Route<dynamic> _generateRoute(RouteSettings settings) {
+  Route<dynamic> _generateRoute(RouteSettings settings, AppState appState) {
     switch (settings.name) {
       case '/':
         return MaterialPageRoute(
@@ -160,6 +158,15 @@ class _SokkerProState extends State<SokkerPro> {
         return MaterialPageRoute(
             builder: (context) => ResponsiveDrawer(
                 setSelectedTheme: _setSelectedTheme, child: const Training()));
+      case '/juniors':
+        return MaterialPageRoute(
+            builder: (context) => ResponsiveDrawer(
+                setSelectedTheme: _setSelectedTheme,
+                child: JuniorsScreen(
+                  juniors: appState.juniors,
+                  progress: appState.juniorsTraining?.juniors ?? {},
+                  potentialData: appState.news?.juniors ?? [],
+                )));
       default:
         return MaterialPageRoute(
             builder: (context) => ResponsiveDrawer(
