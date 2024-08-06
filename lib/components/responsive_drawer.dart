@@ -29,6 +29,10 @@ class _ResponsiveDrawerState extends State<ResponsiveDrawer> {
     _scaffoldKey.currentState?.openDrawer();
   }
 
+  void _closeDrawer() {
+    _scaffoldKey.currentState?.openEndDrawer();
+  }
+
   @override
   Widget build(BuildContext context) {
     final isLoading = Provider.of<AppStateNotifier>(context).state.loading;
@@ -69,10 +73,11 @@ class _ResponsiveDrawerState extends State<ResponsiveDrawer> {
           width: MediaQuery.of(context).size.width,
           child: DrawerContent(
             setSelectedTheme: widget.setSelectedTheme,
+            closeDrawer: _closeDrawer,
           ),
         ),
         body: Container(
-          color: Colors.blue[900], // Main background color
+          color: Colors.blue,
           child: SafeArea(
             child: Column(
               children: [

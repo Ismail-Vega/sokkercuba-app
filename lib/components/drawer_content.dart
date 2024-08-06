@@ -10,8 +10,10 @@ import '../widgets/nav_bar_item.dart';
 
 class DrawerContent extends StatefulWidget {
   final void Function(ThemeMode) setSelectedTheme;
+  final VoidCallback closeDrawer;
 
-  const DrawerContent({super.key, required this.setSelectedTheme});
+  const DrawerContent(
+      {super.key, required this.setSelectedTheme, required this.closeDrawer});
 
   @override
   State<DrawerContent> createState() => _DrawerContentState();
@@ -35,8 +37,7 @@ class _DrawerContentState extends State<DrawerContent> {
 
     await fetchAllData(apiClient, appStateNotifier);
 
-    if (!context.mounted) return;
-    Navigator.pushNamed(context, '/');
+    widget.closeDrawer();
 
     setState(() {
       isLoading = false;
@@ -49,24 +50,54 @@ class _DrawerContentState extends State<DrawerContent> {
       children: [
         AppBar(
           automaticallyImplyLeading: false,
-          title: Container(
-            padding:
-                const EdgeInsets.all(24.0), // Add padding to the entire AppBar
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const Text('Navigation'),
-                TextButton.icon(
-                  icon: const Icon(Icons.update, color: Colors.white),
-                  label: const Text(
-                    'Update my data',
-                    style: TextStyle(color: Colors.white),
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          flexibleSpace: Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [Colors.blue[900] ?? Colors.blue, Colors.blueAccent],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(24.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text(
+                    'Navigation',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 24.0,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
-                  onPressed: () async {
-                    await _updateData(context);
-                  },
-                ),
-              ],
+                  TextButton.icon(
+                    icon: const Icon(Icons.update, color: Colors.white),
+                    label: const Text(
+                      'Update my data',
+                      style: TextStyle(color: Colors.white),
+                    ),
+                    style: TextButton.styleFrom(
+                      backgroundColor: Colors.transparent,
+                      side: const BorderSide(color: Colors.white, width: 1.5),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12.0),
+                      ),
+                    ),
+                    onPressed: () async {
+                      await _updateData(context);
+                    },
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.close, color: Colors.white),
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                  ),
+                ],
+              ),
             ),
           ),
         ),
