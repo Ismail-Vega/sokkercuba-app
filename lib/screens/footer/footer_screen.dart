@@ -31,7 +31,6 @@ class Footer extends StatelessWidget {
                   Navigator.pushNamed(context, '/contact');
                 },
               ),
-              // Add more links here
             ],
           ),
           const Divider(height: 32.0, thickness: 1.0),
@@ -67,7 +66,7 @@ class FooterLink extends StatelessWidget {
     return InkWell(
       onTap: onTap,
       child: Padding(
-        padding: const EdgeInsets.all(8.0), // Adjust padding as needed
+        padding: const EdgeInsets.all(8.0),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [

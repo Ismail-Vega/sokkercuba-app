@@ -51,7 +51,6 @@ class ApiClient {
       final options = Options(
         headers: {
           'Cookie': cookiesString,
-          //'Cookie':             'PHPSESSID=1jij5r4r1a7s8u37cd8lhqcegk; lang=en; lang_ID=2; _html_rtl=0',
         },
       );
 
@@ -87,7 +86,6 @@ class ApiClient {
       final options = Options(
         headers: {
           'Cookie': cookiesString,
-          //'Cookie':             'PHPSESSID=1jij5r4r1a7s8u37cd8lhqcegk; lang=en; lang_ID=2; _html_rtl=0',
         },
       );
 

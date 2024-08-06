@@ -11,7 +11,7 @@ IconData getIconForKind(String kind) {
     case 'injured':
       return Icons.local_hospital;
     default:
-      return Icons.circle; // Default icon
+      return Icons.circle;
   }
 }
 
@@ -26,6 +26,6 @@ Color getColorForKind(String kind) {
     case 'injured':
       return Colors.red;
     default:
-      return Colors.red; // Default color
+      return Colors.red;
   }
 }

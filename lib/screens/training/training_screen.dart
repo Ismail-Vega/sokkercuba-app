@@ -71,10 +71,8 @@ class _TrainingState extends State<Training> {
                     child: Container(
                       decoration: BoxDecoration(
                         color: getSkillChangeColor(report, 'stamina'),
-                        borderRadius: BorderRadius.circular(
-                            4.0), // Set border radius here
+                        borderRadius: BorderRadius.circular(4.0),
                       ),
-                      // Set the background color here
                       child:
                           Center(child: Text(report.skills.stamina.toString())),
                     ),
@@ -86,10 +84,8 @@ class _TrainingState extends State<Training> {
                     child: Container(
                       decoration: BoxDecoration(
                         color: getSkillChangeColor(report, 'pace'),
-                        borderRadius: BorderRadius.circular(
-                            4.0), // Set border radius here
+                        borderRadius: BorderRadius.circular(4.0),
                       ),
-                      // Set the background color here
                       child: Center(child: Text(report.skills.pace.toString())),
                     ),
                   ),
@@ -100,10 +96,8 @@ class _TrainingState extends State<Training> {
                     child: Container(
                       decoration: BoxDecoration(
                         color: getSkillChangeColor(report, 'technique'),
-                        borderRadius: BorderRadius.circular(
-                            4.0), // Set border radius here
+                        borderRadius: BorderRadius.circular(4.0),
                       ),
-                      // Set the background color here
                       child: Center(
                           child: Text(report.skills.technique.toString())),
                     ),
@@ -115,10 +109,8 @@ class _TrainingState extends State<Training> {
                     child: Container(
                       decoration: BoxDecoration(
                         color: getSkillChangeColor(report, 'passing'),
-                        borderRadius: BorderRadius.circular(
-                            4.0), // Set border radius here
+                        borderRadius: BorderRadius.circular(4.0),
                       ),
-                      // Set the background color here
                       child:
                           Center(child: Text(report.skills.passing.toString())),
                     ),
@@ -130,10 +122,8 @@ class _TrainingState extends State<Training> {
                     child: Container(
                       decoration: BoxDecoration(
                         color: getSkillChangeColor(report, 'keeper'),
-                        borderRadius: BorderRadius.circular(
-                            4.0), // Set border radius here
+                        borderRadius: BorderRadius.circular(4.0),
                       ),
-                      // Set the background color here
                       child:
                           Center(child: Text(report.skills.keeper.toString())),
                     ),
@@ -145,10 +135,8 @@ class _TrainingState extends State<Training> {
                     child: Container(
                       decoration: BoxDecoration(
                         color: getSkillChangeColor(report, 'defending'),
-                        borderRadius: BorderRadius.circular(
-                            4.0), // Set border radius here
+                        borderRadius: BorderRadius.circular(4.0),
                       ),
-                      // Set the background color here
                       child: Center(
                           child: Text(report.skills.defending.toString())),
                     ),
@@ -160,10 +148,8 @@ class _TrainingState extends State<Training> {
                     child: Container(
                       decoration: BoxDecoration(
                         color: getSkillChangeColor(report, 'playmaking'),
-                        borderRadius: BorderRadius.circular(
-                            4.0), // Set border radius here
+                        borderRadius: BorderRadius.circular(4.0),
                       ),
-                      // Set the background color here
                       child: Center(
                           child: Text(report.skills.playmaking.toString())),
                     ),
@@ -175,10 +161,8 @@ class _TrainingState extends State<Training> {
                     child: Container(
                       decoration: BoxDecoration(
                         color: getSkillChangeColor(report, 'striker'),
-                        borderRadius: BorderRadius.circular(
-                            4.0), // Set border radius here
+                        borderRadius: BorderRadius.circular(4.0),
                       ),
-                      // Set the background color here
                       child:
                           Center(child: Text(report.skills.striker.toString())),
                     ),
@@ -273,7 +257,7 @@ class _TrainingState extends State<Training> {
     );
 
     return Scaffold(
-      backgroundColor: Colors.blue[900],
+      backgroundColor: Colors.blue,
       body: Column(
         children: [
           Padding(
@@ -283,7 +267,7 @@ class _TrainingState extends State<Training> {
                 DropdownButton<dynamic>(
                     menuMaxHeight: screenHeight / 1.5,
                     borderRadius: const BorderRadius.all(Radius.circular(8.0)),
-                    dropdownColor: Colors.blueAccent,
+                    dropdownColor: Colors.blue[900],
                     hint: const Text('Select Player'),
                     value: playerIndex > -1 ? players[playerIndex] : null,
                     onChanged: handlePlayerChange,
@@ -308,10 +292,9 @@ class _TrainingState extends State<Training> {
           if (selectedPlayer != null)
             Expanded(
               child: ClipRRect(
-                borderRadius:
-                    BorderRadius.circular(16.0), // adjust the radius as needed
+                borderRadius: BorderRadius.circular(16.0),
                 child: Container(
-                  color: Colors.blueAccent,
+                  color: Colors.blue[900],
                   child: Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: ListView(
@@ -465,6 +448,7 @@ class _TrainingState extends State<Training> {
                         ),
                         DropdownButton<int>(
                           value: rowsPerPage,
+                          dropdownColor: Colors.blue[900],
                           items: [10, 25, 50, 100].map((value) {
                             return DropdownMenuItem<int>(
                               value: value,

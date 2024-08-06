@@ -52,7 +52,7 @@ class PlayerCard extends StatelessWidget {
     final report = getPlayerTrainingReport(players, player.id, trainingWeek);
 
     return Card(
-      color: Colors.blueAccent,
+      color: Colors.blue[900],
       child: SafeArea(
         child: Column(
           children: [

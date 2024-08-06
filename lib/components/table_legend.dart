@@ -15,7 +15,7 @@ class TableLegend extends StatelessWidget {
                 Icons.circle,
                 color: Colors.green[400],
                 size: 16,
-              ), // Dark green dot
+              ),
               const SizedBox(width: 8),
               const Text('Advanced Training'),
             ],
@@ -24,8 +24,7 @@ class TableLegend extends StatelessWidget {
             padding: const EdgeInsets.fromLTRB(0, 8, 0, 0),
             child: Row(
               children: [
-                Icon(Icons.circle,
-                    color: Colors.grey[700], size: 16), // Light green dot
+                Icon(Icons.circle, color: Colors.grey[700], size: 16),
                 const SizedBox(width: 8),
                 const Text('Formation Training'),
               ],
@@ -37,7 +36,7 @@ class TableLegend extends StatelessWidget {
           children: [
             Row(
               children: [
-                Icon(Icons.circle, color: Colors.red, size: 16), // Red dot
+                Icon(Icons.circle, color: Colors.red, size: 16),
                 SizedBox(width: 8),
                 Text('Missing Training'),
               ],
@@ -46,7 +45,7 @@ class TableLegend extends StatelessWidget {
               padding: EdgeInsets.fromLTRB(0, 8, 0, 0),
               child: Row(
                 children: [
-                  Icon(Icons.add, color: Colors.red, size: 16), // Cross icon
+                  Icon(Icons.add, color: Colors.red, size: 16),
                   SizedBox(width: 8),
                   Text('Injury'),
                 ],

@@ -15,7 +15,7 @@ Color? getSkillChangeColor(TrainingReport? report, String skill) {
     }
   }
 
-  return null; // Use primary color or null
+  return null;
 }
 
 Color? getJuniorLevelColor(List<ProgressValue>? progressValues) {

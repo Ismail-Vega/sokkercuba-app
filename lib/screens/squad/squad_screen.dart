@@ -21,7 +21,7 @@ class SquadScreen extends StatelessWidget {
     }
 
     return Scaffold(
-      backgroundColor: Colors.blue[900],
+      backgroundColor: Colors.blue,
       body: GridView.builder(
         gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
           crossAxisCount: 1,

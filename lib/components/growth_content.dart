@@ -12,7 +12,7 @@ class GrowthDisplay extends StatelessWidget {
     final secondHalf = entries.sublist(4, 8);
 
     return Card(
-      color: Colors.blueAccent,
+      color: Colors.blue[900],
       child: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(8),

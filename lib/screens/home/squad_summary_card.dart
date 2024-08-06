@@ -18,7 +18,7 @@ class SquadSummaryCard extends StatelessWidget {
     }
 
     return Card(
-      color: Colors.blueAccent,
+      color: Colors.blue[900],
       child: Padding(
         padding: const EdgeInsets.all(12.0),
         child: Column(

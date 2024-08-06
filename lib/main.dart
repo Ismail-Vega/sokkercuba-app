@@ -100,15 +100,15 @@ class _SokkerProState extends State<SokkerPro> {
             title: 'Sokker Pro App',
             theme: ThemeData.light(),
             darkTheme: ThemeData.dark().copyWith(
-              primaryColor: Colors.blue[900],
-              appBarTheme: const AppBarTheme(
-                backgroundColor: Colors.blueAccent,
+              primaryColor: Colors.blue,
+              appBarTheme: AppBarTheme(
+                backgroundColor: Colors.blue[900],
               ),
               buttonTheme: const ButtonThemeData(
                 buttonColor: Colors.blue,
               ),
-              drawerTheme: const DrawerThemeData(
-                backgroundColor: Colors.blueAccent,
+              drawerTheme: DrawerThemeData(
+                backgroundColor: Colors.blue[900],
               ),
             ),
             themeMode: _themeMode,

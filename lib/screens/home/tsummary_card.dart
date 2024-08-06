@@ -19,7 +19,7 @@ class TSummaryCard extends StatelessWidget {
     List<Week> weeks = tsummary.weeks;
 
     return Card(
-      color: Colors.blueAccent,
+      color: Colors.blue[900],
       child: Padding(
         padding: const EdgeInsets.all(8.0),
         child: Column(
@@ -36,9 +36,9 @@ class TSummaryCard extends StatelessWidget {
                 ]),
             const SizedBox(height: 8),
             SizedBox(
-              height: 324.0, // Adjust the height as needed
+              height: 324.0,
               child: SingleChildScrollView(
-                scrollDirection: Axis.vertical, // Allows vertical scrolling
+                scrollDirection: Axis.vertical,
                 child: Table(
                   columnWidths: const {
                     0: FlexColumnWidth(1.5),
@@ -133,11 +133,9 @@ class TSummaryCard extends StatelessWidget {
                       final week = entry.value;
                       return TableRow(
                         decoration: index != weeks.length - 1
-                            ? BoxDecoration(
+                            ? const BoxDecoration(
                                 border: Border(
-                                    bottom: BorderSide(
-                                        color:
-                                            Colors.blue[900] ?? Colors.blue)),
+                                    bottom: BorderSide(color: Colors.blue)),
                               )
                             : null,
                         children: [

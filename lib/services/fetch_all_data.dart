@@ -20,8 +20,6 @@ Future<Map<String, dynamic>> fetchAllData(
 
     if (user != null) {
       final teamId = user['team']?['id'];
-      final plus = user['plus'];
-      final trainingWeek = state.trainingWeek;
 
       final List<Future<dynamic>> initialPromises = [
         apiClient.fetchData(juniorsUrl),
@@ -34,9 +32,22 @@ Future<Map<String, dynamic>> fetchAllData(
 
       final responses = await Future.wait(initialPromises);
 
+      final plus = user['plus'];
+      var stateWeek = state.trainingWeek;
+      final week = user['today']['week'];
+      final day = user['today']['day'];
+
+      if (week != null && day != null) {
+        final trainingWeek = day < 5 ? week - 1 : week;
+
+        if (trainingWeek != stateWeek) {
+          stateWeek = trainingWeek;
+        }
+      }
+
       final juniors = setJuniorsData(state.juniors, responses[0]);
       final training = await setTrainingData(
-          apiClient, plus, trainingWeek, state.training, responses[1]);
+          apiClient, plus, stateWeek, state.training, responses[1]);
       final tsummary = TSummary.fromJson(responses[2]);
       final players = setSquadData(state.players, responses[3]);
       final userStats = UserStats.fromJson(responses[4]);
@@ -55,6 +66,7 @@ Future<Map<String, dynamic>> fetchAllData(
         'players': players,
         'training': training,
         'news': news,
+        'trainingWeek': stateWeek,
       };
 
       appStateNotifier

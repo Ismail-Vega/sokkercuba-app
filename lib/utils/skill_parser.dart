@@ -2,7 +2,7 @@ import 'constants.dart';
 
 String parseSkillToText(int index) {
   if (index < 0 || index >= skillsLevelsList.length) {
-    'Unknown [$index]';
+    'Unknown';
   }
-  return '${skillsLevelsList[index]} [$index]';
+  return skillsLevelsList[index];
 }
