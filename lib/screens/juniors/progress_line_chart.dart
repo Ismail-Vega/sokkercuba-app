@@ -1,43 +1,45 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 
-import '../noData/no_data_screen.dart';
+import '../../models/juniors/junior_progress.dart';
 
-class JuniorsScreen extends StatefulWidget {
-  final List<ProgressValue> data;
-
-  const JuniorsScreen({super.key, required this.data});
+class ProgressLineChart extends StatefulWidget {
+  final JuniorProgress data;
+  const ProgressLineChart({super.key, required this.data});
 
   @override
-  State<JuniorsScreen> createState() => _JuniorsScreenState();
+  State<ProgressLineChart> createState() => _ProgressLineChartState();
 }
 
-class _JuniorsScreenState extends State<JuniorsScreen> {
-  final List<Color> gradientColors = [
-    const Color(0xff23b6e6),
-    const Color(0xff02d39a),
-  ];
+class _ProgressLineChartState extends State<ProgressLineChart> {
+  static const double pointWidth = 40.0;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Juniors Progress'),
-      ),
-      body: widget.data.isEmpty
-          ? const Center(
-              child: NoDataFoundScreen(),
-            )
-          : Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: SizedBox(
-                  width: widget.data.length * 100.0, // Width for scrolling
-                  child: LineChart(mainData()),
-                ),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            final numberOfPoints = widget.data.values.length;
+            final chartContentWidth = numberOfPoints * pointWidth;
+            const chartHeight = 364.0;
+
+            final shouldScroll = chartContentWidth > constraints.maxWidth;
+
+            return SingleChildScrollView(
+              scrollDirection: shouldScroll ? Axis.horizontal : Axis.vertical,
+              child: SizedBox(
+                width: shouldScroll ? chartContentWidth : constraints.maxWidth,
+                height: chartHeight,
+                child: Padding(
+                    padding: const EdgeInsets.all(12.0),
+                    child: LineChart(mainData())),
               ),
-            ),
+            );
+          },
+        ),
+      ),
     );
   }
 
@@ -48,13 +50,21 @@ class _JuniorsScreenState extends State<JuniorsScreen> {
     );
     String text = '';
     int intValue = value.toInt();
-    if (intValue >= 0 && intValue < widget.data.length) {
-      text = 'Week ${intValue + 1}';
+
+    if (intValue >= 0 &&
+        intValue < widget.data.values[widget.data.values.length - 1].x) {
+      text = '$intValue';
     }
     return SideTitleWidget(
       axisSide: meta.axisSide,
       space: 8.0,
-      child: Text(text, style: style),
+      child: Transform.translate(
+        offset: const Offset(0, 0),
+        child: Transform.rotate(
+          angle: -0.785398,
+          child: Text(text, style: style),
+        ),
+      ),
     );
   }
 
@@ -67,6 +77,9 @@ class _JuniorsScreenState extends State<JuniorsScreen> {
   }
 
   LineChartData mainData() {
+    final minX = widget.data.values.first.x.toDouble();
+    final maxX = widget.data.values.last.x.toDouble();
+
     return LineChartData(
       gridData: FlGridData(
         show: true,
@@ -97,7 +110,7 @@ class _JuniorsScreenState extends State<JuniorsScreen> {
         bottomTitles: AxisTitles(
           sideTitles: SideTitles(
             showTitles: true,
-            reservedSize: 22,
+            reservedSize: 24,
             interval: 1,
             getTitlesWidget: bottomTitleWidgets,
           ),
@@ -107,7 +120,7 @@ class _JuniorsScreenState extends State<JuniorsScreen> {
             showTitles: true,
             interval: 1,
             getTitlesWidget: leftTitleWidgets,
-            reservedSize: 28,
+            reservedSize: 32,
           ),
         ),
       ),
@@ -115,41 +128,22 @@ class _JuniorsScreenState extends State<JuniorsScreen> {
         show: true,
         border: Border.all(color: const Color(0xff37434d)),
       ),
-      minX: 0,
-      maxX: (widget.data.length - 1).toDouble(),
+      minX: minX,
+      maxX: maxX,
       minY: 0,
-      maxY: widget.data
-          .map((e) => e.y.toDouble())
-          .reduce((a, b) => a > b ? a : b),
+      maxY: 18,
       lineBarsData: [
         LineChartBarData(
-          spots: widget.data
+          spots: widget.data.values
               .map((e) => FlSpot(e.x.toDouble(), e.y.toDouble()))
               .toList(),
-          isCurved: true,
-          gradient: LinearGradient(colors: gradientColors),
-          barWidth: 5,
-          isStrokeCapRound: true,
+          isCurved: false,
+          color: Colors.red,
           dotData: const FlDotData(
-            show: false,
-          ),
-          belowBarData: BarAreaData(
             show: true,
-            gradient: LinearGradient(
-              colors: gradientColors
-                  .map((color) => color.withOpacity(0.3))
-                  .toList(),
-            ),
           ),
         ),
       ],
     );
   }
-}
-
-class ProgressValue {
-  final int x; // Week value
-  final int y; // Junior level
-
-  ProgressValue(this.x, this.y);
 }

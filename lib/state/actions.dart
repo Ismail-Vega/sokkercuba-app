@@ -1,6 +1,7 @@
 import '../models/juniors/juniors.dart';
 import '../models/news/news.dart';
 import '../models/news/news_item.dart';
+import '../models/news/news_junior.dart';
 import '../models/player/player.dart';
 import '../models/player/player_info.dart';
 import '../models/squad/squad.dart';
@@ -197,17 +198,21 @@ Future<News> setNewsData(
     ApiClient apiClient, News? stateNews, Map<String, dynamic> data) async {
   final newsData = parseNews(data['news'] ?? []);
   final List<NewsItem> currentNews = stateNews?.news ?? [];
+  final List<NewsJunior> currentJuniors = stateNews?.juniors ?? [];
   final currentNewsIds = currentNews.map((item) => item.id).toSet();
 
   final incomingNews = newsData
       .where(
         (item) =>
-            !currentNewsIds.contains(item.id) && item.kind == 'youth_school',
+            !currentNewsIds.contains(item.id) &&
+            item.kind == 'youth_school' &&
+            item.type == 2,
       )
       .toList();
 
   final newNews = [...currentNews, ...incomingNews];
-  final newJuniors = await getJuniorNews(apiClient, incomingNews);
+  final incomingJuniors = await getJuniorNews(apiClient, incomingNews);
+  final List<NewsJunior> newJuniors = [...currentJuniors, ...incomingJuniors];
 
   return News(
       news: currentNews.isEmpty ? newsData : newNews,
