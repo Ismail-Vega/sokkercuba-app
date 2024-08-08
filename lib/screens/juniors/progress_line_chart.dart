@@ -51,8 +51,7 @@ class _ProgressLineChartState extends State<ProgressLineChart> {
     String text = '';
     int intValue = value.toInt();
 
-    if (intValue >= 0 &&
-        intValue < widget.data.values[widget.data.values.length - 1].x) {
+    if (intValue >= 0 && intValue <= widget.data.values.last.x) {
       text = '$intValue';
     }
     return SideTitleWidget(

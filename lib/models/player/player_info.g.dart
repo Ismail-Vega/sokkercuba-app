@@ -26,6 +26,9 @@ PlayerInfo _$PlayerInfoFromJson(Map<String, dynamic> json) => PlayerInfo(
       characteristics: Characteristics.fromJson(
           json['characteristics'] as Map<String, dynamic>),
       skills: Skills.fromJson(json['skills'] as Map<String, dynamic>),
+      skillsChange: json['skillsChange'] == null
+          ? null
+          : SkillsChange.fromJson(json['skillsChange'] as Map<String, dynamic>),
       stats: Stats.fromJson(json['stats'] as Map<String, dynamic>),
       nationalStats:
           Stats.fromJson(json['nationalStats'] as Map<String, dynamic>),
@@ -47,6 +50,7 @@ Map<String, dynamic> _$PlayerInfoToJson(PlayerInfo instance) =>
       'wage': instance.wage,
       'characteristics': instance.characteristics,
       'skills': instance.skills,
+      'skillsChange': instance.skillsChange,
       'stats': instance.stats,
       'nationalStats': instance.nationalStats,
       'face': instance.face,

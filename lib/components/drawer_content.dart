@@ -144,10 +144,14 @@ class _DrawerContentState extends State<DrawerContent> {
 
               if (response != null && context.mounted) {
                 Navigator.pushNamed(context, '/login');
+                appStateNotifier
+                    .dispatch(StoreAction(StoreActionTypes.setLogin, false));
               }
             } catch (error) {
               if (context.mounted) {
                 Navigator.pushNamed(context, '/login');
+                appStateNotifier
+                    .dispatch(StoreAction(StoreActionTypes.setLogin, false));
               }
               throw Exception('Failed to logout: $error');
             } finally {

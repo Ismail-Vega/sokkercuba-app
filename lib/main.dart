@@ -122,6 +122,7 @@ class _SokkerProState extends State<SokkerPro> {
               return _generateRoute(settings, appState);
             },
             initialRoute: '/',
+            debugShowCheckedModeBanner: false,
           );
         },
       ),

@@ -1,11 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 
 import '../../models/player/player.dart';
-import '../../state/app_state_notifier.dart';
 import '../../utils/constants.dart';
 import '../../utils/format_numbers.dart';
-import '../../utils/get_training_data.dart';
 import '../../utils/skills_checker.dart';
 
 class PlayerCard extends StatelessWidget {
@@ -43,13 +40,6 @@ class PlayerCard extends StatelessWidget {
     final theme = Theme.of(context);
     final Color skillThemeColor =
         theme.brightness == Brightness.dark ? Colors.white : Colors.black;
-    final stateProvider = Provider.of<AppStateNotifier>(context);
-    final today = stateProvider.state.user?.today;
-    final week = today != null ? today.week : 1;
-    final training = stateProvider.state.training;
-    final players = training?.players;
-    final trainingWeek = (today?.day ?? 0) < 5 ? week - 1 : week;
-    final report = getPlayerTrainingReport(players, player.id, trainingWeek);
 
     return Card(
       color: Colors.blue[900],
@@ -82,11 +72,11 @@ class PlayerCard extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(horizontal: 8),
                 child: Column(
                   children: [
-                    _buildInfoTable(report, skillThemeColor),
+                    _buildInfoTable(skillThemeColor),
                     const SizedBox(height: 4),
                     const Divider(thickness: 1, color: Colors.grey),
                     const SizedBox(height: 4),
-                    _buildSkillsTable(report, skillThemeColor),
+                    _buildSkillsTable(skillThemeColor),
                   ],
                 ),
               ),
@@ -97,7 +87,7 @@ class PlayerCard extends StatelessWidget {
     );
   }
 
-  Widget _buildInfoTable(report, Color textSpanColor) {
+  Widget _buildInfoTable(Color textSpanColor) {
     return Table(
       columnWidths: const {
         0: FlexColumnWidth(2),
@@ -113,7 +103,6 @@ class PlayerCard extends StatelessWidget {
             'Wage',
             Text(
                 '${formatNumber(player.info.wage?.value)} ${player.info.wage?.currency}'),
-            report,
             textSpanColor),
         _buildTableRow(
             'Tact disc',
@@ -122,14 +111,12 @@ class PlayerCard extends StatelessWidget {
             'Form',
             Text(
                 '${skillsLevelsList[player.info.skills.form]} [${player.info.skills.form}]'),
-            report,
             textSpanColor),
         _buildTableRow(
             'Height',
             Text('${player.info.characteristics.height} cm'),
             'Weight',
             Text('${player.info.characteristics.weight.toStringAsFixed(1)} kg'),
-            report,
             textSpanColor),
         _buildTableRow(
             'BMI',
@@ -137,7 +124,6 @@ class PlayerCard extends StatelessWidget {
             'Cards',
             renderCard(
                 player.info.stats.cards.yellow, player.info.stats.cards.red),
-            report,
             textSpanColor),
         _buildTableRow(
             'NT cards',
@@ -147,7 +133,6 @@ class PlayerCard extends StatelessWidget {
             player.info.injury.daysRemaining > 0
                 ? Text('(${player.info.injury.daysRemaining} days)')
                 : const Text('none'),
-            report,
             textSpanColor),
       ],
     );
@@ -162,7 +147,7 @@ class PlayerCard extends StatelessWidget {
     );
   }
 
-  Widget _buildSkillsTable(report, Color textSpanColor) {
+  Widget _buildSkillsTable(Color textSpanColor) {
     return Table(
       columnWidths: const {
         0: FlexColumnWidth(2),
@@ -178,7 +163,6 @@ class PlayerCard extends StatelessWidget {
             'keeper',
             Text(
                 '${skillsLevelsList[player.info.skills.keeper]} [${player.info.skills.keeper}]'),
-            report,
             textSpanColor),
         _buildTableRow(
             'pace',
@@ -187,7 +171,6 @@ class PlayerCard extends StatelessWidget {
             'defender',
             Text(
                 '${skillsLevelsList[player.info.skills.defending]} [${player.info.skills.defending}]'),
-            report,
             textSpanColor),
         _buildTableRow(
             'technique',
@@ -196,7 +179,6 @@ class PlayerCard extends StatelessWidget {
             'playmaker',
             Text(
                 '${skillsLevelsList[player.info.skills.playmaking]} [${player.info.skills.playmaking}]'),
-            report,
             textSpanColor),
         _buildTableRow(
             'passing',
@@ -205,20 +187,19 @@ class PlayerCard extends StatelessWidget {
             'striker',
             Text(
                 '${skillsLevelsList[player.info.skills.striker]} [${player.info.skills.striker}]'),
-            report,
             textSpanColor),
       ],
     );
   }
 
   TableRow _buildTableRow(String skill1, Widget value1, String skill2,
-      Widget value2, report, Color skillThemeColor) {
+      Widget value2, Color skillThemeColor) {
     return TableRow(children: [
       _buildSkillCell(
           skill1,
           styledTextWidget(
               child: value1,
-              color: getSkillChangeColor(report, skill1),
+              color: getSkillChangeColor(player.info, skill1),
               defaultColor: skillThemeColor)),
       const TableCell(
           child: Padding(padding: EdgeInsets.all(4.0), child: Text(""))),
@@ -226,7 +207,7 @@ class PlayerCard extends StatelessWidget {
           skill2,
           styledTextWidget(
               child: value2,
-              color: getSkillChangeColor(report, skill2),
+              color: getSkillChangeColor(player.info, skill2),
               defaultColor: skillThemeColor)),
     ]);
   }

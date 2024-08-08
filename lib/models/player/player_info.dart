@@ -1,5 +1,6 @@
 import 'package:json_annotation/json_annotation.dart';
 
+import '../../mixins/skills_mixin.dart';
 import '../common/code_name.dart';
 import '../team/team.dart';
 import 'characteristics.dart';
@@ -9,12 +10,13 @@ import 'player_name.dart';
 import 'player_value.dart';
 import 'player_wage.dart';
 import 'skills.dart';
+import 'skills_change.dart';
 import 'stats.dart';
 
 part 'player_info.g.dart';
 
 @JsonSerializable()
-class PlayerInfo {
+class PlayerInfo with SkillMethods {
   final PlayerName name;
   final CodeName? formation;
   final int? number;
@@ -24,7 +26,10 @@ class PlayerInfo {
   final PlayerValue? previousValue;
   final Wage? wage;
   final Characteristics characteristics;
+  @override
   final Skills skills;
+  @override
+  final SkillsChange? skillsChange;
   final Stats stats;
   final Stats nationalStats;
   final Face face;
@@ -43,6 +48,7 @@ class PlayerInfo {
     required this.wage,
     required this.characteristics,
     required this.skills,
+    this.skillsChange,
     required this.stats,
     required this.nationalStats,
     required this.face,

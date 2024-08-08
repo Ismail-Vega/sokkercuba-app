@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 
+import '../mixins/skills_mixin.dart';
 import '../models/juniors/progress_value.dart';
-import '../models/training/training_report.dart';
 
-Color? getSkillChangeColor(TrainingReport? report, String skill) {
-  if (report != null) {
+Color? getSkillChangeColor(SkillMethods report, String skill) {
+  if (report.skillsChange != null) {
     final skillChange = report.getSkillChange(skill);
     if (skillChange != null) {
       if (skillChange > 0) {
