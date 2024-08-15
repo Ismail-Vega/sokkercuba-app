@@ -35,12 +35,27 @@ class PlayerCard extends StatelessWidget {
     return const Text("0");
   }
 
+  Widget renderInjure(int days) {
+    if (days == 0) {
+      return const Text('None');
+    }
+
+    return Row(children: [
+      const Icon(
+        Icons.local_hospital,
+        color: Colors.red,
+        size: 16,
+      ),
+      Text('($days)')
+    ]);
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final Color skillThemeColor =
         theme.brightness == Brightness.dark ? Colors.white : Colors.black;
-
+    final screenWidth = MediaQuery.of(context).size.width;
     return Card(
       color: Colors.blue[900],
       child: SafeArea(
@@ -130,9 +145,7 @@ class PlayerCard extends StatelessWidget {
             renderCard(player.info.nationalStats.cards.yellow,
                 player.info.nationalStats.cards.red),
             'Injury',
-            player.info.injury.daysRemaining > 0
-                ? Text('(${player.info.injury.daysRemaining} days)')
-                : const Text('none'),
+            renderInjure(player.info.injury.daysRemaining),
             textSpanColor),
       ],
     );
@@ -168,7 +181,7 @@ class PlayerCard extends StatelessWidget {
             'pace',
             Text(
                 '${skillsLevelsList[player.info.skills.pace]} [${player.info.skills.pace}]'),
-            'defender',
+            'defending',
             Text(
                 '${skillsLevelsList[player.info.skills.defending]} [${player.info.skills.defending}]'),
             textSpanColor),
@@ -176,7 +189,7 @@ class PlayerCard extends StatelessWidget {
             'technique',
             Text(
                 '${skillsLevelsList[player.info.skills.technique]} [${player.info.skills.technique}]'),
-            'playmaker',
+            'playmaking',
             Text(
                 '${skillsLevelsList[player.info.skills.playmaking]} [${player.info.skills.playmaking}]'),
             textSpanColor),
@@ -192,6 +205,13 @@ class PlayerCard extends StatelessWidget {
     );
   }
 
+  String parseSkill2(String skill) {
+    if (skill == 'defending') return 'defender';
+    if (skill == 'playmaking') return 'playmaker';
+
+    return skill;
+  }
+
   TableRow _buildTableRow(String skill1, Widget value1, String skill2,
       Widget value2, Color skillThemeColor) {
     return TableRow(children: [
@@ -204,7 +224,7 @@ class PlayerCard extends StatelessWidget {
       const TableCell(
           child: Padding(padding: EdgeInsets.all(4.0), child: Text(""))),
       _buildSkillCell(
-          skill2,
+          parseSkill2(skill2),
           styledTextWidget(
               child: value2,
               color: getSkillChangeColor(player.info, skill2),

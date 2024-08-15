@@ -46,13 +46,13 @@ mixin SkillMethods {
         return skillsChange!.stamina;
       case 'keeper':
         return skillsChange!.keeper;
-      case 'playmaker':
+      case 'playmaking':
         return skillsChange!.playmaking;
       case 'passing':
         return skillsChange!.passing;
       case 'technique':
         return skillsChange!.technique;
-      case 'defender':
+      case 'defending':
         return skillsChange!.defending;
       case 'striker':
         return skillsChange!.striker;
