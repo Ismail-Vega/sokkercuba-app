@@ -82,8 +82,7 @@ class PlayerCard extends StatelessWidget {
                     ),
                   ),
                   Text(
-                    //'Age: ${player.info.characteristics.age}',
-                    'Age: ${MediaQuery.of(context).size.width}',
+                    'Age: ${player.info.characteristics.age}',
                     style: TextStyle(fontSize: customTheme.smallFontSize),
                   ),
                 ],
