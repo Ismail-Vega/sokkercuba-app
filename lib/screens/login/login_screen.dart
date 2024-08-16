@@ -115,76 +115,88 @@ class _LoginScreenState extends State<LoginScreen> {
       backgroundColor: Colors.blue[900],
       body: ModalProgressHUD(
         inAsyncCall: showSpinner,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24.0),
-          child: Form(
-            key: _formKey,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: <Widget>[
-                const SizedBox(
-                  height: 100.0,
-                  child: CircleAvatar(
-                    radius: 50.0,
-                    backgroundColor: Colors.blue,
-                    child: Icon(
-                      Icons.lock_outline,
-                      size: 50.0,
-                      color: Colors.white,
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            final maxWidth = constraints.maxWidth * 0.7;
+            final fieldWidth = constraints.maxWidth > 600 ? 400.0 : maxWidth;
+
+            return Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24.0),
+              child: Form(
+                key: _formKey,
+                child: Center(
+                  child: ConstrainedBox(
+                    constraints: BoxConstraints(maxWidth: fieldWidth),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: <Widget>[
+                        const SizedBox(
+                          height: 100.0,
+                          child: CircleAvatar(
+                            radius: 50.0,
+                            backgroundColor: Colors.blue,
+                            child: Icon(
+                              Icons.lock_outline,
+                              size: 50.0,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(
+                          height: 48.0,
+                        ),
+                        TextFormField(
+                          textAlign: TextAlign.center,
+                          onChanged: (value) {
+                            login = value;
+                          },
+                          validator: (value) {
+                            if (value!.isEmpty) {
+                              return 'Login cannot be empty';
+                            }
+                            return null;
+                          },
+                          decoration: kTextFieldDecoration.copyWith(
+                            hintText: 'Enter your username',
+                            helperText: ' ',
+                          ),
+                        ),
+                        const SizedBox(
+                          height: 8.0,
+                        ),
+                        TextFormField(
+                          obscureText: true,
+                          textAlign: TextAlign.center,
+                          onChanged: (value) {
+                            password = value;
+                          },
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Password cannot be empty';
+                            }
+                            return null;
+                          },
+                          decoration: kTextFieldDecoration.copyWith(
+                            hintText: 'Enter your password',
+                            helperText: ' ',
+                          ),
+                        ),
+                        const SizedBox(
+                          height: 24.0,
+                        ),
+                        RoundedButton(
+                          title: 'Log In',
+                          colour: Colors.blue,
+                          onPressed: _handleLogin,
+                        ),
+                      ],
                     ),
                   ),
                 ),
-                const SizedBox(
-                  height: 48.0,
-                ),
-                TextFormField(
-                  textAlign: TextAlign.center,
-                  onChanged: (value) {
-                    login = value;
-                  },
-                  validator: (value) {
-                    if (value!.isEmpty) {
-                      return 'Login cannot be empty';
-                    }
-                    return null;
-                  },
-                  decoration: kTextFieldDecoration.copyWith(
-                    hintText: 'Enter your username',
-                    helperText: ' ',
-                  ),
-                ),
-                const SizedBox(
-                  height: 8.0,
-                ),
-                TextFormField(
-                  obscureText: true,
-                  textAlign: TextAlign.center,
-                  onChanged: (value) {
-                    password = value;
-                  },
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Password cannot be empty';
-                    }
-                    return null;
-                  },
-                  decoration: kTextFieldDecoration.copyWith(
-                    hintText: 'Enter your password',
-                    helperText: ' ',
-                  ),
-                ),
-                const SizedBox(
-                  height: 24.0,
-                ),
-                RoundedButton(
-                  title: 'Log In',
-                  colour: Colors.blue,
-                  onPressed: _handleLogin,
-                ),
-              ],
-            ),
-          ),
+              ),
+            );
+          },
         ),
       ),
     );

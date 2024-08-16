@@ -77,25 +77,17 @@ class _WelcomeScreenState extends State<WelcomeScreen>
   Widget build(BuildContext context) {
     return DefaultTextStyle(
       style: Theme.of(context).textTheme.bodyMedium!,
-      child: LayoutBuilder(
-          builder: (BuildContext context, BoxConstraints viewportConstraints) {
-        return SingleChildScrollView(
-          child: ConstrainedBox(
-            constraints: BoxConstraints(
-              minHeight: viewportConstraints.maxHeight,
-            ),
-            child: const Column(
-              children: [
-                UserCard(),
-                SizedBox(height: 8),
-                SquadSummaryCard(),
-                SizedBox(height: 8),
-                TSummaryCard(),
-              ],
-            ),
-          ),
-        );
-      }),
+      child: const SingleChildScrollView(
+        child: Column(
+          children: [
+            UserCard(),
+            SizedBox(height: 8),
+            SquadSummaryCard(),
+            SizedBox(height: 8),
+            TSummaryCard(),
+          ],
+        ),
+      ),
     );
   }
 }

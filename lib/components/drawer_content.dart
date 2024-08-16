@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../models/navigation/nav_bar_item_model.dart';
+import '../screens/footer/footer_screen.dart';
 import '../services/api_client.dart';
 import '../services/fetch_all_data.dart';
 import '../state/actions.dart';
@@ -46,7 +47,7 @@ class _DrawerContentState extends State<DrawerContent> {
 
   @override
   Widget build(BuildContext context) {
-    return ListView(
+    return Column(
       children: [
         AppBar(
           automaticallyImplyLeading: false,
@@ -103,63 +104,72 @@ class _DrawerContentState extends State<DrawerContent> {
         ),
         if (isLoading) const LinearProgressIndicator(),
         const Divider(),
-        for (var item in drawerPublicItems)
-          NavBarItem(
-            icon: item.icon,
-            path: item.path,
-            value: item.value,
-            onTap: () {
-              Navigator.of(context).pop();
-              Navigator.pushNamed(context, item.path);
-            },
+        Expanded(
+          child: ListView(
+            shrinkWrap: true,
+            children: [
+              for (var item in drawerPublicItems)
+                NavBarItem(
+                  icon: item.icon,
+                  path: item.path,
+                  value: item.value,
+                  onTap: () {
+                    Navigator.of(context).pop();
+                    Navigator.pushNamed(context, item.path);
+                  },
+                ),
+              const Divider(),
+              for (var item in drawerPrivateItems)
+                NavBarItem(
+                  icon: item.icon,
+                  path: item.path,
+                  value: item.value,
+                  onTap: () {
+                    Navigator.of(context).pop();
+                    Navigator.pushNamed(context, item.path);
+                  },
+                ),
+              const Divider(),
+              NavBarItem(
+                icon: Icons.logout,
+                path: '/login',
+                value: 'Logout',
+                onTap: () async {
+                  final appStateNotifier =
+                      Provider.of<AppStateNotifier>(context, listen: false);
+
+                  try {
+                    appStateNotifier.dispatch(
+                        StoreAction(StoreActionTypes.setLoading, true));
+
+                    final apiClient = ApiClient();
+                    await apiClient.initCookieJar();
+
+                    final response =
+                        await apiClient.sendData('/auth/logout', {});
+
+                    if (response != null && context.mounted) {
+                      Navigator.pushNamed(context, '/login');
+                      appStateNotifier.dispatch(
+                          StoreAction(StoreActionTypes.setLogin, false));
+                    }
+                  } catch (error) {
+                    if (context.mounted) {
+                      Navigator.pushNamed(context, '/login');
+                      appStateNotifier.dispatch(
+                          StoreAction(StoreActionTypes.setLogin, false));
+                    }
+                    throw Exception('Failed to logout: $error');
+                  } finally {
+                    appStateNotifier.dispatch(
+                        StoreAction(StoreActionTypes.setLoading, false));
+                  }
+                },
+              ),
+            ],
           ),
-        const Divider(),
-        for (var item in drawerPrivateItems)
-          NavBarItem(
-            icon: item.icon,
-            path: item.path,
-            value: item.value,
-            onTap: () {
-              Navigator.of(context).pop();
-              Navigator.pushNamed(context, item.path);
-            },
-          ),
-        const Divider(),
-        NavBarItem(
-          icon: Icons.logout,
-          path: '/login',
-          value: 'Logout',
-          onTap: () async {
-            final appStateNotifier =
-                Provider.of<AppStateNotifier>(context, listen: false);
-
-            try {
-              appStateNotifier
-                  .dispatch(StoreAction(StoreActionTypes.setLoading, true));
-
-              final apiClient = ApiClient();
-              await apiClient.initCookieJar();
-
-              final response = await apiClient.sendData('/auth/logout', {});
-
-              if (response != null && context.mounted) {
-                Navigator.pushNamed(context, '/login');
-                appStateNotifier
-                    .dispatch(StoreAction(StoreActionTypes.setLogin, false));
-              }
-            } catch (error) {
-              if (context.mounted) {
-                Navigator.pushNamed(context, '/login');
-                appStateNotifier
-                    .dispatch(StoreAction(StoreActionTypes.setLogin, false));
-              }
-              throw Exception('Failed to logout: $error');
-            } finally {
-              appStateNotifier
-                  .dispatch(StoreAction(StoreActionTypes.setLoading, false));
-            }
-          },
         ),
+        const Footer(),
       ],
     );
   }

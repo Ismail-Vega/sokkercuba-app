@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:modal_progress_hud_nsn/modal_progress_hud_nsn.dart';
 import 'package:provider/provider.dart';
 
-import '../screens/footer/footer_screen.dart';
 import '../state/app_state_notifier.dart';
 import 'drawer_content.dart';
 
@@ -87,7 +86,6 @@ class _ResponsiveDrawerState extends State<ResponsiveDrawer> {
                     child: widget.child,
                   ),
                 ),
-                const Footer(),
               ],
             ),
           ),

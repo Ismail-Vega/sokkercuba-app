@@ -20,19 +20,36 @@ class SquadScreen extends StatelessWidget {
       return const NoDataFoundScreen();
     }
 
-    return Scaffold(
-      backgroundColor: Colors.blue,
-      body: GridView.builder(
-        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 1,
-          mainAxisSpacing: 8,
-        ),
-        itemCount: squad.length,
-        itemBuilder: (context, index) {
-          final player = squad[index];
-          return PlayerCard(player: player);
-        },
+    final screenWidth = MediaQuery.of(context).size.width;
+    int crossAxisCount = 1;
+    double childAspectRatio = 1;
+
+    if (screenWidth > 320 && screenWidth <= 400) {
+      childAspectRatio = 0.95;
+    } else if (screenWidth > 400 && screenWidth <= 600) {
+      childAspectRatio = 1.05;
+    } else if (screenWidth > 600 && screenWidth <= 900) {
+      childAspectRatio = 1.35;
+    } else if (screenWidth > 900 && screenWidth <= 1200) {
+      crossAxisCount = 2;
+      childAspectRatio = 1;
+    } else if (screenWidth > 1200) {
+      crossAxisCount = 3;
+      childAspectRatio = 0.9;
+    }
+
+    return GridView.builder(
+      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: crossAxisCount,
+        mainAxisSpacing: 8,
+        crossAxisSpacing: 8,
+        childAspectRatio: childAspectRatio,
       ),
+      itemCount: squad.length,
+      itemBuilder: (context, index) {
+        final player = squad[index];
+        return PlayerCard(player: player);
+      },
     );
   }
 }

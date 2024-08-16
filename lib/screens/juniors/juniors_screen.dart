@@ -23,56 +23,53 @@ class JuniorsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.blue,
-      body: juniors?.juniors != null && juniors!.juniors!.isNotEmpty
-          ? ListView(
-              children: [
-                Container(
-                  decoration: const BoxDecoration(
-                    borderRadius: BorderRadius.only(
-                      bottomLeft: Radius.circular(20.0),
-                      bottomRight: Radius.circular(20.0),
-                    ),
+    return juniors?.juniors != null && juniors!.juniors!.isNotEmpty
+        ? ListView(
+            children: [
+              Container(
+                decoration: const BoxDecoration(
+                  borderRadius: BorderRadius.only(
+                    bottomLeft: Radius.circular(20.0),
+                    bottomRight: Radius.circular(20.0),
                   ),
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(
-                      vertical: 16.0,
-                      horizontal: 20.0,
-                    ),
-                    child: SafeArea(
-                      child: Column(
-                        children: [
-                          Text(
-                            'Junior team, ${juniors?.juniors?.length ?? 0} juniors',
-                            style: const TextStyle(
-                              fontSize: 20.0,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white,
-                            ),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(
+                    vertical: 16.0,
+                    horizontal: 20.0,
+                  ),
+                  child: SafeArea(
+                    child: Column(
+                      children: [
+                        Text(
+                          'Junior team, ${juniors?.juniors?.length ?? 0} juniors',
+                          style: const TextStyle(
+                            fontSize: 20.0,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
                           ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
                   ),
                 ),
-                const SizedBox(height: 6),
-                ...juniors!.juniors!.map((junior) {
-                  int index =
-                      potentialData.indexWhere((item) => item.id == junior.id);
-                  NewsJunior? potential =
-                      index != -1 ? potentialData[index] : null;
+              ),
+              const SizedBox(height: 6),
+              ...juniors!.juniors!.map((junior) {
+                int index =
+                    potentialData.indexWhere((item) => item.id == junior.id);
+                NewsJunior? potential =
+                    index != -1 ? potentialData[index] : null;
 
-                  return JuniorTile(
-                    junior: junior,
-                    progress: progress?[junior.id],
-                    potential: potential,
-                  );
-                }),
-              ],
-            )
-          : const NoDataFoundScreen(),
-    );
+                return JuniorTile(
+                  junior: junior,
+                  progress: progress?[junior.id],
+                  potential: potential,
+                );
+              }),
+            ],
+          )
+        : const NoDataFoundScreen();
   }
 }
 

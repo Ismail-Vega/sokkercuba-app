@@ -5,11 +5,14 @@ class Scouting extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.blue,
-      body: Center(
+    return DefaultTextStyle(
+      style: Theme.of(context).textTheme.bodyMedium!,
+      child: SizedBox(
+        width: double.infinity,
+        height: double.infinity,
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             const Text(
               'Coming Soon',
