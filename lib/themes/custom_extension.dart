@@ -6,17 +6,17 @@ class CustomThemeExtension extends ThemeExtension<CustomThemeExtension> {
   final double smallFontSize;
   final double mediumFontSize;
   final double largeFontSize;
-  final double paddingSmall;
-  final double paddingMedium;
-  final double paddingLarge;
+  final double smallPadding;
+  final double mediumPadding;
+  final double largePadding;
 
   CustomThemeExtension({
     required this.smallFontSize,
     required this.mediumFontSize,
     required this.largeFontSize,
-    required this.paddingSmall,
-    required this.paddingMedium,
-    required this.paddingLarge,
+    required this.smallPadding,
+    required this.mediumPadding,
+    required this.largePadding,
   });
 
   factory CustomThemeExtension.of(BuildContext context) {
@@ -26,17 +26,17 @@ class CustomThemeExtension extends ThemeExtension<CustomThemeExtension> {
     final mediumFontSize = screenWidth * 0.034;
     final largeFontSize = screenWidth * 0.05;
 
-    double paddingSmall = screenWidth < 415 ? 4 : 8;
-    double paddingMedium = screenWidth < 415 ? 8 : 16;
-    double paddingLarge = screenWidth < 415 ? 16 : 24;
+    double smallPadding = screenWidth < 415 ? 4 : 8;
+    double mediumPadding = screenWidth < 415 ? 8 : 16;
+    double largePadding = screenWidth < 415 ? 16 : 24;
 
     return CustomThemeExtension(
       smallFontSize: smallFontSize,
       mediumFontSize: mediumFontSize,
       largeFontSize: largeFontSize,
-      paddingSmall: paddingSmall,
-      paddingMedium: paddingMedium,
-      paddingLarge: paddingLarge,
+      smallPadding: smallPadding,
+      mediumPadding: mediumPadding,
+      largePadding: largePadding,
     );
   }
 
@@ -45,17 +45,17 @@ class CustomThemeExtension extends ThemeExtension<CustomThemeExtension> {
     double? smallFontSize,
     double? mediumFontSize,
     double? largeFontSize,
-    double? paddingSmall,
-    double? paddingMedium,
-    double? paddingLarge,
+    double? smallPadding,
+    double? mediumPadding,
+    double? largePadding,
   }) {
     return CustomThemeExtension(
       smallFontSize: smallFontSize ?? this.smallFontSize,
       mediumFontSize: mediumFontSize ?? this.mediumFontSize,
       largeFontSize: largeFontSize ?? this.largeFontSize,
-      paddingSmall: paddingSmall ?? this.paddingSmall,
-      paddingMedium: paddingMedium ?? this.paddingMedium,
-      paddingLarge: paddingLarge ?? this.paddingLarge,
+      smallPadding: smallPadding ?? this.smallPadding,
+      mediumPadding: mediumPadding ?? this.mediumPadding,
+      largePadding: largePadding ?? this.largePadding,
     );
   }
 
@@ -69,9 +69,9 @@ class CustomThemeExtension extends ThemeExtension<CustomThemeExtension> {
       smallFontSize: lerpDouble(smallFontSize, other.smallFontSize, t)!,
       mediumFontSize: lerpDouble(mediumFontSize, other.mediumFontSize, t)!,
       largeFontSize: lerpDouble(largeFontSize, other.largeFontSize, t)!,
-      paddingSmall: lerpDouble(paddingSmall, other.paddingSmall, t)!,
-      paddingMedium: lerpDouble(paddingMedium, other.paddingMedium, t)!,
-      paddingLarge: lerpDouble(paddingLarge, other.paddingLarge, t)!,
+      smallPadding: lerpDouble(smallPadding, other.smallPadding, t)!,
+      mediumPadding: lerpDouble(mediumPadding, other.mediumPadding, t)!,
+      largePadding: lerpDouble(largePadding, other.largePadding, t)!,
     );
   }
 }

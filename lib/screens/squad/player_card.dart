@@ -58,6 +58,8 @@ class PlayerCard extends StatelessWidget {
     final customTheme = Theme.of(context).extension<CustomThemeExtension>()!;
     final Color skillThemeColor =
         theme.brightness == Brightness.dark ? Colors.white : Colors.black;
+    final smallPadding = customTheme.smallPadding;
+    final mediumPadding = customTheme.mediumPadding;
 
     return Card(
       color: Colors.blue[900],
@@ -65,7 +67,8 @@ class PlayerCard extends StatelessWidget {
         child: Column(
           children: [
             Padding(
-              padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
+              padding: EdgeInsets.fromLTRB(
+                  mediumPadding, smallPadding, mediumPadding, 0),
               child: Row(
                 children: [
                   Expanded(
@@ -86,18 +89,20 @@ class PlayerCard extends StatelessWidget {
               ),
             ),
             const Padding(
-              padding: EdgeInsets.only(bottom: 4.0, left: 8, right: 8),
+              padding: EdgeInsets.symmetric(vertical: 0, horizontal: 8),
               child: Divider(thickness: 1, color: Colors.grey),
             ),
             Flexible(
               child: SingleChildScrollView(
-                padding: const EdgeInsets.symmetric(horizontal: 8),
+                padding: EdgeInsets.symmetric(
+                  horizontal: mediumPadding,
+                ),
                 child: Column(
                   children: [
                     _buildInfoTable(skillThemeColor, customTheme),
-                    const SizedBox(height: 4),
+                    SizedBox(height: smallPadding),
                     const Divider(thickness: 1, color: Colors.grey),
-                    const SizedBox(height: 4),
+                    SizedBox(height: smallPadding),
                     _buildSkillsTable(skillThemeColor, customTheme),
                   ],
                 ),
@@ -277,41 +282,45 @@ class PlayerCard extends StatelessWidget {
     return TableRow(
       children: [
         _buildSkillCell(
-          skill1,
-          styledTextWidget(
-            child: value1,
-            color: getSkillChangeColor(player.info, skill1),
-            fontSize: customTheme.smallFontSize,
-            defaultColor: skillThemeColor,
-          ),
-        ),
+            skill1,
+            styledTextWidget(
+              child: value1,
+              color: getSkillChangeColor(player.info, skill1),
+              fontSize: customTheme.smallFontSize,
+              defaultColor: skillThemeColor,
+            ),
+            customTheme.smallFontSize,
+            customTheme.smallPadding),
         const TableCell(
           child: Padding(padding: EdgeInsets.all(4.0), child: Text("")),
         ),
         _buildSkillCell(
-          parseSkill2(skill2),
-          styledTextWidget(
-            child: value2,
-            color: getSkillChangeColor(player.info, skill2),
-            fontSize: customTheme.smallFontSize,
-            defaultColor: skillThemeColor,
-          ),
-        ),
+            parseSkill2(skill2),
+            styledTextWidget(
+              child: value2,
+              color: getSkillChangeColor(player.info, skill2),
+              fontSize: customTheme.smallFontSize,
+              defaultColor: skillThemeColor,
+            ),
+            customTheme.smallFontSize,
+            customTheme.smallPadding),
       ],
     );
   }
 
-  Widget _buildSkillCell(String skill, Widget value) {
+  Widget _buildSkillCell(
+      String skill, Widget value, double fontSize, double padding) {
     return TableCell(
       child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 8.0),
+        padding: EdgeInsets.symmetric(vertical: padding),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Flexible(
               child: Text(
                 skill,
-                style: const TextStyle(overflow: TextOverflow.ellipsis),
+                style: TextStyle(
+                    overflow: TextOverflow.ellipsis, fontSize: fontSize),
               ),
             ),
             value,

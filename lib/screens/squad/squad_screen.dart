@@ -24,9 +24,7 @@ class SquadScreen extends StatelessWidget {
     int crossAxisCount = 1;
     double childAspectRatio = 1;
 
-    if (screenWidth > 320 && screenWidth <= 414) {
-      childAspectRatio = 0.90;
-    } else if (screenWidth > 414 && screenWidth <= 600) {
+    if (screenWidth > 414 && screenWidth <= 600) {
       childAspectRatio = 1.05;
     } else if (screenWidth > 600 && screenWidth <= 900) {
       childAspectRatio = 1.35;
