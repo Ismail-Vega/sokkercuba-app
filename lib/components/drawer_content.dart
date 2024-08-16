@@ -7,6 +7,7 @@ import '../services/api_client.dart';
 import '../services/fetch_all_data.dart';
 import '../state/actions.dart';
 import '../state/app_state_notifier.dart';
+import '../themes/custom_extension.dart';
 import '../widgets/nav_bar_item.dart';
 
 class DrawerContent extends StatefulWidget {
@@ -47,6 +48,8 @@ class _DrawerContentState extends State<DrawerContent> {
 
   @override
   Widget build(BuildContext context) {
+    final customTheme = Theme.of(context).extension<CustomThemeExtension>()!;
+
     return Column(
       children: [
         AppBar(
@@ -62,23 +65,25 @@ class _DrawerContentState extends State<DrawerContent> {
               ),
             ),
             child: Padding(
-              padding: const EdgeInsets.all(24.0),
+              padding: const EdgeInsets.fromLTRB(18, 24, 18, 8),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text(
+                  Text(
                     'Navigation',
                     style: TextStyle(
                       color: Colors.white,
-                      fontSize: 24.0,
+                      fontSize: customTheme.mediumFontSize,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
                   TextButton.icon(
                     icon: const Icon(Icons.update, color: Colors.white),
-                    label: const Text(
+                    label: Text(
                       'Update my data',
-                      style: TextStyle(color: Colors.white),
+                      style: TextStyle(
+                          color: Colors.white,
+                          fontSize: customTheme.smallFontSize),
                     ),
                     style: TextButton.styleFrom(
                       backgroundColor: Colors.transparent,
@@ -106,7 +111,6 @@ class _DrawerContentState extends State<DrawerContent> {
         const Divider(),
         Expanded(
           child: ListView(
-            shrinkWrap: true,
             children: [
               for (var item in drawerPublicItems)
                 NavBarItem(

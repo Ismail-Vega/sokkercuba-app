@@ -19,6 +19,7 @@ import 'screens/xtreme/xtreme_screen.dart';
 import 'services/api_client.dart';
 import 'state/app_state.dart';
 import 'state/app_state_notifier.dart';
+import 'themes/custom_extension.dart';
 
 GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
@@ -93,12 +94,17 @@ class _SokkerProState extends State<SokkerPro> {
       child: Consumer<AppStateNotifier>(
         builder: (context, appStateNotifier, child) {
           final appState = appStateNotifier.state;
+          final customTheme = CustomThemeExtension.of(context);
 
           return MaterialApp(
             builder: FToastBuilder(),
             navigatorKey: navigatorKey,
             title: 'Sokker Pro App',
-            theme: ThemeData.light(),
+            theme: ThemeData.light().copyWith(
+              extensions: [
+                customTheme,
+              ],
+            ),
             darkTheme: ThemeData.dark().copyWith(
               primaryColor: Colors.blue,
               appBarTheme: AppBarTheme(
@@ -110,6 +116,9 @@ class _SokkerProState extends State<SokkerPro> {
               drawerTheme: DrawerThemeData(
                 backgroundColor: Colors.blue[900],
               ),
+              extensions: [
+                customTheme,
+              ],
             ),
             themeMode: _themeMode,
             home: appState.loggedIn

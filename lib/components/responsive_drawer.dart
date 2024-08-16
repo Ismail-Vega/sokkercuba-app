@@ -3,6 +3,7 @@ import 'package:modal_progress_hud_nsn/modal_progress_hud_nsn.dart';
 import 'package:provider/provider.dart';
 
 import '../state/app_state_notifier.dart';
+import '../themes/custom_extension.dart';
 import 'drawer_content.dart';
 
 class ResponsiveDrawer extends StatefulWidget {
@@ -35,13 +36,17 @@ class _ResponsiveDrawerState extends State<ResponsiveDrawer> {
   @override
   Widget build(BuildContext context) {
     final isLoading = Provider.of<AppStateNotifier>(context).state.loading;
+    final customTheme = Theme.of(context).extension<CustomThemeExtension>();
 
     return ModalProgressHUD(
       inAsyncCall: isLoading,
       child: Scaffold(
         key: _scaffoldKey,
         appBar: AppBar(
-          title: const Text('Sokker Pro'),
+          title: Text(
+            'Sokker Pro',
+            style: TextStyle(fontSize: customTheme?.mediumFontSize),
+          ),
           leading: IconButton(
             icon: const Icon(Icons.menu),
             onPressed: _openDrawer,
@@ -52,15 +57,19 @@ class _ResponsiveDrawerState extends State<ResponsiveDrawer> {
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Text(Theme.of(context).brightness == Brightness.dark
-                      ? 'Light Mode'
-                      : 'Dark Mode'),
+                  Text(
+                    Theme.of(context).brightness == Brightness.dark
+                        ? 'Light Mode'
+                        : 'Dark Mode',
+                    style: TextStyle(fontSize: customTheme?.smallFontSize),
+                  ),
                   const SizedBox(width: 8),
                   Switch(
                     value: Theme.of(context).brightness == Brightness.dark,
                     onChanged: (value) {
                       widget.setSelectedTheme(
-                          value ? ThemeMode.dark : ThemeMode.light);
+                        value ? ThemeMode.dark : ThemeMode.light,
+                      );
                     },
                   ),
                 ],
