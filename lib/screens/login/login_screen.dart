@@ -47,7 +47,7 @@ class _LoginScreenState extends State<LoginScreen> {
           {'login': login, 'password': password, 'remember': true},
         );
 
-        if (response.statusCode == 200 && mounted) {
+        if (response != null && response.statusCode == 200 && mounted) {
           final appStateNotifier =
               Provider.of<AppStateNotifier>(context, listen: false);
           final result = await fetchAllData(apiClient, appStateNotifier);

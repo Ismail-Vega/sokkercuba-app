@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import '../../models/player/player.dart';
 import '../../themes/custom_extension.dart';
 import '../../utils/constants.dart';
-import '../../utils/format_numbers.dart';
+import '../../utils/format.dart';
 import '../../utils/skills_checker.dart';
 
 class PlayerCard extends StatelessWidget {
@@ -82,7 +82,8 @@ class PlayerCard extends StatelessWidget {
                     ),
                   ),
                   Text(
-                    'Age: ${player.info.characteristics.age}',
+                    //'Age: ${player.info.characteristics.age}',
+                    'Age: ${MediaQuery.of(context).size.width}',
                     style: TextStyle(fontSize: customTheme.smallFontSize),
                   ),
                 ],

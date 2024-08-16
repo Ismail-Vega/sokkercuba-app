@@ -67,6 +67,7 @@ Future<Map<String, dynamic>> fetchAllData(
         'training': training,
         'news': news,
         'trainingWeek': stateWeek,
+        'dataUpdatedOn': DateTime.now()
       };
 
       appStateNotifier

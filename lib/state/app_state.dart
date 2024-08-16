@@ -23,6 +23,7 @@ class AppState {
   final TSummary? tsummary;
   final Squad? players;
   final SquadTraining? training;
+  final DateTime? dataUpdatedOn;
 
   AppState({
     this.error = false,
@@ -40,25 +41,26 @@ class AppState {
     this.tsummary,
     this.players,
     this.training,
+    this.dataUpdatedOn,
   });
 
-  AppState copyWith({
-    bool? error,
-    String? errorMsg,
-    String? username,
-    int? teamId,
-    int? trainingWeek,
-    bool? loading,
-    bool? loggedIn,
-    User? user,
-    News? news,
-    UserStats? userStats,
-    Juniors? juniors,
-    JuniorsTraining? juniorsTraining,
-    TSummary? tsummary,
-    Squad? players,
-    SquadTraining? training,
-  }) {
+  AppState copyWith(
+      {bool? error,
+      String? errorMsg,
+      String? username,
+      int? teamId,
+      int? trainingWeek,
+      bool? loading,
+      bool? loggedIn,
+      User? user,
+      News? news,
+      UserStats? userStats,
+      Juniors? juniors,
+      JuniorsTraining? juniorsTraining,
+      TSummary? tsummary,
+      Squad? players,
+      SquadTraining? training,
+      DateTime? dataUpdatedOn}) {
     return AppState(
       error: error ?? this.error,
       errorMsg: errorMsg ?? this.errorMsg,
@@ -75,6 +77,7 @@ class AppState {
       juniorsTraining: juniorsTraining ?? this.juniorsTraining,
       players: players ?? this.players,
       training: training ?? this.training,
+      dataUpdatedOn: dataUpdatedOn ?? this.dataUpdatedOn,
     );
   }
 
@@ -95,6 +98,7 @@ class AppState {
       juniorsTraining: payload['juniorsTraining'] ?? juniorsTraining,
       players: payload['players'] ?? players,
       training: payload['training'] ?? training,
+      dataUpdatedOn: payload['dataUpdatedOn'] ?? dataUpdatedOn,
     );
   }
 
@@ -115,6 +119,7 @@ class AppState {
       'juniorsTraining': juniorsTraining?.toJson(),
       'players': players?.toJson(),
       'training': training?.toJson(),
+      'dataUpdatedOn': dataUpdatedOn
     };
   }
 
@@ -143,6 +148,7 @@ class AppState {
       training: json['training'] != null
           ? SquadTraining.fromJson(json['training'])
           : null,
+      dataUpdatedOn: json['dataUpdatedOn'],
     );
   }
 }

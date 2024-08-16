@@ -21,14 +21,25 @@ class CustomThemeExtension extends ThemeExtension<CustomThemeExtension> {
 
   factory CustomThemeExtension.of(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
+    double screenMultiplier;
 
-    final smallFontSize = screenWidth * 0.028;
-    final mediumFontSize = screenWidth * 0.034;
-    final largeFontSize = screenWidth * 0.05;
+    if (screenWidth < 600) {
+      screenMultiplier = 1;
+    } else if (screenWidth < 864) {
+      screenMultiplier = 0.5;
+    } else if (screenWidth < 1200) {
+      screenMultiplier = 0.6;
+    } else {
+      screenMultiplier = 0.4;
+    }
 
-    double smallPadding = screenWidth < 415 ? 4 : 8;
-    double mediumPadding = screenWidth < 415 ? 8 : 16;
-    double largePadding = screenWidth < 415 ? 16 : 24;
+    final smallFontSize = screenWidth * 0.028 * screenMultiplier;
+    final mediumFontSize = screenWidth * 0.034 * screenMultiplier;
+    final largeFontSize = screenWidth * 0.04 * screenMultiplier;
+
+    double smallPadding = screenWidth < 413 ? 4 : 8;
+    double mediumPadding = screenWidth < 413 ? 8 : 16;
+    double largePadding = screenWidth < 413 ? 16 : 24;
 
     return CustomThemeExtension(
       smallFontSize: smallFontSize,

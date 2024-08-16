@@ -48,10 +48,7 @@ Juniors setJuniorsData(Juniors? stateJuniors, Map<String, dynamic> data) {
       .where((junior) => !currentJuniorsIds.contains(junior.id))
       .toList();
 
-  final List<Junior> newPrevJuniors = [
-    ...prevJuniors,
-    ...leftJuniors.where((junior) => !leftJuniors.contains(junior.id)).toList()
-  ];
+  final List<Junior> newPrevJuniors = [...prevJuniors, ...leftJuniors];
 
   return Juniors(
     juniors: currentJuniors,

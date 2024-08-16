@@ -71,6 +71,7 @@ class ApiClient {
       if (kDebugMode) {
         print('Exception while sending data: $e');
       }
+      return null;
     }
   }
 

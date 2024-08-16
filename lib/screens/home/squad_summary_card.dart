@@ -3,7 +3,7 @@ import 'package:provider/provider.dart';
 
 import '../../state/app_state_notifier.dart';
 import '../../utils/constants.dart';
-import '../../utils/format_numbers.dart';
+import '../../utils/format.dart';
 
 class SquadSummaryCard extends StatelessWidget {
   const SquadSummaryCard({super.key});
