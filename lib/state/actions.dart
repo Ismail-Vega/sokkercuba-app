@@ -162,7 +162,7 @@ Future<SquadTraining?> setTrainingData(ApiClient apiClient, bool plus,
           final trainingReport = TrainingReport.fromJson(report);
 
           if (!weeksInFirstList.contains(trainingReport.week)) {
-            statePlayerReport.report.add(trainingReport);
+            statePlayerReport.report.insert(0, trainingReport);
           }
         }
 
