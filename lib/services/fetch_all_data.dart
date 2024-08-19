@@ -67,7 +67,7 @@ Future<Map<String, dynamic>> fetchAllData(
         'training': training,
         'news': news,
         'trainingWeek': stateWeek,
-        'dataUpdatedOn': DateTime.now()
+        'dataUpdatedOn': DateTime.now().toIso8601String()
       };
 
       appStateNotifier
@@ -89,6 +89,15 @@ Future<Map<String, dynamic>> fetchAllData(
       return {'code': '500', 'error': 'Failed to fetch all data!'};
     }
   } catch (error) {
+    Fluttertoast.showToast(
+        msg: "Failed to fetch all data!",
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.BOTTOM,
+        timeInSecForIosWeb: 1,
+        backgroundColor: Colors.red,
+        textColor: Colors.white,
+        fontSize: 16.0);
+
     return {'code': '500', 'error': error.toString()};
   }
 }

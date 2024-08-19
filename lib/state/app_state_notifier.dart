@@ -1,6 +1,9 @@
 import 'dart:convert';
+import 'dart:io';
 
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'actions.dart';
@@ -38,6 +41,82 @@ class AppStateNotifier extends ChangeNotifier {
       _state.players?.players.forEach((player) {
         player.skillsHistory?[trainingWeek] = player.info;
       });
+    }
+  }
+
+  Future<void> exportAppStateWithFilePicker() async {
+    final stateJson = jsonEncode(_state.toJson());
+
+    String? selectedDirectory = await FilePicker.platform.getDirectoryPath();
+    if (selectedDirectory != null) {
+      final file = File('$selectedDirectory/sokker_data.json');
+      await file.writeAsString(stateJson);
+
+      Fluttertoast.showToast(
+          msg: "Your sokker data was exported to: ${file.path}!",
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.BOTTOM,
+          timeInSecForIosWeb: 1,
+          backgroundColor: Colors.green,
+          textColor: Colors.white,
+          fontSize: 16.0);
+    } else {
+      Fluttertoast.showToast(
+          msg: "There was an error while trying to export your sokker data!",
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.BOTTOM,
+          timeInSecForIosWeb: 1,
+          backgroundColor: Colors.red,
+          textColor: Colors.white,
+          fontSize: 16.0);
+    }
+  }
+
+  Future<void> importAppStateWithFilePicker() async {
+    FilePickerResult? result = await FilePicker.platform.pickFiles(
+      type: FileType.custom,
+      allowedExtensions: ['json'],
+    );
+
+    if (result != null) {
+      final file = File(result.files.single.path!);
+      final stateJson = await file.readAsString();
+
+      try {
+        final jsonData = jsonDecode(stateJson);
+
+        final appState = AppState.fromJson(jsonData);
+        _state = appState;
+        await _saveState();
+        notifyListeners();
+
+        Fluttertoast.showToast(
+            msg: "Your sokker data was imported successfully!",
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.BOTTOM,
+            timeInSecForIosWeb: 1,
+            backgroundColor: Colors.green,
+            textColor: Colors.white,
+            fontSize: 16.0);
+      } catch (e) {
+        Fluttertoast.showToast(
+            msg: 'There was an error while trying to parse the file: $e',
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.BOTTOM,
+            timeInSecForIosWeb: 1,
+            backgroundColor: Colors.red,
+            textColor: Colors.white,
+            fontSize: 16.0);
+      }
+    } else {
+      Fluttertoast.showToast(
+          msg: "There was an error while trying to read the file!",
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.BOTTOM,
+          timeInSecForIosWeb: 1,
+          backgroundColor: Colors.red,
+          textColor: Colors.white,
+          fontSize: 16.0);
     }
   }
 

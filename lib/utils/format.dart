@@ -6,11 +6,12 @@ String? formatNumber(int? number) {
   return formatter.format(number).replaceAll(',', ' ');
 }
 
-String formatDateTime(DateTime? dateTime, {String locale = 'en_US'}) {
-  if (dateTime == null) {
+String formatDateTime(String? date, {String locale = 'en_US'}) {
+  if (date == null) {
     return 'No date available';
   }
 
+  final dateTime = DateTime.parse(date);
   final DateFormat dateFormatter = DateFormat('MMM d, y', locale);
   final DateFormat timeFormatter = DateFormat('HH:mm:ss', locale);
 

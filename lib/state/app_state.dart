@@ -23,7 +23,7 @@ class AppState {
   final TSummary? tsummary;
   final Squad? players;
   final SquadTraining? training;
-  final DateTime? dataUpdatedOn;
+  final String? dataUpdatedOn;
 
   AppState({
     this.error = false,
@@ -60,7 +60,7 @@ class AppState {
       TSummary? tsummary,
       Squad? players,
       SquadTraining? training,
-      DateTime? dataUpdatedOn}) {
+      String? dataUpdatedOn}) {
     return AppState(
       error: error ?? this.error,
       errorMsg: errorMsg ?? this.errorMsg,

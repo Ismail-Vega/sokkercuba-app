@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:provider/provider.dart';
 
 import '../models/navigation/nav_bar_item_model.dart';
@@ -37,13 +38,24 @@ class _DrawerContentState extends State<DrawerContent> {
     final appStateNotifier =
         Provider.of<AppStateNotifier>(context, listen: false);
 
-    await fetchAllData(apiClient, appStateNotifier);
+    final result = await fetchAllData(apiClient, appStateNotifier);
 
-    widget.closeDrawer();
+    if (result['code'] == 200 && result['success'] == true) {
+      widget.closeDrawer();
 
-    setState(() {
-      isLoading = false;
-    });
+      setState(() {
+        isLoading = false;
+      });
+    } else {
+      Fluttertoast.showToast(
+          msg: "Failed to fetch all data!",
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.BOTTOM,
+          timeInSecForIosWeb: 1,
+          backgroundColor: Colors.red,
+          textColor: Colors.white,
+          fontSize: 16.0);
+    }
   }
 
   @override
@@ -133,6 +145,39 @@ class _DrawerContentState extends State<DrawerContent> {
                     Navigator.pushNamed(context, item.path);
                   },
                 ),
+              const Divider(),
+              ListTile(
+                leading: const Icon(Icons.upload_file),
+                title: const Text('Import your data'),
+                onTap: () async {
+                  setState(() {
+                    isLoading = true;
+                  });
+                  final appStateNotifier =
+                      Provider.of<AppStateNotifier>(context, listen: false);
+                  await appStateNotifier.importAppStateWithFilePicker();
+                  setState(() {
+                    isLoading = false;
+                  });
+                  widget.closeDrawer();
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.download),
+                title: const Text('Export your data'),
+                onTap: () async {
+                  setState(() {
+                    isLoading = true;
+                  });
+                  final appStateNotifier =
+                      Provider.of<AppStateNotifier>(context, listen: false);
+                  await appStateNotifier.exportAppStateWithFilePicker();
+                  setState(() {
+                    isLoading = false;
+                  });
+                  widget.closeDrawer();
+                },
+              ),
               const Divider(),
               NavBarItem(
                 icon: Icons.logout,
