@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
+import '../../mixins/skills_mixin.dart';
 import '../../models/player/player.dart';
+import '../../state/app_state_notifier.dart';
 import '../../themes/custom_extension.dart';
 import '../../utils/constants.dart';
 import '../../utils/format.dart';
+import '../../utils/get_training_data.dart';
 import '../../utils/skills_checker.dart';
 
 class PlayerCard extends StatelessWidget {
@@ -60,6 +64,10 @@ class PlayerCard extends StatelessWidget {
         theme.brightness == Brightness.dark ? Colors.white : Colors.black;
     final smallPadding = customTheme.smallPadding;
     final mediumPadding = customTheme.mediumPadding;
+    final state = Provider.of<AppStateNotifier>(context).state;
+    final trainingWeek = state.trainingWeek;
+    final players = state.training?.players;
+    final report = getPlayerTrainingReport(players, player.id, trainingWeek);
 
     return Card(
       color: Colors.blue[900],
@@ -99,11 +107,11 @@ class PlayerCard extends StatelessWidget {
                 ),
                 child: Column(
                   children: [
-                    _buildInfoTable(skillThemeColor, customTheme),
+                    _buildInfoTable(report, skillThemeColor, customTheme),
                     SizedBox(height: smallPadding),
                     const Divider(thickness: 1, color: Colors.grey),
                     SizedBox(height: smallPadding),
-                    _buildSkillsTable(skillThemeColor, customTheme),
+                    _buildSkillsTable(report, skillThemeColor, customTheme),
                   ],
                 ),
               ),
@@ -114,8 +122,8 @@ class PlayerCard extends StatelessWidget {
     );
   }
 
-  Widget _buildInfoTable(
-      Color textSpanColor, CustomThemeExtension customTheme) {
+  Widget _buildInfoTable(SkillMethods? report, Color textSpanColor,
+      CustomThemeExtension customTheme) {
     return Table(
       columnWidths: const {
         0: FlexColumnWidth(2),
@@ -125,61 +133,96 @@ class PlayerCard extends StatelessWidget {
       defaultVerticalAlignment: TableCellVerticalAlignment.middle,
       children: [
         _buildTableRow(
-          'Value',
-          Text(
-            '${formatNumber(player.info.value?.value)} ${(player.info.value?.currency)}',
-            style: TextStyle(fontSize: customTheme.smallFontSize),
-          ),
-          'Wage',
-          Text(
-            '${formatNumber(player.info.wage?.value)} ${player.info.wage?.currency}',
-            style: TextStyle(fontSize: customTheme.smallFontSize),
-          ),
-          textSpanColor,
-          customTheme,
-        ),
+            'Value',
+            styledTextWidget(
+              child: Text(
+                '${formatNumber(player.info.value?.value)} ${(player.info.value?.currency)}',
+                style: TextStyle(fontSize: customTheme.smallFontSize),
+              ),
+              fontSize: customTheme.smallFontSize,
+              defaultColor: textSpanColor,
+            ),
+            'Wage',
+            styledTextWidget(
+              child: Text(
+                '${formatNumber(player.info.wage?.value)} ${player.info.wage?.currency}',
+                style: TextStyle(fontSize: customTheme.smallFontSize),
+              ),
+              fontSize: customTheme.smallFontSize,
+              defaultColor: textSpanColor,
+            ),
+            customTheme),
         _buildTableRow(
           'Tact disc',
-          Text(
-            '${skillsLevelsList[player.info.skills.tacticalDiscipline]} [${player.info.skills.tacticalDiscipline}]',
-            style: TextStyle(fontSize: customTheme.smallFontSize),
+          styledTextWidget(
+            child: Text(
+              '${skillsLevelsList[player.info.skills.tacticalDiscipline]} [${player.info.skills.tacticalDiscipline}]',
+              style: TextStyle(fontSize: customTheme.smallFontSize),
+            ),
+            fontSize: customTheme.smallFontSize,
+            defaultColor: textSpanColor,
           ),
           'Form',
-          Text(
-            '${skillsLevelsList[player.info.skills.form]} [${player.info.skills.form}]',
-            style: TextStyle(fontSize: customTheme.smallFontSize),
+          styledTextWidget(
+            child: Text(
+              '${skillsLevelsList[player.info.skills.form]} [${player.info.skills.form}]',
+              style: TextStyle(fontSize: customTheme.smallFontSize),
+            ),
+            fontSize: customTheme.smallFontSize,
+            defaultColor: textSpanColor,
           ),
-          textSpanColor,
           customTheme,
         ),
         _buildTableRow(
           'Height',
-          Text('${player.info.characteristics.height} cm',
-              style: TextStyle(fontSize: customTheme.smallFontSize)),
+          styledTextWidget(
+            child: Text('${player.info.characteristics.height} cm',
+                style: TextStyle(fontSize: customTheme.smallFontSize)),
+            fontSize: customTheme.smallFontSize,
+            defaultColor: textSpanColor,
+          ),
           'Weight',
-          Text('${player.info.characteristics.weight.toStringAsFixed(1)} kg',
-              style: TextStyle(fontSize: customTheme.smallFontSize)),
-          textSpanColor,
+          styledTextWidget(
+            child: Text(
+                '${player.info.characteristics.weight.toStringAsFixed(1)} kg',
+                style: TextStyle(fontSize: customTheme.smallFontSize)),
+            fontSize: customTheme.smallFontSize,
+            defaultColor: textSpanColor,
+          ),
           customTheme,
         ),
         _buildTableRow(
           'BMI',
-          Text(player.info.characteristics.bmi.toStringAsFixed(2),
-              style: TextStyle(fontSize: customTheme.smallFontSize)),
+          styledTextWidget(
+            child: Text(player.info.characteristics.bmi.toStringAsFixed(2),
+                style: TextStyle(fontSize: customTheme.smallFontSize)),
+            fontSize: customTheme.smallFontSize,
+            defaultColor: textSpanColor,
+          ),
           'Cards',
-          renderCard(player.info.stats.cards.yellow,
-              player.info.stats.cards.red, customTheme.smallFontSize),
-          textSpanColor,
+          styledTextWidget(
+            child: renderCard(player.info.stats.cards.yellow,
+                player.info.stats.cards.red, customTheme.smallFontSize),
+            fontSize: customTheme.smallFontSize,
+            defaultColor: textSpanColor,
+          ),
           customTheme,
         ),
         _buildTableRow(
           'NT cards',
-          renderCard(player.info.nationalStats.cards.yellow,
-              player.info.nationalStats.cards.red, customTheme.smallFontSize),
+          styledTextWidget(
+            child: renderCard(player.info.nationalStats.cards.yellow,
+                player.info.nationalStats.cards.red, customTheme.smallFontSize),
+            fontSize: customTheme.smallFontSize,
+            defaultColor: textSpanColor,
+          ),
           'Injury',
-          renderInjury(player.info.injury.daysRemaining,
-              customTheme.smallFontSize, customTheme.smallFontSize),
-          textSpanColor,
+          styledTextWidget(
+            child: renderInjury(player.info.injury.daysRemaining,
+                customTheme.smallFontSize, customTheme.smallFontSize),
+            fontSize: customTheme.smallFontSize,
+            defaultColor: textSpanColor,
+          ),
           customTheme,
         ),
       ],
@@ -200,8 +243,8 @@ class PlayerCard extends StatelessWidget {
     );
   }
 
-  Widget _buildSkillsTable(
-      Color textSpanColor, CustomThemeExtension customTheme) {
+  Widget _buildSkillsTable(SkillMethods? report, Color textSpanColor,
+      CustomThemeExtension customTheme) {
     return Table(
       columnWidths: const {
         0: FlexColumnWidth(2),
@@ -212,58 +255,104 @@ class PlayerCard extends StatelessWidget {
       children: [
         _buildTableRow(
           'stamina',
-          Text(
-            '${skillsLevelsList[player.info.skills.stamina]} [${player.info.skills.stamina}]',
-            style: TextStyle(fontSize: customTheme.smallFontSize),
+          styledTextWidget(
+            child: Text(
+              '${skillsLevelsList[player.info.skills.stamina]} [${player.info.skills.stamina}]',
+              style: TextStyle(fontSize: customTheme.smallFontSize),
+            ),
+            color:
+                report != null ? getSkillChangeColor(report, 'stamina') : null,
+            fontSize: customTheme.smallFontSize,
+            defaultColor: textSpanColor,
           ),
           'keeper',
-          Text(
-            '${skillsLevelsList[player.info.skills.keeper]} [${player.info.skills.keeper}]',
-            style: TextStyle(fontSize: customTheme.smallFontSize),
+          styledTextWidget(
+            child: Text(
+              '${skillsLevelsList[player.info.skills.keeper]} [${player.info.skills.keeper}]',
+              style: TextStyle(fontSize: customTheme.smallFontSize),
+            ),
+            color:
+                report != null ? getSkillChangeColor(report, 'keeper') : null,
+            fontSize: customTheme.smallFontSize,
+            defaultColor: textSpanColor,
           ),
-          textSpanColor,
           customTheme,
         ),
         _buildTableRow(
           'pace',
-          Text(
-            '${skillsLevelsList[player.info.skills.pace]} [${player.info.skills.pace}]',
-            style: TextStyle(fontSize: customTheme.smallFontSize),
+          styledTextWidget(
+            child: Text(
+              '${skillsLevelsList[player.info.skills.pace]} [${player.info.skills.pace}]',
+              style: TextStyle(fontSize: customTheme.smallFontSize),
+            ),
+            color: report != null ? getSkillChangeColor(report, 'pace') : null,
+            fontSize: customTheme.smallFontSize,
+            defaultColor: textSpanColor,
           ),
           'defending',
-          Text(
-            '${skillsLevelsList[player.info.skills.defending]} [${player.info.skills.defending}]',
-            style: TextStyle(fontSize: customTheme.smallFontSize),
+          styledTextWidget(
+            child: Text(
+              '${skillsLevelsList[player.info.skills.defending]} [${player.info.skills.defending}]',
+              style: TextStyle(fontSize: customTheme.smallFontSize),
+            ),
+            color: report != null
+                ? getSkillChangeColor(report, 'defending')
+                : null,
+            fontSize: customTheme.smallFontSize,
+            defaultColor: textSpanColor,
           ),
-          textSpanColor,
           customTheme,
         ),
         _buildTableRow(
           'technique',
-          Text(
-            '${skillsLevelsList[player.info.skills.technique]} [${player.info.skills.technique}]',
-            style: TextStyle(fontSize: customTheme.smallFontSize),
+          styledTextWidget(
+            child: Text(
+              '${skillsLevelsList[player.info.skills.technique]} [${player.info.skills.technique}]',
+              style: TextStyle(fontSize: customTheme.smallFontSize),
+            ),
+            color: report != null
+                ? getSkillChangeColor(report, 'technique')
+                : null,
+            fontSize: customTheme.smallFontSize,
+            defaultColor: textSpanColor,
           ),
           'playmaking',
-          Text(
-            '${skillsLevelsList[player.info.skills.playmaking]} [${player.info.skills.playmaking}]',
-            style: TextStyle(fontSize: customTheme.smallFontSize),
+          styledTextWidget(
+            child: Text(
+              '${skillsLevelsList[player.info.skills.playmaking]} [${player.info.skills.playmaking}]',
+              style: TextStyle(fontSize: customTheme.smallFontSize),
+            ),
+            color: report != null
+                ? getSkillChangeColor(report, 'playmaking')
+                : null,
+            fontSize: customTheme.smallFontSize,
+            defaultColor: textSpanColor,
           ),
-          textSpanColor,
           customTheme,
         ),
         _buildTableRow(
           'passing',
-          Text(
-            '${skillsLevelsList[player.info.skills.passing]} [${player.info.skills.passing}]',
-            style: TextStyle(fontSize: customTheme.smallFontSize),
+          styledTextWidget(
+            child: Text(
+              '${skillsLevelsList[player.info.skills.passing]} [${player.info.skills.passing}]',
+              style: TextStyle(fontSize: customTheme.smallFontSize),
+            ),
+            color:
+                report != null ? getSkillChangeColor(report, 'passing') : null,
+            fontSize: customTheme.smallFontSize,
+            defaultColor: textSpanColor,
           ),
           'striker',
-          Text(
-            '${skillsLevelsList[player.info.skills.striker]} [${player.info.skills.striker}]',
-            style: TextStyle(fontSize: customTheme.smallFontSize),
+          styledTextWidget(
+            child: Text(
+              '${skillsLevelsList[player.info.skills.striker]} [${player.info.skills.striker}]',
+              style: TextStyle(fontSize: customTheme.smallFontSize),
+            ),
+            color:
+                report != null ? getSkillChangeColor(report, 'striker') : null,
+            fontSize: customTheme.smallFontSize,
+            defaultColor: textSpanColor,
           ),
-          textSpanColor,
           customTheme,
         ),
       ],
@@ -278,31 +367,15 @@ class PlayerCard extends StatelessWidget {
   }
 
   TableRow _buildTableRow(String skill1, Widget value1, String skill2,
-      Widget value2, Color skillThemeColor, CustomThemeExtension customTheme) {
+      Widget value2, CustomThemeExtension customTheme) {
     return TableRow(
       children: [
-        _buildSkillCell(
-            skill1,
-            styledTextWidget(
-              child: value1,
-              color: getSkillChangeColor(player.info, skill1),
-              fontSize: customTheme.smallFontSize,
-              defaultColor: skillThemeColor,
-            ),
-            customTheme.smallFontSize,
+        _buildSkillCell(skill1, value1, customTheme.smallFontSize,
             customTheme.smallPadding),
         const TableCell(
           child: Padding(padding: EdgeInsets.all(4.0), child: Text("")),
         ),
-        _buildSkillCell(
-            parseSkill2(skill2),
-            styledTextWidget(
-              child: value2,
-              color: getSkillChangeColor(player.info, skill2),
-              fontSize: customTheme.smallFontSize,
-              defaultColor: skillThemeColor,
-            ),
-            customTheme.smallFontSize,
+        _buildSkillCell(parseSkill2(skill2), value2, customTheme.smallFontSize,
             customTheme.smallPadding),
       ],
     );
