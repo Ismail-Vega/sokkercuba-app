@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'actions.dart';
@@ -47,29 +48,53 @@ class AppStateNotifier extends ChangeNotifier {
   Future<void> exportAppStateWithFilePicker() async {
     final stateJson = jsonEncode(_state.toJson());
 
-    String? selectedDirectory = await FilePicker.platform.getDirectoryPath();
-    if (selectedDirectory != null) {
-      final file = File('$selectedDirectory/sokker_data.json');
-      await file.writeAsString(stateJson);
+    try {
+      final selectedDirectory = await getDownloadsDirectoryPath();
 
+      if (selectedDirectory != null) {
+        final file = File('$selectedDirectory/sokker_data.json');
+        await file.writeAsString(stateJson);
+
+        Fluttertoast.showToast(
+            msg: "Your sokker data was exported to: ${file.path}!",
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.BOTTOM,
+            timeInSecForIosWeb: 5,
+            backgroundColor: Colors.green,
+            textColor: Colors.white,
+            fontSize: 16.0);
+      } else {
+        Fluttertoast.showToast(
+            msg: "There was an error while trying to export your sokker data!",
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.BOTTOM,
+            timeInSecForIosWeb: 3,
+            backgroundColor: Colors.red,
+            textColor: Colors.white,
+            fontSize: 16.0);
+      }
+    } catch (e) {
       Fluttertoast.showToast(
-          msg: "Your sokker data was exported to: ${file.path}!",
+          msg: 'Error: $e',
           toastLength: Toast.LENGTH_SHORT,
           gravity: ToastGravity.BOTTOM,
-          timeInSecForIosWeb: 1,
-          backgroundColor: Colors.green,
-          textColor: Colors.white,
-          fontSize: 16.0);
-    } else {
-      Fluttertoast.showToast(
-          msg: "There was an error while trying to export your sokker data!",
-          toastLength: Toast.LENGTH_SHORT,
-          gravity: ToastGravity.BOTTOM,
-          timeInSecForIosWeb: 1,
+          timeInSecForIosWeb: 5,
           backgroundColor: Colors.red,
           textColor: Colors.white,
           fontSize: 16.0);
     }
+  }
+
+  Future<String?> getDownloadsDirectoryPath() async {
+    if (Platform.isAndroid) {
+      return '/storage/emulated/0/Download';
+    } else if (Platform.isIOS) {
+      return FilePicker.platform.getDirectoryPath();
+    } else if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
+      final downloadsDirectory = await getDownloadsDirectory();
+      return downloadsDirectory?.path;
+    }
+    return null;
   }
 
   Future<void> importAppStateWithFilePicker() async {

@@ -11,12 +11,17 @@ class TSummaryCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final appState = Provider.of<AppStateNotifier>(context).state;
     final tsummary = appState.tsummary;
+    final trainingWeek = appState.trainingWeek;
 
     if (tsummary == null) {
       return const SizedBox.shrink();
     }
 
     List<Week> weeks = tsummary.weeks;
+
+    if (weeks.isNotEmpty && weeks.first.week != trainingWeek) {
+      weeks.removeAt(0);
+    }
 
     return Card(
       color: Colors.blue[900],

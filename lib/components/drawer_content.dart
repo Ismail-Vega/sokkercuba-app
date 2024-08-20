@@ -77,7 +77,7 @@ class _DrawerContentState extends State<DrawerContent> {
               ),
             ),
             child: Padding(
-              padding: const EdgeInsets.fromLTRB(18, 24, 18, 8),
+              padding: const EdgeInsets.fromLTRB(18, 40, 18, 8),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -88,25 +88,6 @@ class _DrawerContentState extends State<DrawerContent> {
                       fontSize: customTheme.mediumFontSize,
                       fontWeight: FontWeight.bold,
                     ),
-                  ),
-                  TextButton.icon(
-                    icon: const Icon(Icons.update, color: Colors.white),
-                    label: Text(
-                      'Update my data',
-                      style: TextStyle(
-                          color: Colors.white,
-                          fontSize: customTheme.smallFontSize),
-                    ),
-                    style: TextButton.styleFrom(
-                      backgroundColor: Colors.transparent,
-                      side: const BorderSide(color: Colors.white, width: 1.5),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12.0),
-                      ),
-                    ),
-                    onPressed: () async {
-                      await _updateData(context);
-                    },
                   ),
                   IconButton(
                     icon: const Icon(Icons.close, color: Colors.white),
@@ -120,9 +101,9 @@ class _DrawerContentState extends State<DrawerContent> {
           ),
         ),
         if (isLoading) const LinearProgressIndicator(),
-        const Divider(),
         Expanded(
           child: ListView(
+            padding: const EdgeInsets.symmetric(vertical: 8),
             children: [
               for (var item in drawerPublicItems)
                 NavBarItem(
@@ -176,6 +157,19 @@ class _DrawerContentState extends State<DrawerContent> {
                     isLoading = false;
                   });
                   widget.closeDrawer();
+                },
+              ),
+              ListTile(
+                leading: const Icon(
+                  Icons.update,
+                  color: Colors.white,
+                  size: 24,
+                ),
+                title: const Text(
+                  'Update your data',
+                ),
+                onTap: () async {
+                  await _updateData(context);
                 },
               ),
               const Divider(),
