@@ -34,9 +34,9 @@ mixin SkillMethods {
     }
 
     switch (skill) {
-      case 'Form':
+      case 'form':
         return skillsChange!.form;
-      case 'Tact disc':
+      case 'tacticalDiscipline':
         return skillsChange!.tacticalDiscipline;
       case 'teamwork':
         return skillsChange!.teamwork;

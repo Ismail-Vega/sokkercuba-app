@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../mixins/skills_mixin.dart';
 import '../models/juniors/progress_value.dart';
+import '../models/player/player_info.dart';
 
 Color? getSkillChangeColor(SkillMethods report, String skill) {
   if (report.skillsChange != null) {
@@ -33,4 +34,18 @@ Color? getJuniorLevelColor(List<ProgressValue>? progressValues) {
   } else {
     return null;
   }
+}
+
+Color? getValueChangeColor(PlayerInfo? prevState, PlayerInfo currState) {
+  if (prevState != null) {
+    if (prevState.value != null) {
+      if (prevState.value!.value > currState.value!.value) {
+        return Colors.green;
+      } else if (prevState.value!.value < currState.value!.value) {
+        return Colors.red;
+      }
+    }
+  }
+
+  return null;
 }

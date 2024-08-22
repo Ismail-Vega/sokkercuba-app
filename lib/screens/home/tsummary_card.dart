@@ -19,10 +19,6 @@ class TSummaryCard extends StatelessWidget {
 
     List<Week> weeks = tsummary.weeks;
 
-    if (weeks.isNotEmpty && weeks.first.week != trainingWeek) {
-      weeks.removeAt(0);
-    }
-
     return Card(
       color: Colors.blue[900],
       child: Padding(
@@ -133,9 +129,15 @@ class TSummaryCard extends StatelessWidget {
                         ),
                       ],
                     ),
-                    ...weeks.asMap().entries.map((entry) {
+                    ...weeks.asMap().entries.where((entry) {
+                      final value = entry.value;
+
+                      return !(trainingWeek != null &&
+                          value.week == (trainingWeek + 1));
+                    }).map((entry) {
                       final index = entry.key;
                       final week = entry.value;
+
                       return TableRow(
                         decoration: index != weeks.length - 1
                             ? const BoxDecoration(

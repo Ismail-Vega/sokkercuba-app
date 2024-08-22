@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 
 import '../../mixins/skills_mixin.dart';
 import '../../models/player/player.dart';
+import '../../models/player/player_info.dart';
 import '../../state/app_state_notifier.dart';
 import '../../themes/custom_extension.dart';
 import '../../utils/constants.dart';
@@ -68,6 +69,10 @@ class PlayerCard extends StatelessWidget {
     final trainingWeek = state.trainingWeek;
     final players = state.training?.players;
     final report = getPlayerTrainingReport(players, player.id, trainingWeek);
+    final skillsHistory = player.skillsHistory;
+    final prevState = trainingWeek != null && skillsHistory != null
+        ? skillsHistory[trainingWeek - 1]
+        : null;
 
     return Card(
       color: Colors.blue[900],
@@ -107,7 +112,8 @@ class PlayerCard extends StatelessWidget {
                 ),
                 child: Column(
                   children: [
-                    _buildInfoTable(report, skillThemeColor, customTheme),
+                    _buildInfoTable(
+                        report, prevState, skillThemeColor, customTheme),
                     SizedBox(height: smallPadding),
                     const Divider(thickness: 1, color: Colors.grey),
                     SizedBox(height: smallPadding),
@@ -122,8 +128,8 @@ class PlayerCard extends StatelessWidget {
     );
   }
 
-  Widget _buildInfoTable(SkillMethods? report, Color textSpanColor,
-      CustomThemeExtension customTheme) {
+  Widget _buildInfoTable(SkillMethods? report, PlayerInfo? prevState,
+      Color textSpanColor, CustomThemeExtension customTheme) {
     return Table(
       columnWidths: const {
         0: FlexColumnWidth(2),
@@ -139,6 +145,7 @@ class PlayerCard extends StatelessWidget {
                 '${formatNumber(player.info.value?.value)} ${(player.info.value?.currency)}',
                 style: TextStyle(fontSize: customTheme.smallFontSize),
               ),
+              color: getValueChangeColor(prevState, player.info),
               fontSize: customTheme.smallFontSize,
               defaultColor: textSpanColor,
             ),
@@ -159,6 +166,9 @@ class PlayerCard extends StatelessWidget {
               '${skillsLevelsList[player.info.skills.tacticalDiscipline]} [${player.info.skills.tacticalDiscipline}]',
               style: TextStyle(fontSize: customTheme.smallFontSize),
             ),
+            color: report != null
+                ? getSkillChangeColor(report, 'tacticalDiscipline')
+                : null,
             fontSize: customTheme.smallFontSize,
             defaultColor: textSpanColor,
           ),
@@ -168,24 +178,31 @@ class PlayerCard extends StatelessWidget {
               '${skillsLevelsList[player.info.skills.form]} [${player.info.skills.form}]',
               style: TextStyle(fontSize: customTheme.smallFontSize),
             ),
+            color: report != null ? getSkillChangeColor(report, 'form') : null,
             fontSize: customTheme.smallFontSize,
             defaultColor: textSpanColor,
           ),
           customTheme,
         ),
         _buildTableRow(
-          'Height',
+          'Team work',
           styledTextWidget(
-            child: Text('${player.info.characteristics.height} cm',
+            child: Text(
+                '${skillsLevelsList[player.info.skills.teamwork]} [${player.info.skills.teamwork}]',
                 style: TextStyle(fontSize: customTheme.smallFontSize)),
+            color:
+                report != null ? getSkillChangeColor(report, 'teamwork') : null,
             fontSize: customTheme.smallFontSize,
             defaultColor: textSpanColor,
           ),
-          'Weight',
+          'Exp',
           styledTextWidget(
             child: Text(
-                '${player.info.characteristics.weight.toStringAsFixed(1)} kg',
+                '${skillsLevelsList[player.info.skills.experience]} [${player.info.skills.experience}]',
                 style: TextStyle(fontSize: customTheme.smallFontSize)),
+            color: report != null
+                ? getSkillChangeColor(report, 'experience')
+                : null,
             fontSize: customTheme.smallFontSize,
             defaultColor: textSpanColor,
           ),

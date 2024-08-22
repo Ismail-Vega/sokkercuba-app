@@ -97,19 +97,6 @@ Future<SquadTraining?> setTrainingData(ApiClient apiClient, bool plus,
 
   final training = stateData ?? SquadTraining(players: []);
 
-  if (training.players.isNotEmpty) {
-    int checkIndex = training.players.indexWhere((player) {
-      if (player.report.isNotEmpty) {
-        return player.report[0].week == week;
-      }
-      return false;
-    });
-
-    if (checkIndex != -1) {
-      return stateData;
-    }
-  }
-
   if (!plus) {
     for (var player in players) {
       final report = TrainingReport.fromJson(player['report']);
