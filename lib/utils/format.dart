@@ -6,7 +6,8 @@ String? formatNumber(int? number) {
   return formatter.format(number).replaceAll(',', ' ');
 }
 
-String formatDateTime(String? date, {String locale = 'en_US'}) {
+String formatDateTime(String? date,
+    {String locale = 'en_US', bool isShort = false}) {
   if (date == null) {
     return 'No date available';
   }
@@ -17,6 +18,8 @@ String formatDateTime(String? date, {String locale = 'en_US'}) {
 
   final String formattedDate = dateFormatter.format(dateTime);
   final String formattedTime = timeFormatter.format(dateTime);
+
+  if (isShort) return formattedDate;
 
   return '$formattedDate at $formattedTime';
 }

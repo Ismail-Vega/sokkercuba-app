@@ -12,7 +12,7 @@ TeamPlayer _$TeamPlayerFromJson(Map<String, dynamic> json) => TeamPlayer(
       transfer: json['transfer'],
       skillsHistory: (json['skillsHistory'] as Map<String, dynamic>?)?.map(
         (k, e) => MapEntry(
-            int.parse(k), PlayerInfo.fromJson(e as Map<String, dynamic>)),
+            int.parse(k), PlayerHistory.fromJson(e as Map<String, dynamic>)),
       ),
     );
 

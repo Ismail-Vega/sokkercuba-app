@@ -1,14 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:provider/provider.dart';
 
 import '../models/navigation/nav_bar_item_model.dart';
 import '../screens/footer/footer_screen.dart';
 import '../services/api_client.dart';
 import '../services/fetch_all_data.dart';
+import '../services/toast_service.dart';
 import '../state/actions.dart';
 import '../state/app_state_notifier.dart';
 import '../themes/custom_extension.dart';
+import '../utils/format.dart';
 import '../widgets/nav_bar_item.dart';
 
 class DrawerContent extends StatefulWidget {
@@ -26,6 +27,8 @@ class _DrawerContentState extends State<DrawerContent> {
   bool isLoading = false;
 
   Future<void> _updateData(BuildContext context) async {
+    final toastService = ToastService(context);
+
     setState(() {
       isLoading = true;
     });
@@ -38,7 +41,7 @@ class _DrawerContentState extends State<DrawerContent> {
     final appStateNotifier =
         Provider.of<AppStateNotifier>(context, listen: false);
 
-    final result = await fetchAllData(apiClient, appStateNotifier);
+    final result = await fetchAllData(apiClient, appStateNotifier, context);
 
     if (result['code'] == 200 && result['success'] == true) {
       widget.closeDrawer();
@@ -46,15 +49,16 @@ class _DrawerContentState extends State<DrawerContent> {
       setState(() {
         isLoading = false;
       });
+
+      toastService.showToast(
+        'Data updated on! ${formatDateTime(result['dataUpdatedOn'])}',
+        backgroundColor: Colors.green,
+      );
     } else {
-      Fluttertoast.showToast(
-          msg: "Failed to fetch all data!",
-          toastLength: Toast.LENGTH_SHORT,
-          gravity: ToastGravity.BOTTOM,
-          timeInSecForIosWeb: 1,
-          backgroundColor: Colors.red,
-          textColor: Colors.white,
-          fontSize: 16.0);
+      toastService.showToast(
+        "Failed to fetch all data!",
+        backgroundColor: Colors.red,
+      );
     }
   }
 
@@ -136,7 +140,7 @@ class _DrawerContentState extends State<DrawerContent> {
                   });
                   final appStateNotifier =
                       Provider.of<AppStateNotifier>(context, listen: false);
-                  await appStateNotifier.importAppStateWithFilePicker();
+                  await appStateNotifier.importAppStateWithFilePicker(context);
                   setState(() {
                     isLoading = false;
                   });
@@ -152,7 +156,7 @@ class _DrawerContentState extends State<DrawerContent> {
                   });
                   final appStateNotifier =
                       Provider.of<AppStateNotifier>(context, listen: false);
-                  await appStateNotifier.exportAppStateWithFilePicker();
+                  await appStateNotifier.exportAppStateWithFilePicker(context);
                   setState(() {
                     isLoading = false;
                   });

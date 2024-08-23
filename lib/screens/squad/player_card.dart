@@ -11,10 +11,37 @@ import '../../utils/format.dart';
 import '../../utils/get_training_data.dart';
 import '../../utils/skills_checker.dart';
 
-class PlayerCard extends StatelessWidget {
+class PlayerCard extends StatefulWidget {
   final TeamPlayer player;
 
   const PlayerCard({super.key, required this.player});
+
+  @override
+  State<PlayerCard> createState() => _PlayerCardState();
+}
+
+class _PlayerCardState extends State<PlayerCard> {
+  int? selectedWeek;
+  PlayerInfo? selectedPlayerInfo;
+
+  @override
+  void initState() {
+    super.initState();
+    selectedPlayerInfo = widget.player.info;
+  }
+
+  void _onWeekSelected(int? week) {
+    setState(() {
+      selectedWeek = week;
+
+      if (week != null && widget.player.skillsHistory != null) {
+        selectedPlayerInfo =
+            widget.player.skillsHistory![week]?.info ?? widget.player.info;
+      } else {
+        selectedPlayerInfo = widget.player.info;
+      }
+    });
+  }
 
   Widget renderCard(int yellow, int red, double iconSize) {
     if (red > 0) {
@@ -63,16 +90,20 @@ class PlayerCard extends StatelessWidget {
     final customTheme = Theme.of(context).extension<CustomThemeExtension>()!;
     final Color skillThemeColor =
         theme.brightness == Brightness.dark ? Colors.white : Colors.black;
-    final smallPadding = customTheme.smallPadding;
     final mediumPadding = customTheme.mediumPadding;
     final state = Provider.of<AppStateNotifier>(context).state;
     final trainingWeek = state.trainingWeek;
     final players = state.training?.players;
-    final report = getPlayerTrainingReport(players, player.id, trainingWeek);
-    final skillsHistory = player.skillsHistory;
-    final prevState = trainingWeek != null && skillsHistory != null
-        ? skillsHistory[trainingWeek - 1]
+    final noSelection = selectedWeek == null || selectedWeek == trainingWeek;
+    final report = noSelection
+        ? getPlayerTrainingReport(players, widget.player.id, trainingWeek)
         : null;
+    final skillsHistory = widget.player.skillsHistory;
+    final prevState =
+        trainingWeek != null && skillsHistory != null && noSelection
+            ? skillsHistory[trainingWeek - 1]?.info
+            : null;
+    final player = selectedPlayerInfo ?? widget.player.info;
 
     return Card(
       color: Colors.blue[900],
@@ -80,24 +111,67 @@ class PlayerCard extends StatelessWidget {
         child: Column(
           children: [
             Padding(
-              padding: EdgeInsets.fromLTRB(
-                  mediumPadding, smallPadding, mediumPadding, 0),
+              padding: EdgeInsets.fromLTRB(mediumPadding, 0, mediumPadding, 0),
               child: Row(
                 children: [
-                  Expanded(
-                    child: Text(
-                      player.info.name.full,
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: customTheme.mediumFontSize,
-                        overflow: TextOverflow.ellipsis,
-                      ),
+                  Text(
+                    player.name.full,
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: customTheme.mediumFontSize,
+                      overflow: TextOverflow.ellipsis,
                     ),
                   ),
-                  Text(
-                    'Age: ${player.info.characteristics.age}',
-                    style: TextStyle(fontSize: customTheme.smallFontSize),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      'Age: ${player.characteristics.age}',
+                      style: TextStyle(fontSize: customTheme.smallFontSize),
+                    ),
                   ),
+                  if (widget.player.skillsHistory != null &&
+                      widget.player.skillsHistory!.isNotEmpty)
+                    DropdownButton<int>(
+                        value: selectedWeek,
+                        dropdownColor: Colors.blue[900],
+                        hint: const Padding(
+                          padding: EdgeInsets.zero,
+                          child: Text(
+                            "Show History",
+                            style: TextStyle(
+                              fontSize: 10,
+                              height: 1.0,
+                            ),
+                          ),
+                        ),
+                        items: widget.player.skillsHistory!.keys
+                            .toList()
+                            .reversed
+                            .map((week) {
+                          final date = widget.player.skillsHistory![week]?.date;
+
+                          return DropdownMenuItem<int>(
+                            value: week,
+                            child: Padding(
+                              padding: EdgeInsets.zero,
+                              child: Text(
+                                "Week: $week (${formatDateTime(date, isShort: true)})",
+                                style: const TextStyle(
+                                  fontSize: 10,
+                                  height: 1.0,
+                                ),
+                              ),
+                            ),
+                          );
+                        }).toList(),
+                        onChanged: _onWeekSelected,
+                        style: const TextStyle(
+                          fontSize: 10,
+                          height: 1.0,
+                        ),
+                        isDense: true,
+                        underline: const SizedBox(),
+                        focusColor: Colors.transparent),
                 ],
               ),
             ),
@@ -108,16 +182,14 @@ class PlayerCard extends StatelessWidget {
             Flexible(
               child: SingleChildScrollView(
                 padding: EdgeInsets.symmetric(
-                  horizontal: mediumPadding,
-                ),
+                    horizontal: mediumPadding, vertical: 0),
                 child: Column(
                   children: [
-                    _buildInfoTable(
-                        report, prevState, skillThemeColor, customTheme),
-                    SizedBox(height: smallPadding),
+                    _buildInfoTable(report, prevState, player, skillThemeColor,
+                        customTheme),
                     const Divider(thickness: 1, color: Colors.grey),
-                    SizedBox(height: smallPadding),
-                    _buildSkillsTable(report, skillThemeColor, customTheme),
+                    _buildSkillsTable(
+                        report, player, skillThemeColor, customTheme),
                   ],
                 ),
               ),
@@ -128,8 +200,12 @@ class PlayerCard extends StatelessWidget {
     );
   }
 
-  Widget _buildInfoTable(SkillMethods? report, PlayerInfo? prevState,
-      Color textSpanColor, CustomThemeExtension customTheme) {
+  Widget _buildInfoTable(
+      SkillMethods? report,
+      PlayerInfo? prevState,
+      PlayerInfo player,
+      Color textSpanColor,
+      CustomThemeExtension customTheme) {
     return Table(
       columnWidths: const {
         0: FlexColumnWidth(2),
@@ -142,17 +218,17 @@ class PlayerCard extends StatelessWidget {
             'Value',
             styledTextWidget(
               child: Text(
-                '${formatNumber(player.info.value?.value)} ${(player.info.value?.currency)}',
+                '${formatNumber(player.value?.value)} ${(player.value?.currency)}',
                 style: TextStyle(fontSize: customTheme.smallFontSize),
               ),
-              color: getValueChangeColor(prevState, player.info),
+              color: getValueChangeColor(prevState, player),
               fontSize: customTheme.smallFontSize,
               defaultColor: textSpanColor,
             ),
             'Wage',
             styledTextWidget(
               child: Text(
-                '${formatNumber(player.info.wage?.value)} ${player.info.wage?.currency}',
+                '${formatNumber(player.wage?.value)} ${player.wage?.currency}',
                 style: TextStyle(fontSize: customTheme.smallFontSize),
               ),
               fontSize: customTheme.smallFontSize,
@@ -163,7 +239,7 @@ class PlayerCard extends StatelessWidget {
           'Tact disc',
           styledTextWidget(
             child: Text(
-              '${skillsLevelsList[player.info.skills.tacticalDiscipline]} [${player.info.skills.tacticalDiscipline}]',
+              '${skillsLevelsList[player.skills.tacticalDiscipline]} [${player.skills.tacticalDiscipline}]',
               style: TextStyle(fontSize: customTheme.smallFontSize),
             ),
             color: report != null
@@ -175,7 +251,7 @@ class PlayerCard extends StatelessWidget {
           'Form',
           styledTextWidget(
             child: Text(
-              '${skillsLevelsList[player.info.skills.form]} [${player.info.skills.form}]',
+              '${skillsLevelsList[player.skills.form]} [${player.skills.form}]',
               style: TextStyle(fontSize: customTheme.smallFontSize),
             ),
             color: report != null ? getSkillChangeColor(report, 'form') : null,
@@ -188,7 +264,7 @@ class PlayerCard extends StatelessWidget {
           'Team work',
           styledTextWidget(
             child: Text(
-                '${skillsLevelsList[player.info.skills.teamwork]} [${player.info.skills.teamwork}]',
+                '${skillsLevelsList[player.skills.teamwork]} [${player.skills.teamwork}]',
                 style: TextStyle(fontSize: customTheme.smallFontSize)),
             color:
                 report != null ? getSkillChangeColor(report, 'teamwork') : null,
@@ -198,7 +274,7 @@ class PlayerCard extends StatelessWidget {
           'Exp',
           styledTextWidget(
             child: Text(
-                '${skillsLevelsList[player.info.skills.experience]} [${player.info.skills.experience}]',
+                '${skillsLevelsList[player.skills.experience]} [${player.skills.experience}]',
                 style: TextStyle(fontSize: customTheme.smallFontSize)),
             color: report != null
                 ? getSkillChangeColor(report, 'experience')
@@ -211,15 +287,15 @@ class PlayerCard extends StatelessWidget {
         _buildTableRow(
           'BMI',
           styledTextWidget(
-            child: Text(player.info.characteristics.bmi.toStringAsFixed(2),
+            child: Text(player.characteristics.bmi.toStringAsFixed(2),
                 style: TextStyle(fontSize: customTheme.smallFontSize)),
             fontSize: customTheme.smallFontSize,
             defaultColor: textSpanColor,
           ),
           'Cards',
           styledTextWidget(
-            child: renderCard(player.info.stats.cards.yellow,
-                player.info.stats.cards.red, customTheme.smallFontSize),
+            child: renderCard(player.stats.cards.yellow, player.stats.cards.red,
+                customTheme.smallFontSize),
             fontSize: customTheme.smallFontSize,
             defaultColor: textSpanColor,
           ),
@@ -228,14 +304,14 @@ class PlayerCard extends StatelessWidget {
         _buildTableRow(
           'NT cards',
           styledTextWidget(
-            child: renderCard(player.info.nationalStats.cards.yellow,
-                player.info.nationalStats.cards.red, customTheme.smallFontSize),
+            child: renderCard(player.nationalStats.cards.yellow,
+                player.nationalStats.cards.red, customTheme.smallFontSize),
             fontSize: customTheme.smallFontSize,
             defaultColor: textSpanColor,
           ),
           'Injury',
           styledTextWidget(
-            child: renderInjury(player.info.injury.daysRemaining,
+            child: renderInjury(player.injury.daysRemaining,
                 customTheme.smallFontSize, customTheme.smallFontSize),
             fontSize: customTheme.smallFontSize,
             defaultColor: textSpanColor,
@@ -260,8 +336,8 @@ class PlayerCard extends StatelessWidget {
     );
   }
 
-  Widget _buildSkillsTable(SkillMethods? report, Color textSpanColor,
-      CustomThemeExtension customTheme) {
+  Widget _buildSkillsTable(SkillMethods? report, PlayerInfo player,
+      Color textSpanColor, CustomThemeExtension customTheme) {
     return Table(
       columnWidths: const {
         0: FlexColumnWidth(2),
@@ -274,7 +350,7 @@ class PlayerCard extends StatelessWidget {
           'stamina',
           styledTextWidget(
             child: Text(
-              '${skillsLevelsList[player.info.skills.stamina]} [${player.info.skills.stamina}]',
+              '${skillsLevelsList[player.skills.stamina]} [${player.skills.stamina}]',
               style: TextStyle(fontSize: customTheme.smallFontSize),
             ),
             color:
@@ -285,7 +361,7 @@ class PlayerCard extends StatelessWidget {
           'keeper',
           styledTextWidget(
             child: Text(
-              '${skillsLevelsList[player.info.skills.keeper]} [${player.info.skills.keeper}]',
+              '${skillsLevelsList[player.skills.keeper]} [${player.skills.keeper}]',
               style: TextStyle(fontSize: customTheme.smallFontSize),
             ),
             color:
@@ -299,7 +375,7 @@ class PlayerCard extends StatelessWidget {
           'pace',
           styledTextWidget(
             child: Text(
-              '${skillsLevelsList[player.info.skills.pace]} [${player.info.skills.pace}]',
+              '${skillsLevelsList[player.skills.pace]} [${player.skills.pace}]',
               style: TextStyle(fontSize: customTheme.smallFontSize),
             ),
             color: report != null ? getSkillChangeColor(report, 'pace') : null,
@@ -309,7 +385,7 @@ class PlayerCard extends StatelessWidget {
           'defending',
           styledTextWidget(
             child: Text(
-              '${skillsLevelsList[player.info.skills.defending]} [${player.info.skills.defending}]',
+              '${skillsLevelsList[player.skills.defending]} [${player.skills.defending}]',
               style: TextStyle(fontSize: customTheme.smallFontSize),
             ),
             color: report != null
@@ -324,7 +400,7 @@ class PlayerCard extends StatelessWidget {
           'technique',
           styledTextWidget(
             child: Text(
-              '${skillsLevelsList[player.info.skills.technique]} [${player.info.skills.technique}]',
+              '${skillsLevelsList[player.skills.technique]} [${player.skills.technique}]',
               style: TextStyle(fontSize: customTheme.smallFontSize),
             ),
             color: report != null
@@ -336,7 +412,7 @@ class PlayerCard extends StatelessWidget {
           'playmaking',
           styledTextWidget(
             child: Text(
-              '${skillsLevelsList[player.info.skills.playmaking]} [${player.info.skills.playmaking}]',
+              '${skillsLevelsList[player.skills.playmaking]} [${player.skills.playmaking}]',
               style: TextStyle(fontSize: customTheme.smallFontSize),
             ),
             color: report != null
@@ -351,7 +427,7 @@ class PlayerCard extends StatelessWidget {
           'passing',
           styledTextWidget(
             child: Text(
-              '${skillsLevelsList[player.info.skills.passing]} [${player.info.skills.passing}]',
+              '${skillsLevelsList[player.skills.passing]} [${player.skills.passing}]',
               style: TextStyle(fontSize: customTheme.smallFontSize),
             ),
             color:
@@ -362,7 +438,7 @@ class PlayerCard extends StatelessWidget {
           'striker',
           styledTextWidget(
             child: Text(
-              '${skillsLevelsList[player.info.skills.striker]} [${player.info.skills.striker}]',
+              '${skillsLevelsList[player.skills.striker]} [${player.skills.striker}]',
               style: TextStyle(fontSize: customTheme.smallFontSize),
             ),
             color:

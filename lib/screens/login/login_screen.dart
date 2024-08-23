@@ -1,11 +1,11 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:modal_progress_hud_nsn/modal_progress_hud_nsn.dart';
 import 'package:provider/provider.dart';
 
 import '../../services/api_client.dart';
 import '../../services/fetch_all_data.dart';
+import '../../services/toast_service.dart';
 import '../../state/actions.dart';
 import '../../state/app_state_notifier.dart';
 import '../../utils/constants.dart';
@@ -37,6 +37,7 @@ class _LoginScreenState extends State<LoginScreen> {
   Future<void> _handleLogin() async {
     if (_formKey.currentState!.validate()) {
       _toggleSpinner(true);
+      final toastService = ToastService(context);
 
       try {
         final apiClient = ApiClient();
@@ -50,7 +51,8 @@ class _LoginScreenState extends State<LoginScreen> {
         if (response != null && response.statusCode == 200 && mounted) {
           final appStateNotifier =
               Provider.of<AppStateNotifier>(context, listen: false);
-          final result = await fetchAllData(apiClient, appStateNotifier);
+          final result =
+              await fetchAllData(apiClient, appStateNotifier, context);
 
           if (result['code'] == 200 && result['success'] == true) {
             appStateNotifier
@@ -58,51 +60,35 @@ class _LoginScreenState extends State<LoginScreen> {
             appStateNotifier
                 .dispatch(StoreAction(StoreActionTypes.setUsername, login));
           } else {
-            Fluttertoast.showToast(
-                msg: "Failed to fetch all data!",
-                toastLength: Toast.LENGTH_SHORT,
-                gravity: ToastGravity.BOTTOM,
-                timeInSecForIosWeb: 1,
-                backgroundColor: Colors.red,
-                textColor: Colors.white,
-                fontSize: 16.0);
+            toastService.showToast(
+              "Failed to fetch all data!",
+              backgroundColor: Colors.red,
+            );
           }
 
           if (!mounted) return;
           Navigator.pushNamed(context, '/');
         } else {
           if (response.statusCode == 401) {
-            Fluttertoast.showToast(
-                msg: "Incorrect login info, please try again!",
-                toastLength: Toast.LENGTH_SHORT,
-                gravity: ToastGravity.BOTTOM,
-                timeInSecForIosWeb: 1,
-                backgroundColor: Colors.red,
-                textColor: Colors.white,
-                fontSize: 16.0);
+            toastService.showToast(
+              "Incorrect login info, please try again!",
+              backgroundColor: Colors.red,
+            );
           } else {
-            Fluttertoast.showToast(
-                msg: "There was an error while logging you in!",
-                toastLength: Toast.LENGTH_SHORT,
-                gravity: ToastGravity.BOTTOM,
-                timeInSecForIosWeb: 1,
-                backgroundColor: Colors.red,
-                textColor: Colors.white,
-                fontSize: 16.0);
+            toastService.showToast(
+              "There was an error while logging you in!",
+              backgroundColor: Colors.red,
+            );
           }
         }
       } catch (e) {
         if (kDebugMode) {
           print('catch: $e');
         }
-        Fluttertoast.showToast(
-            msg: "There was an error while logging you in!",
-            toastLength: Toast.LENGTH_SHORT,
-            gravity: ToastGravity.BOTTOM,
-            timeInSecForIosWeb: 1,
-            backgroundColor: Colors.red,
-            textColor: Colors.white,
-            fontSize: 16.0);
+        toastService.showToast(
+          "There was an error while logging you in!",
+          backgroundColor: Colors.red,
+        );
       } finally {
         _toggleSpinner(false);
       }

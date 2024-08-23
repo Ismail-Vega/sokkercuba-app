@@ -3,6 +3,7 @@ import '../models/news/news.dart';
 import '../models/news/news_item.dart';
 import '../models/news/news_junior.dart';
 import '../models/player/player.dart';
+import '../models/player/player_history.dart';
 import '../models/player/player_info.dart';
 import '../models/squad/squad.dart';
 import '../models/training/training.dart';
@@ -56,26 +57,36 @@ Juniors setJuniorsData(Juniors? stateJuniors, Map<String, dynamic> data) {
   );
 }
 
-Squad setSquadData(Squad? stateSquad, Map<String, dynamic> data) {
-  final totalData = data['total'] ?? 0;
-  final playersData = parsePlayers(data['players'] ?? []);
+Squad setSquadData(
+    Squad? stateSquad, Map<String, dynamic> data, int? trainingWeek) {
+  final int totalData = data['total'] ?? 0;
+  final List<TeamPlayer> playersData = parsePlayers(data['players'] ?? []);
+  final Set<int> playersDataIds =
+      playersData.map((player) => player.id).toSet();
+
+  List<TeamPlayer> newPrevPlayers = stateSquad?.prevPlayers ?? [];
+  final Set<int> newPrevPlayersIds =
+      newPrevPlayers.map((player) => player.id).toSet();
+
   final List<TeamPlayer> statePlayers = stateSquad?.players ?? [];
-  final playersDataIds = playersData.map((player) => player.id).toSet();
-
-  final List<TeamPlayer> prevPlayers = stateSquad?.prevPlayers ?? [];
-  final prevPlayersIds = prevPlayers.map((player) => player.id).toSet();
-
-  final List<TeamPlayer> newPrevPlayers = [...prevPlayers];
 
   for (final player in statePlayers) {
     if (!playersDataIds.contains(player.id)) {
-      if (prevPlayersIds.contains(player.id)) {
-        final index = newPrevPlayers.indexWhere((p) => p.id == player.id);
-        if (index != -1) {
-          newPrevPlayers[index] = player;
-        }
-      } else {
+      if (!newPrevPlayersIds.contains(player.id)) {
         newPrevPlayers.add(player);
+      } else {
+        final int index = newPrevPlayers.indexWhere((p) => p.id == player.id);
+        if (index != -1) newPrevPlayers[index] = player;
+      }
+    } else if (trainingWeek != null) {
+      final int playerIndex = playersData.indexWhere((p) => p.id == player.id);
+
+      if (playerIndex != -1) {
+        final skillsHistory = player.skillsHistory ?? {};
+        skillsHistory[trainingWeek] = PlayerHistory(
+            info: playersData[playerIndex].info,
+            date: DateTime.now().toIso8601String());
+        playersData[playerIndex].skillsHistory = skillsHistory;
       }
     }
   }

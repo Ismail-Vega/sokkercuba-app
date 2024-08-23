@@ -36,12 +36,12 @@ Color? getJuniorLevelColor(List<ProgressValue>? progressValues) {
   }
 }
 
-Color? getValueChangeColor(PlayerInfo? prevState, PlayerInfo currState) {
+Color? getValueChangeColor(PlayerInfo? prevState, PlayerInfo state) {
   if (prevState != null) {
     if (prevState.value != null) {
-      if (prevState.value!.value > currState.value!.value) {
+      if (prevState.value!.value > state.value!.value) {
         return Colors.green;
-      } else if (prevState.value!.value < currState.value!.value) {
+      } else if (prevState.value!.value < state.value!.value) {
         return Colors.red;
       }
     }

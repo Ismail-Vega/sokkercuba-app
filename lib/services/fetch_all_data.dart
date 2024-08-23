@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 
 import '../models/team/team_stats.dart';
 import '../models/team/user.dart';
@@ -11,9 +10,12 @@ import '../state/app_state_notifier.dart';
 import '../utils/constants.dart';
 import 'api_client.dart';
 import 'fetch_juniors_training.dart';
+import 'toast_service.dart';
 
-Future<Map<String, dynamic>> fetchAllData(
-    ApiClient apiClient, AppStateNotifier appStateNotifier) async {
+Future<Map<String, dynamic>> fetchAllData(ApiClient apiClient,
+    AppStateNotifier appStateNotifier, BuildContext context) async {
+  final toastService = ToastService(context);
+
   try {
     final user = await apiClient.fetchData('/current');
     final state = appStateNotifier.state;
@@ -49,13 +51,14 @@ Future<Map<String, dynamic>> fetchAllData(
       final training = await setTrainingData(
           apiClient, plus, stateWeek, state.training, responses[1]);
       final tsummary = TSummary.fromJson(responses[2]);
-      final players = setSquadData(state.players, responses[3]);
+      final players = setSquadData(state.players, responses[3], stateWeek);
       final userStats = UserStats.fromJson(responses[4]);
       final news = await setNewsData(apiClient, state.news, responses[5]);
 
       final juniorsTraining =
           await getJuniorsTraining(apiClient, responses[0]['juniors']);
 
+      final dataUpdatedOn = DateTime.now().toIso8601String();
       final filteredPayload = {
         'teamId': user['team']?['id'],
         'user': User.fromJson(user),
@@ -67,36 +70,25 @@ Future<Map<String, dynamic>> fetchAllData(
         'training': training,
         'news': news,
         'trainingWeek': stateWeek,
-        'dataUpdatedOn': DateTime.now().toIso8601String()
+        'dataUpdatedOn': dataUpdatedOn
       };
 
       appStateNotifier
           .dispatch(StoreAction(StoreActionTypes.setAll, filteredPayload));
 
-      return {
-        'success': true,
-        'code': 200,
-      };
+      return {'success': true, 'code': 200, 'dataUpdatedOn': dataUpdatedOn};
     } else {
-      Fluttertoast.showToast(
-          msg: "Failed to fetch all data!",
-          toastLength: Toast.LENGTH_SHORT,
-          gravity: ToastGravity.BOTTOM,
-          timeInSecForIosWeb: 1,
-          backgroundColor: Colors.red,
-          textColor: Colors.white,
-          fontSize: 16.0);
+      toastService.showToast(
+        "Failed to fetch all data!",
+        backgroundColor: Colors.red,
+      );
       return {'code': '500', 'error': 'Failed to fetch all data!'};
     }
   } catch (error) {
-    Fluttertoast.showToast(
-        msg: "Failed to fetch all data!",
-        toastLength: Toast.LENGTH_SHORT,
-        gravity: ToastGravity.BOTTOM,
-        timeInSecForIosWeb: 1,
-        backgroundColor: Colors.red,
-        textColor: Colors.white,
-        fontSize: 16.0);
+    toastService.showToast(
+      "Failed to fetch all data!",
+      backgroundColor: Colors.red,
+    );
 
     return {'code': '500', 'error': error.toString()};
   }

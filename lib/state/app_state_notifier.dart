@@ -3,10 +3,10 @@ import 'dart:io';
 
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../services/toast_service.dart';
 import 'actions.dart';
 import 'app_state.dart';
 
@@ -31,22 +31,11 @@ class AppStateNotifier extends ChangeNotifier {
   Future<void> _saveState() async {
     final prefs = await SharedPreferences.getInstance();
     prefs.setString('appState', jsonEncode(_state.toJson()));
-    _handleWeekChange();
   }
 
-  void _handleWeekChange() {
-    final week = _state.user?.today.week;
-    final day = _state.user?.today.day;
-    if (week != null && day != null) {
-      final trainingWeek = day < 5 ? week - 1 : week;
-      _state.players?.players.forEach((player) {
-        player.skillsHistory?[trainingWeek] = player.info;
-      });
-    }
-  }
-
-  Future<void> exportAppStateWithFilePicker() async {
+  Future<void> exportAppStateWithFilePicker(BuildContext context) async {
     final stateJson = jsonEncode(_state.toJson());
+    final toastService = ToastService(context);
 
     try {
       String? downloadsDirectory = await FilePicker.platform.getDirectoryPath(
@@ -60,32 +49,22 @@ class AppStateNotifier extends ChangeNotifier {
         final file = File(filePath);
         await file.writeAsString(stateJson);
 
-        Fluttertoast.showToast(
-          msg: "Data successfully exported to: $filePath",
-          toastLength: Toast.LENGTH_LONG,
-          gravity: ToastGravity.BOTTOM,
+        toastService.showToastWithCloseButton(
+          "Data successfully exported to: $filePath",
           backgroundColor: Colors.green,
-          textColor: Colors.white,
         );
         return;
       } else {
-        Fluttertoast.showToast(
-          msg:
-              "Export canceled or no directory selected. Saving in internal storage.",
-          toastLength: Toast.LENGTH_SHORT,
-          gravity: ToastGravity.BOTTOM,
+        toastService.showToast(
+          "Export canceled or no directory selected.",
           backgroundColor: Colors.orange,
-          textColor: Colors.white,
         );
+        return;
       }
     } catch (e) {
-      Fluttertoast.showToast(
-        msg:
-            "Failed to export to the selected directory. Saving in internal storage instead.",
-        toastLength: Toast.LENGTH_LONG,
-        gravity: ToastGravity.BOTTOM,
+      toastService.showToast(
+        "Failed to export to the selected directory. Saving in internal storage instead.",
         backgroundColor: Colors.orange,
-        textColor: Colors.white,
       );
     }
 
@@ -95,25 +74,20 @@ class AppStateNotifier extends ChangeNotifier {
       final file = File(filePath);
       await file.writeAsString(stateJson);
 
-      Fluttertoast.showToast(
-        msg: "Data saved in: $filePath",
-        toastLength: Toast.LENGTH_LONG,
-        gravity: ToastGravity.BOTTOM,
+      toastService.showToastWithCloseButton(
+        "Data saved in: $filePath",
         backgroundColor: Colors.orange,
-        textColor: Colors.white,
       );
     } catch (e) {
-      Fluttertoast.showToast(
-        msg: "Error saving data: $e",
-        toastLength: Toast.LENGTH_LONG,
-        gravity: ToastGravity.BOTTOM,
+      toastService.showToastWithCloseButton(
+        "Error saving data: $e",
         backgroundColor: Colors.red,
-        textColor: Colors.white,
       );
     }
   }
 
-  Future<void> importAppStateWithFilePicker() async {
+  Future<void> importAppStateWithFilePicker(BuildContext context) async {
+    final toastService = ToastService(context);
     FilePickerResult? result = await FilePicker.platform.pickFiles(
       type: FileType.custom,
       allowedExtensions: ['json'],
@@ -131,33 +105,21 @@ class AppStateNotifier extends ChangeNotifier {
         await _saveState();
         notifyListeners();
 
-        Fluttertoast.showToast(
-            msg: "Your sokker data was imported successfully!",
-            toastLength: Toast.LENGTH_SHORT,
-            gravity: ToastGravity.BOTTOM,
-            timeInSecForIosWeb: 1,
-            backgroundColor: Colors.green,
-            textColor: Colors.white,
-            fontSize: 16.0);
+        toastService.showToast(
+          "Your sokker data was imported successfully!",
+          backgroundColor: Colors.green,
+        );
       } catch (e) {
-        Fluttertoast.showToast(
-            msg: 'There was an error while trying to parse the file: $e',
-            toastLength: Toast.LENGTH_SHORT,
-            gravity: ToastGravity.BOTTOM,
-            timeInSecForIosWeb: 1,
-            backgroundColor: Colors.red,
-            textColor: Colors.white,
-            fontSize: 16.0);
+        toastService.showToastWithCloseButton(
+          'There was an error while trying to parse the file: $e',
+          backgroundColor: Colors.red,
+        );
       }
     } else {
-      Fluttertoast.showToast(
-          msg: "There was an error while trying to read the file!",
-          toastLength: Toast.LENGTH_SHORT,
-          gravity: ToastGravity.BOTTOM,
-          timeInSecForIosWeb: 1,
-          backgroundColor: Colors.red,
-          textColor: Colors.white,
-          fontSize: 16.0);
+      toastService.showToast(
+        "There was an error while trying to read the file!",
+        backgroundColor: Colors.red,
+      );
     }
   }
 
