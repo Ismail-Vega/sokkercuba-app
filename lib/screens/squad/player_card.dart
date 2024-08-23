@@ -188,8 +188,8 @@ class _PlayerCardState extends State<PlayerCard> {
                     _buildInfoTable(report, prevState, player, skillThemeColor,
                         customTheme),
                     const Divider(thickness: 1, color: Colors.grey),
-                    _buildSkillsTable(
-                        report, player, skillThemeColor, customTheme),
+                    _buildSkillsTable(report, widget.player.info, player,
+                        skillThemeColor, customTheme),
                   ],
                 ),
               ),
@@ -336,8 +336,12 @@ class _PlayerCardState extends State<PlayerCard> {
     );
   }
 
-  Widget _buildSkillsTable(SkillMethods? report, PlayerInfo player,
-      Color textSpanColor, CustomThemeExtension customTheme) {
+  Widget _buildSkillsTable(
+      SkillMethods? report,
+      PlayerInfo curInfo,
+      PlayerInfo selectedInfo,
+      Color textSpanColor,
+      CustomThemeExtension customTheme) {
     return Table(
       columnWidths: const {
         0: FlexColumnWidth(2),
@@ -349,23 +353,55 @@ class _PlayerCardState extends State<PlayerCard> {
         _buildTableRow(
           'stamina',
           styledTextWidget(
-            child: Text(
-              '${skillsLevelsList[player.skills.stamina]} [${player.skills.stamina}]',
-              style: TextStyle(fontSize: customTheme.smallFontSize),
+            child: RichText(
+              text: TextSpan(
+                style: TextStyle(
+                  fontSize: customTheme.smallFontSize,
+                  color: report != null
+                      ? getSkillChangeColor(report, 'stamina')
+                      : null,
+                ),
+                children: [
+                  TextSpan(
+                    text: '${skillsLevelsList[selectedInfo.skills.stamina]} [',
+                  ),
+                  TextSpan(
+                    text: selectedInfo.skills.stamina.toString(),
+                  ),
+                  getHistorySkillChange(curInfo, selectedInfo, 'stamina'),
+                  const TextSpan(
+                    text: ']',
+                  ),
+                ],
+              ),
             ),
-            color:
-                report != null ? getSkillChangeColor(report, 'stamina') : null,
             fontSize: customTheme.smallFontSize,
             defaultColor: textSpanColor,
           ),
           'keeper',
           styledTextWidget(
-            child: Text(
-              '${skillsLevelsList[player.skills.keeper]} [${player.skills.keeper}]',
-              style: TextStyle(fontSize: customTheme.smallFontSize),
+            child: RichText(
+              text: TextSpan(
+                style: TextStyle(
+                  fontSize: customTheme.smallFontSize,
+                  color: report != null
+                      ? getSkillChangeColor(report, 'keeper')
+                      : null,
+                ),
+                children: [
+                  TextSpan(
+                    text: '${skillsLevelsList[selectedInfo.skills.keeper]} [',
+                  ),
+                  TextSpan(
+                    text: selectedInfo.skills.keeper.toString(),
+                  ),
+                  getHistorySkillChange(curInfo, selectedInfo, 'keeper'),
+                  const TextSpan(
+                    text: ']',
+                  ),
+                ],
+              ),
             ),
-            color:
-                report != null ? getSkillChangeColor(report, 'keeper') : null,
             fontSize: customTheme.smallFontSize,
             defaultColor: textSpanColor,
           ),
@@ -374,23 +410,56 @@ class _PlayerCardState extends State<PlayerCard> {
         _buildTableRow(
           'pace',
           styledTextWidget(
-            child: Text(
-              '${skillsLevelsList[player.skills.pace]} [${player.skills.pace}]',
-              style: TextStyle(fontSize: customTheme.smallFontSize),
+            child: RichText(
+              text: TextSpan(
+                style: TextStyle(
+                  fontSize: customTheme.smallFontSize,
+                  color: report != null
+                      ? getSkillChangeColor(report, 'pace')
+                      : null,
+                ),
+                children: [
+                  TextSpan(
+                    text: '${skillsLevelsList[selectedInfo.skills.pace]} [',
+                  ),
+                  TextSpan(
+                    text: selectedInfo.skills.pace.toString(),
+                  ),
+                  getHistorySkillChange(curInfo, selectedInfo, 'pace'),
+                  const TextSpan(
+                    text: ']',
+                  ),
+                ],
+              ),
             ),
-            color: report != null ? getSkillChangeColor(report, 'pace') : null,
             fontSize: customTheme.smallFontSize,
             defaultColor: textSpanColor,
           ),
           'defending',
           styledTextWidget(
-            child: Text(
-              '${skillsLevelsList[player.skills.defending]} [${player.skills.defending}]',
-              style: TextStyle(fontSize: customTheme.smallFontSize),
+            child: RichText(
+              text: TextSpan(
+                style: TextStyle(
+                  fontSize: customTheme.smallFontSize,
+                  color: report != null
+                      ? getSkillChangeColor(report, 'defending')
+                      : null,
+                ),
+                children: [
+                  TextSpan(
+                    text:
+                        '${skillsLevelsList[selectedInfo.skills.defending]} [',
+                  ),
+                  TextSpan(
+                    text: selectedInfo.skills.defending.toString(),
+                  ),
+                  getHistorySkillChange(curInfo, selectedInfo, 'defending'),
+                  const TextSpan(
+                    text: ']',
+                  ),
+                ],
+              ),
             ),
-            color: report != null
-                ? getSkillChangeColor(report, 'defending')
-                : null,
             fontSize: customTheme.smallFontSize,
             defaultColor: textSpanColor,
           ),
@@ -399,25 +468,57 @@ class _PlayerCardState extends State<PlayerCard> {
         _buildTableRow(
           'technique',
           styledTextWidget(
-            child: Text(
-              '${skillsLevelsList[player.skills.technique]} [${player.skills.technique}]',
-              style: TextStyle(fontSize: customTheme.smallFontSize),
+            child: RichText(
+              text: TextSpan(
+                style: TextStyle(
+                  fontSize: customTheme.smallFontSize,
+                  color: report != null
+                      ? getSkillChangeColor(report, 'technique')
+                      : null,
+                ),
+                children: [
+                  TextSpan(
+                    text:
+                        '${skillsLevelsList[selectedInfo.skills.technique]} [',
+                  ),
+                  TextSpan(
+                    text: selectedInfo.skills.technique.toString(),
+                  ),
+                  getHistorySkillChange(curInfo, selectedInfo, 'technique'),
+                  const TextSpan(
+                    text: ']',
+                  ),
+                ],
+              ),
             ),
-            color: report != null
-                ? getSkillChangeColor(report, 'technique')
-                : null,
             fontSize: customTheme.smallFontSize,
             defaultColor: textSpanColor,
           ),
           'playmaking',
           styledTextWidget(
-            child: Text(
-              '${skillsLevelsList[player.skills.playmaking]} [${player.skills.playmaking}]',
-              style: TextStyle(fontSize: customTheme.smallFontSize),
+            child: RichText(
+              text: TextSpan(
+                style: TextStyle(
+                  fontSize: customTheme.smallFontSize,
+                  color: report != null
+                      ? getSkillChangeColor(report, 'playmaking')
+                      : null,
+                ),
+                children: [
+                  TextSpan(
+                    text:
+                        '${skillsLevelsList[selectedInfo.skills.playmaking]} [',
+                  ),
+                  TextSpan(
+                    text: selectedInfo.skills.playmaking.toString(),
+                  ),
+                  getHistorySkillChange(curInfo, selectedInfo, 'playmaking'),
+                  const TextSpan(
+                    text: ']',
+                  ),
+                ],
+              ),
             ),
-            color: report != null
-                ? getSkillChangeColor(report, 'playmaking')
-                : null,
             fontSize: customTheme.smallFontSize,
             defaultColor: textSpanColor,
           ),
@@ -426,23 +527,55 @@ class _PlayerCardState extends State<PlayerCard> {
         _buildTableRow(
           'passing',
           styledTextWidget(
-            child: Text(
-              '${skillsLevelsList[player.skills.passing]} [${player.skills.passing}]',
-              style: TextStyle(fontSize: customTheme.smallFontSize),
+            child: RichText(
+              text: TextSpan(
+                style: TextStyle(
+                  fontSize: customTheme.smallFontSize,
+                  color: report != null
+                      ? getSkillChangeColor(report, 'passing')
+                      : null,
+                ),
+                children: [
+                  TextSpan(
+                    text: '${skillsLevelsList[selectedInfo.skills.passing]} [',
+                  ),
+                  TextSpan(
+                    text: selectedInfo.skills.passing.toString(),
+                  ),
+                  getHistorySkillChange(curInfo, selectedInfo, 'passing'),
+                  const TextSpan(
+                    text: ']',
+                  ),
+                ],
+              ),
             ),
-            color:
-                report != null ? getSkillChangeColor(report, 'passing') : null,
             fontSize: customTheme.smallFontSize,
             defaultColor: textSpanColor,
           ),
           'striker',
           styledTextWidget(
-            child: Text(
-              '${skillsLevelsList[player.skills.striker]} [${player.skills.striker}]',
-              style: TextStyle(fontSize: customTheme.smallFontSize),
+            child: RichText(
+              text: TextSpan(
+                style: TextStyle(
+                  fontSize: customTheme.smallFontSize,
+                  color: report != null
+                      ? getSkillChangeColor(report, 'striker')
+                      : null,
+                ),
+                children: [
+                  TextSpan(
+                    text: '${skillsLevelsList[selectedInfo.skills.striker]} [',
+                  ),
+                  TextSpan(
+                    text: selectedInfo.skills.striker.toString(),
+                  ),
+                  getHistorySkillChange(curInfo, selectedInfo, 'striker'),
+                  const TextSpan(
+                    text: ']',
+                  ),
+                ],
+              ),
             ),
-            color:
-                report != null ? getSkillChangeColor(report, 'striker') : null,
             fontSize: customTheme.smallFontSize,
             defaultColor: textSpanColor,
           ),

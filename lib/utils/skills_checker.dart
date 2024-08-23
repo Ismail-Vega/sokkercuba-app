@@ -49,3 +49,30 @@ Color? getValueChangeColor(PlayerInfo? prevState, PlayerInfo state) {
 
   return null;
 }
+
+TextSpan getHistorySkillChange(
+    PlayerInfo prevState, PlayerInfo state, String skill) {
+  if (prevState.getSkill(skill) != null && state.getSkill(skill) != null) {
+    final diff = prevState.getSkill(skill)! - state.getSkill(skill)!;
+
+    if (diff > 0) {
+      return TextSpan(
+        text: '+$diff',
+        style: const TextStyle(color: Colors.green),
+      );
+    } else if (diff < 0) {
+      return TextSpan(
+        text: '$diff',
+        style: const TextStyle(color: Colors.red),
+      );
+    } else {
+      return const TextSpan(
+        text: '',
+      );
+    }
+  }
+
+  return const TextSpan(
+    text: '',
+  );
+}
