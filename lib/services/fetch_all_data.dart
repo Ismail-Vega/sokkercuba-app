@@ -21,6 +21,16 @@ Future<Map<String, dynamic>> fetchAllData(ApiClient apiClient,
     final state = appStateNotifier.state;
 
     if (user != null) {
+      final readOnlyMode = user['lock']?['readOnlyMode'];
+
+      if (readOnlyMode) {
+        toastService.showToast(
+          "Sokker data is temporarily unavailable. Please try again later.",
+          backgroundColor: Colors.red,
+        );
+        return {'success': false, 'code': 500};
+      }
+
       final teamId = user['team']?['id'];
 
       final List<Future<dynamic>> initialPromises = [
@@ -47,7 +57,7 @@ Future<Map<String, dynamic>> fetchAllData(ApiClient apiClient,
         }
       }
 
-      final juniors = setJuniorsData(state.juniors, responses[0]);
+      final juniors = setJuniorsData(state.juniors, responses[0], stateWeek);
       final training = await setTrainingData(
           apiClient, plus, stateWeek, state.training, responses[1]);
       final tsummary = TSummary.fromJson(responses[2]);
