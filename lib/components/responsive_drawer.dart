@@ -8,12 +8,10 @@ import 'drawer_content.dart';
 
 class ResponsiveDrawer extends StatefulWidget {
   final Widget child;
-  final void Function(ThemeMode) setSelectedTheme;
 
   const ResponsiveDrawer({
     super.key,
     required this.child,
-    required this.setSelectedTheme,
   });
 
   @override
@@ -30,7 +28,7 @@ class _ResponsiveDrawerState extends State<ResponsiveDrawer> {
   }
 
   void _closeDrawer() {
-    _scaffoldKey.currentState?.openEndDrawer();
+    _scaffoldKey.currentState?.closeDrawer();
   }
 
   @override
@@ -51,36 +49,10 @@ class _ResponsiveDrawerState extends State<ResponsiveDrawer> {
             icon: const Icon(Icons.menu),
             onPressed: _openDrawer,
           ),
-          actions: [
-            Padding(
-              padding: const EdgeInsets.only(right: 8.0),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    Theme.of(context).brightness == Brightness.dark
-                        ? 'Light Mode'
-                        : 'Dark Mode',
-                    style: TextStyle(fontSize: customTheme?.smallFontSize),
-                  ),
-                  const SizedBox(width: 8),
-                  Switch(
-                    value: Theme.of(context).brightness == Brightness.dark,
-                    onChanged: (value) {
-                      widget.setSelectedTheme(
-                        value ? ThemeMode.dark : ThemeMode.light,
-                      );
-                    },
-                  ),
-                ],
-              ),
-            ),
-          ],
         ),
         drawer: Drawer(
           width: MediaQuery.of(context).size.width,
           child: DrawerContent(
-            setSelectedTheme: widget.setSelectedTheme,
             closeDrawer: _closeDrawer,
           ),
         ),

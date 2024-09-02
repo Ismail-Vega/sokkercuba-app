@@ -79,14 +79,6 @@ class SokkerPro extends StatefulWidget {
 }
 
 class _SokkerProState extends State<SokkerPro> {
-  ThemeMode _themeMode = ThemeMode.dark;
-
-  void _setSelectedTheme(ThemeMode mode) {
-    setState(() {
-      _themeMode = mode;
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
@@ -120,10 +112,9 @@ class _SokkerProState extends State<SokkerPro> {
                 customTheme,
               ],
             ),
-            themeMode: _themeMode,
+            themeMode: ThemeMode.dark,
             home: appState.loggedIn
                 ? ResponsiveDrawer(
-                    setSelectedTheme: _setSelectedTheme,
                     child: WelcomeScreen(user: appState.user),
                   )
                 : const LoginScreen(),
@@ -142,46 +133,37 @@ class _SokkerProState extends State<SokkerPro> {
     switch (settings.name) {
       case '/':
         return MaterialPageRoute(
-            builder: (context) => ResponsiveDrawer(
-                setSelectedTheme: _setSelectedTheme,
-                child: const WelcomeScreen()));
+            builder: (context) =>
+                const ResponsiveDrawer(child: WelcomeScreen()));
       case '/xtreme':
         return MaterialPageRoute(
-            builder: (context) => ResponsiveDrawer(
-                setSelectedTheme: _setSelectedTheme, child: const Xtreme()));
+            builder: (context) => const ResponsiveDrawer(child: Xtreme()));
       case '/scouting':
         return MaterialPageRoute(
-            builder: (context) => ResponsiveDrawer(
-                setSelectedTheme: _setSelectedTheme, child: const Scouting()));
+            builder: (context) => const ResponsiveDrawer(child: Scouting()));
       case '/contact':
         return MaterialPageRoute(
-            builder: (context) => ResponsiveDrawer(
-                setSelectedTheme: _setSelectedTheme, child: const Contact()));
+            builder: (context) => const ResponsiveDrawer(child: Contact()));
       case '/squad':
         return MaterialPageRoute(
-            builder: (context) => ResponsiveDrawer(
-                setSelectedTheme: _setSelectedTheme,
-                child: const SquadScreen()));
+            builder: (context) => const ResponsiveDrawer(child: SquadScreen()));
       case '/login':
         return MaterialPageRoute(builder: (context) => const LoginScreen());
       case '/training':
         return MaterialPageRoute(
-            builder: (context) => ResponsiveDrawer(
-                setSelectedTheme: _setSelectedTheme, child: const Training()));
+            builder: (context) => const ResponsiveDrawer(child: Training()));
       case '/juniors':
         return MaterialPageRoute(
             builder: (context) => ResponsiveDrawer(
-                setSelectedTheme: _setSelectedTheme,
-                child: JuniorsScreen(
+                    child: JuniorsScreen(
                   juniors: appState.juniors,
                   progress: appState.juniorsTraining?.juniors ?? {},
                   potentialData: appState.news?.juniors ?? [],
                 )));
       default:
         return MaterialPageRoute(
-            builder: (context) => ResponsiveDrawer(
-                setSelectedTheme: _setSelectedTheme,
-                child: const WelcomeScreen()));
+            builder: (context) =>
+                const ResponsiveDrawer(child: WelcomeScreen()));
     }
   }
 }

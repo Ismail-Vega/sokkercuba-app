@@ -13,11 +13,12 @@ import '../utils/format.dart';
 import '../widgets/nav_bar_item.dart';
 
 class DrawerContent extends StatefulWidget {
-  final void Function(ThemeMode) setSelectedTheme;
   final VoidCallback closeDrawer;
 
-  const DrawerContent(
-      {super.key, required this.setSelectedTheme, required this.closeDrawer});
+  const DrawerContent({
+    super.key,
+    required this.closeDrawer,
+  });
 
   @override
   State<DrawerContent> createState() => _DrawerContentState();
@@ -49,6 +50,14 @@ class _DrawerContentState extends State<DrawerContent> {
       setState(() {
         isLoading = false;
       });
+
+      if (!context.mounted) return;
+
+      final currentPath = ModalRoute.of(context)?.settings.name;
+
+      if (currentPath != null) {
+        Navigator.pushReplacementNamed(context, currentPath);
+      }
 
       toastService.showToast(
         'Data updated on! ${formatDateTime(result['dataUpdatedOn'])}',
