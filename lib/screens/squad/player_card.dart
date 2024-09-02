@@ -114,64 +114,66 @@ class _PlayerCardState extends State<PlayerCard> {
               padding: EdgeInsets.fromLTRB(mediumPadding, 0, mediumPadding, 0),
               child: Row(
                 children: [
-                  Text(
-                    player.name.full,
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: customTheme.mediumFontSize,
+                  Expanded(
+                    child: Text(
+                      player.name.full,
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: customTheme.mediumFontSize,
+                      ),
                       overflow: TextOverflow.ellipsis,
                     ),
                   ),
                   const SizedBox(width: 8),
-                  Expanded(
-                    child: Text(
-                      'Age: ${player.characteristics.age}',
-                      style: TextStyle(fontSize: customTheme.smallFontSize),
-                    ),
+                  Text(
+                    'Age: ${player.characteristics.age}',
+                    style: TextStyle(fontSize: customTheme.smallFontSize),
                   ),
+                  const SizedBox(width: 8),
                   if (widget.player.skillsHistory != null &&
                       widget.player.skillsHistory!.isNotEmpty)
                     DropdownButton<int>(
-                        value: selectedWeek,
-                        dropdownColor: Colors.blue[900],
-                        hint: const Padding(
-                          padding: EdgeInsets.zero,
-                          child: Text(
-                            "Show History",
-                            style: TextStyle(
-                              fontSize: 10,
-                              height: 1.0,
-                            ),
+                      value: selectedWeek,
+                      dropdownColor: Colors.blue[900],
+                      hint: const Padding(
+                        padding: EdgeInsets.zero,
+                        child: Text(
+                          "Show History",
+                          style: TextStyle(
+                            fontSize: 10,
+                            height: 1.0,
                           ),
                         ),
-                        items: widget.player.skillsHistory!.keys
-                            .toList()
-                            .reversed
-                            .map((week) {
-                          final date = widget.player.skillsHistory![week]?.date;
+                      ),
+                      items: widget.player.skillsHistory!.keys
+                          .toList()
+                          .reversed
+                          .map((week) {
+                        final date = widget.player.skillsHistory![week]?.date;
 
-                          return DropdownMenuItem<int>(
-                            value: week,
-                            child: Padding(
-                              padding: EdgeInsets.zero,
-                              child: Text(
-                                "Week: $week (${formatDateTime(date, isShort: true)})",
-                                style: const TextStyle(
-                                  fontSize: 10,
-                                  height: 1.0,
-                                ),
+                        return DropdownMenuItem<int>(
+                          value: week,
+                          child: Padding(
+                            padding: EdgeInsets.zero,
+                            child: Text(
+                              "Week: $week (${formatDateTime(date, isShort: true)})",
+                              style: const TextStyle(
+                                fontSize: 10,
+                                height: 1.0,
                               ),
                             ),
-                          );
-                        }).toList(),
-                        onChanged: _onWeekSelected,
-                        style: const TextStyle(
-                          fontSize: 10,
-                          height: 1.0,
-                        ),
-                        isDense: true,
-                        underline: const SizedBox(),
-                        focusColor: Colors.transparent),
+                          ),
+                        );
+                      }).toList(),
+                      onChanged: _onWeekSelected,
+                      style: const TextStyle(
+                        fontSize: 10,
+                        height: 1.0,
+                      ),
+                      isDense: true,
+                      underline: const SizedBox(),
+                      focusColor: Colors.transparent,
+                    ),
                 ],
               ),
             ),
