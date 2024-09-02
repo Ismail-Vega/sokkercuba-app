@@ -14,6 +14,7 @@ Junior _$JuniorFromJson(Map<String, dynamic> json) => Junior(
       skill: (json['skill'] as num).toInt(),
       age: (json['age'] as num).toInt(),
       weeksLeft: (json['weeksLeft'] as num).toInt(),
+      startWeek: (json['startWeek'] as num?)?.toInt(),
     );
 
 Map<String, dynamic> _$JuniorToJson(Junior instance) => <String, dynamic>{
@@ -24,6 +25,7 @@ Map<String, dynamic> _$JuniorToJson(Junior instance) => <String, dynamic>{
       'skill': instance.skill,
       'age': instance.age,
       'weeksLeft': instance.weeksLeft,
+      'startWeek': instance.startWeek,
     };
 
 Juniors _$JuniorsFromJson(Map<String, dynamic> json) => Juniors(

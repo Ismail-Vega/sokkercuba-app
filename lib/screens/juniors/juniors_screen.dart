@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import '../../models/juniors/junior_progress.dart';
 import '../../models/juniors/juniors.dart';
 import '../../models/news/news_junior.dart';
+import '../../state/app_state_notifier.dart';
 import '../../utils/junior_utils.dart';
 import '../../utils/skill_parser.dart';
 import '../../utils/skills_checker.dart';
 import '../noData/no_data_screen.dart';
+import 'junior_card_header.dart';
 import 'progress_line_chart.dart';
 
 class JuniorsScreen extends StatelessWidget {
@@ -97,6 +100,8 @@ class _JuniorTileState extends State<JuniorTile> {
     final junior = widget.junior;
     final progress = widget.progress;
     final potential = widget.potential;
+    final trainingWeek =
+        Provider.of<AppStateNotifier>(context).state.trainingWeek;
 
     return Card(
       color: Colors.blue[900],
@@ -113,24 +118,11 @@ class _JuniorTileState extends State<JuniorTile> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        junior.fullName.full,
-                        style: const TextStyle(
-                            fontSize: 16.0, fontWeight: FontWeight.bold),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.fromLTRB(0, 8.0, 8.0, 0),
-                        child: Align(
-                          alignment: Alignment.centerRight,
-                          child: Icon(
-                            _isExpanded ? Icons.expand_less : Icons.expand_more,
-                          ),
-                        ),
-                      ),
-                    ],
+                  JuniorRow(
+                    juniorFullName: junior.fullName.full,
+                    isExpanded: _isExpanded,
+                    weeksLeft: junior.weeksLeft,
+                    isNew: junior.startWeek == trainingWeek,
                   ),
                   const SizedBox(height: 8.0),
                   SingleChildScrollView(

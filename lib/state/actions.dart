@@ -39,10 +39,12 @@ enum StoreActionTypes {
   setAll,
 }
 
-Juniors setJuniorsData(Juniors? stateJuniors, Map<String, dynamic> data) {
+Juniors setJuniorsData(
+    Juniors? stateJuniors, Map<String, dynamic> data, int? stateWeek) {
   final currentJuniors = parseJuniors(data['juniors'] ?? []);
   final currentJuniorsIds = currentJuniors.map((junior) => junior.id).toSet();
   final juniors = stateJuniors != null ? stateJuniors.toJson()['juniors'] : [];
+  final stateJuniorsIds = juniors.map((junior) => junior.id).toSet();
   final prevJuniors =
       stateJuniors != null ? stateJuniors.toJson()['prevJuniors'] : [];
   final leftJuniors = juniors
@@ -51,8 +53,16 @@ Juniors setJuniorsData(Juniors? stateJuniors, Map<String, dynamic> data) {
 
   final List<Junior> newPrevJuniors = [...prevJuniors, ...leftJuniors];
 
+  final List<Junior> updatedCurrentJuniors = currentJuniors.map((junior) {
+    if (!stateJuniorsIds.contains(junior.id) || junior.startWeek == null) {
+      return junior.copyWith(startWeek: stateWeek);
+    } else {
+      return junior;
+    }
+  }).toList();
+
   return Juniors(
-    juniors: currentJuniors,
+    juniors: updatedCurrentJuniors,
     prevJuniors: newPrevJuniors,
   );
 }

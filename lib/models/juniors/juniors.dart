@@ -13,6 +13,7 @@ class Junior {
   final int skill;
   final int age;
   final int weeksLeft;
+  final int? startWeek;
 
   Junior({
     required this.id,
@@ -22,10 +23,33 @@ class Junior {
     required this.skill,
     required this.age,
     required this.weeksLeft,
+    required this.startWeek,
   });
 
   factory Junior.fromJson(Map<String, dynamic> json) => _$JuniorFromJson(json);
   Map<String, dynamic> toJson() => _$JuniorToJson(this);
+
+  Junior copyWith({
+    int? id,
+    int? teamId,
+    String? name,
+    PlayerName? fullName,
+    int? skill,
+    int? age,
+    int? weeksLeft,
+    int? startWeek,
+  }) {
+    return Junior(
+      id: id ?? this.id,
+      teamId: teamId ?? this.teamId,
+      name: name ?? this.name,
+      fullName: fullName ?? this.fullName,
+      skill: skill ?? this.skill,
+      age: age ?? this.age,
+      weeksLeft: weeksLeft ?? this.weeksLeft,
+      startWeek: startWeek ?? this.startWeek,
+    );
+  }
 }
 
 @JsonSerializable()
