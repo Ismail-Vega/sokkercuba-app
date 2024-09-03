@@ -169,7 +169,7 @@ class _JuniorsScreenState extends State<JuniorsScreen> {
                 _expandedStates[junior.id] = !_expandedStates[junior.id]!;
                 WidgetsBinding.instance.addPostFrameCallback((_) {
                   if (_expandedStates[junior.id]!) {
-                    _showDetailsDialog(progress);
+                    _showDetailsDialog(junior.id, progress);
                   }
                 });
               });
@@ -207,7 +207,7 @@ class _JuniorsScreenState extends State<JuniorsScreen> {
                 _expandedStates[junior.id] = !isExpanded;
                 WidgetsBinding.instance.addPostFrameCallback((_) {
                   if (_expandedStates[junior.id]!) {
-                    _showDetailsDialog(progress);
+                    _showDetailsDialog(junior.id, progress);
                   }
                 });
               });
@@ -274,7 +274,7 @@ class _JuniorsScreenState extends State<JuniorsScreen> {
           _expandedStates[id] = !_expandedStates[id]!;
           WidgetsBinding.instance.addPostFrameCallback((_) {
             if (_expandedStates[id]!) {
-              _showDetailsDialog(progress);
+              _showDetailsDialog(id, progress);
             }
           });
         });
@@ -292,46 +292,70 @@ class _JuniorsScreenState extends State<JuniorsScreen> {
     );
   }
 
-  void _showDetailsDialog(JuniorProgress? progress) {
+  void _showDetailsDialog(int id, JuniorProgress? progress) {
     showDialog(
       context: context,
-      builder: (context) => Dialog(
-        shape: const RoundedRectangleBorder(
-            borderRadius: BorderRadius.all(Radius.circular(16.0))),
-        insetPadding: const EdgeInsets.all(8.0),
-        child: Container(
-          padding: EdgeInsets.zero,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              const Padding(
-                padding: EdgeInsets.all(8.0),
-                child: Text(
-                  'Skill level chart',
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                  textAlign: TextAlign.center,
+      builder: (context) => PopScope(
+        onPopInvokedWithResult: (didPop, result) {
+          if (didPop) {
+            setState(() {
+              _expandedStates[id] = false;
+            });
+          }
+        },
+        child: Dialog(
+          shape: const RoundedRectangleBorder(
+              borderRadius: BorderRadius.all(Radius.circular(16.0))),
+          insetPadding: const EdgeInsets.all(8.0),
+          child: Container(
+            padding: EdgeInsets.zero,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                const Padding(
+                  padding: EdgeInsets.all(8.0),
+                  child: Text(
+                    'Skill level chart',
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                    textAlign: TextAlign.center,
+                  ),
                 ),
-              ),
-              progress != null
-                  ? SizedBox(
-                      height: 364,
-                      child: ProgressLineChart(data: progress),
-                    )
-                  : const Center(
-                      child: NoDataFoundScreen(),
+                progress != null
+                    ? SizedBox(
+                        height: 364,
+                        child: ProgressLineChart(data: progress),
+                      )
+                    : const Center(
+                        child: NoDataFoundScreen(),
+                      ),
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: TextButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                      setState(() {
+                        _expandedStates[id] = false;
+                      });
+                    },
+                    child: const Text(
+                      'Close',
+                      style: TextStyle(
+                        color: Colors.red,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: TextButton(
-                  onPressed: () => Navigator.of(context).pop(),
-                  child: const Text('Close'),
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
-    );
+    ).then((_) {
+      setState(() {
+        _expandedStates[id] = false;
+      });
+    });
   }
 }
