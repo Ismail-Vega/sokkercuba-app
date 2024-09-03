@@ -1,58 +1,31 @@
 import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:flutter/material.dart';
 
-class JuniorRow extends StatefulWidget {
-  final String juniorFullName;
-  final bool isExpanded;
+class JuniorBadge extends StatefulWidget {
   final int weeksLeft;
   final bool isNew;
+  final bool showAnimation;
 
-  const JuniorRow({
+  const JuniorBadge({
     super.key,
-    required this.juniorFullName,
-    required this.isExpanded,
     required this.weeksLeft,
     required this.isNew,
+    required this.showAnimation,
   });
 
   @override
-  State<JuniorRow> createState() => _JuniorRowState();
+  State<JuniorBadge> createState() => _JuniorBadgeState();
 }
 
-class _JuniorRowState extends State<JuniorRow> {
+class _JuniorBadgeState extends State<JuniorBadge> {
   bool _isAnimationCompleted = false;
+  String text = '';
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Expanded(
-          child: Text(
-            widget.juniorFullName,
-            style: const TextStyle(
-              fontSize: 12.0,
-              fontWeight: FontWeight.bold,
-            ),
-            overflow: TextOverflow.ellipsis,
-          ),
-        ),
-        if (widget.weeksLeft == 0 || widget.isNew) _buildAnimatedOrStaticText(),
-        Padding(
-          padding: const EdgeInsets.fromLTRB(8.0, 8.0, 0, 0),
-          child: Align(
-            alignment: Alignment.topRight,
-            child: Icon(
-              widget.isExpanded ? Icons.expand_less : Icons.expand_more,
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildAnimatedOrStaticText() {
-    String text = '';
+    if (!widget.showAnimation) {
+      return const SizedBox.shrink();
+    }
 
     if (widget.weeksLeft == 0) {
       text = 'READY!';
@@ -64,7 +37,7 @@ class _JuniorRowState extends State<JuniorRow> {
       return Text(
         text,
         style: const TextStyle(
-          fontSize: 16.0,
+          fontSize: 8.0,
           fontWeight: FontWeight.bold,
           color: Colors.green,
         ),
@@ -76,7 +49,7 @@ class _JuniorRowState extends State<JuniorRow> {
         ScaleAnimatedText(
           text,
           textStyle: const TextStyle(
-            fontSize: 16.0,
+            fontSize: 8.0,
             fontWeight: FontWeight.bold,
             color: Colors.green,
           ),

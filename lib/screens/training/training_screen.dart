@@ -257,216 +257,246 @@ class _TrainingState extends State<Training> {
     );
 
     return Scaffold(
-      backgroundColor: Colors.blue,
-      body: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 4.0),
-            child: Row(
-              children: [
-                DropdownButton<dynamic>(
-                    menuMaxHeight: screenHeight / 1.5,
-                    borderRadius: const BorderRadius.all(Radius.circular(8.0)),
-                    dropdownColor: Colors.blue[900],
-                    hint: const Text('Select Player'),
-                    value: playerIndex > -1 ? players[playerIndex] : null,
-                    onChanged: handlePlayerChange,
-                    items: playerDropdownItems,
-                    style: const TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    )),
-              ],
-            ),
-          ),
-          const SizedBox(height: 8),
-          Column(
-            children: [
-              if (selectedPlayer != null)
-                GrowthDisplay(
-                    growth:
-                        calculateSkillGrowth(getSelectedPlayerReport().report)),
-            ],
-          ),
-          const SizedBox(height: 8),
-          if (selectedPlayer != null)
-            Expanded(
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(16.0),
-                child: Container(
-                  color: Colors.blue[900],
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: ListView(
+        backgroundColor: Colors.blue,
+        body: LayoutBuilder(builder: (context, constraints) {
+          final isWideScreen = constraints.maxWidth > 764;
+
+          return Center(
+            child: ConstrainedBox(
+              constraints: BoxConstraints(
+                maxWidth: isWideScreen ? 764 : double.infinity,
+              ),
+              child: Column(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 4.0),
+                    child: Row(
                       children: [
-                        SingleChildScrollView(
-                          scrollDirection: Axis.horizontal,
-                          child: Table(
-                            defaultColumnWidth: const IntrinsicColumnWidth(),
-                            children: [
-                              const TableRow(
-                                children: [
-                                  Padding(
-                                    padding:
-                                        EdgeInsets.symmetric(horizontal: 8.0),
-                                    child: Text('Week',
-                                        textAlign: TextAlign.center,
-                                        style: TextStyle(
-                                            fontWeight: FontWeight.bold)),
-                                  ),
-                                  Padding(
-                                    padding:
-                                        EdgeInsets.symmetric(horizontal: 8.0),
-                                    child: Text('Sta.',
-                                        textAlign: TextAlign.center,
-                                        style: TextStyle(
-                                            fontWeight: FontWeight.bold)),
-                                  ),
-                                  Padding(
-                                    padding:
-                                        EdgeInsets.symmetric(horizontal: 8.0),
-                                    child: Text('Pac.',
-                                        textAlign: TextAlign.center,
-                                        style: TextStyle(
-                                            fontWeight: FontWeight.bold)),
-                                  ),
-                                  Padding(
-                                    padding:
-                                        EdgeInsets.symmetric(horizontal: 8.0),
-                                    child: Text('Tec.',
-                                        textAlign: TextAlign.center,
-                                        style: TextStyle(
-                                            fontWeight: FontWeight.bold)),
-                                  ),
-                                  Padding(
-                                    padding:
-                                        EdgeInsets.symmetric(horizontal: 8.0),
-                                    child: Text('Pas.',
-                                        textAlign: TextAlign.center,
-                                        style: TextStyle(
-                                            fontWeight: FontWeight.bold)),
-                                  ),
-                                  Padding(
-                                    padding:
-                                        EdgeInsets.symmetric(horizontal: 8.0),
-                                    child: Text('Kp.',
-                                        textAlign: TextAlign.center,
-                                        style: TextStyle(
-                                            fontWeight: FontWeight.bold)),
-                                  ),
-                                  Padding(
-                                    padding:
-                                        EdgeInsets.symmetric(horizontal: 8.0),
-                                    child: Text('Def.',
-                                        textAlign: TextAlign.center,
-                                        style: TextStyle(
-                                            fontWeight: FontWeight.bold)),
-                                  ),
-                                  Padding(
-                                    padding:
-                                        EdgeInsets.symmetric(horizontal: 8.0),
-                                    child: Text('Plm.',
-                                        textAlign: TextAlign.center,
-                                        style: TextStyle(
-                                            fontWeight: FontWeight.bold)),
-                                  ),
-                                  Padding(
-                                    padding:
-                                        EdgeInsets.symmetric(horizontal: 8.0),
-                                    child: Text('Str.',
-                                        textAlign: TextAlign.center,
-                                        style: TextStyle(
-                                            fontWeight: FontWeight.bold)),
-                                  ),
-                                  Padding(
-                                    padding:
-                                        EdgeInsets.symmetric(horizontal: 8.0),
-                                    child: Text('Type',
-                                        textAlign: TextAlign.center,
-                                        style: TextStyle(
-                                            fontWeight: FontWeight.bold)),
-                                  ),
-                                  Padding(
-                                    padding:
-                                        EdgeInsets.symmetric(horizontal: 8.0),
-                                    child: Text('Pos.',
-                                        textAlign: TextAlign.center,
-                                        style: TextStyle(
-                                            fontWeight: FontWeight.bold)),
-                                  ),
-                                  Padding(
-                                    padding:
-                                        EdgeInsets.symmetric(horizontal: 8.0),
-                                    child: Text('Kind',
-                                        textAlign: TextAlign.center,
-                                        style: TextStyle(
-                                            fontWeight: FontWeight.bold)),
-                                  ),
-                                  Padding(
-                                    padding:
-                                        EdgeInsets.symmetric(horizontal: 8.0),
-                                    child: Text('Games',
-                                        textAlign: TextAlign.center,
-                                        style: TextStyle(
-                                            fontWeight: FontWeight.bold)),
-                                  ),
-                                  Padding(
-                                    padding:
-                                        EdgeInsets.symmetric(horizontal: 8.0),
-                                    child: Text('Eff.',
-                                        textAlign: TextAlign.center,
-                                        style: TextStyle(
-                                            fontWeight: FontWeight.bold)),
-                                  ),
-                                ],
-                              ),
-                              ...generateRows()
-                                  .skip(currentPage * rowsPerPage)
-                                  .take(rowsPerPage),
-                            ],
-                          ),
-                        ),
-                        const SizedBox(height: 16),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.end,
-                          children: [
-                            IconButton(
-                              icon: const Icon(Icons.chevron_left),
-                              onPressed: currentPage > 0
-                                  ? () => handleChangePage(currentPage - 1)
-                                  : null,
-                            ),
-                            Text('${currentPage + 1}'),
-                            IconButton(
-                              icon: const Icon(Icons.chevron_right),
-                              onPressed: (currentPage + 1) * rowsPerPage <
-                                      getSelectedPlayerReport().report.length
-                                  ? () => handleChangePage(currentPage + 1)
-                                  : null,
-                            ),
-                          ],
-                        ),
-                        DropdownButton<int>(
-                          value: rowsPerPage,
-                          dropdownColor: Colors.blue[900],
-                          items: [10, 25, 50, 100].map((value) {
-                            return DropdownMenuItem<int>(
-                              value: value,
-                              child: Text('$value rows per page'),
-                            );
-                          }).toList(),
-                          onChanged: (value) => handleChangeRowsPerPage(value!),
-                        ),
-                        const SizedBox(height: 16),
-                        const TableLegend(),
+                        DropdownButton<dynamic>(
+                            focusColor: Colors.blue,
+                            menuMaxHeight: screenHeight / 1.5,
+                            borderRadius:
+                                const BorderRadius.all(Radius.circular(8.0)),
+                            dropdownColor: Colors.blue[900],
+                            hint: const Text('Select Player'),
+                            value:
+                                playerIndex > -1 ? players[playerIndex] : null,
+                            onChanged: handlePlayerChange,
+                            items: playerDropdownItems,
+                            style: const TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                            )),
                       ],
                     ),
                   ),
-                ),
+                  const SizedBox(height: 8),
+                  if (selectedPlayer != null)
+                    GrowthDisplay(
+                        growth: calculateSkillGrowth(
+                            getSelectedPlayerReport().report)),
+                  const SizedBox(height: 8),
+                  if (selectedPlayer != null)
+                    Expanded(
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(16.0),
+                        child: Container(
+                          color: Colors.blue[900],
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: ListView(
+                              children: [
+                                SingleChildScrollView(
+                                  scrollDirection: Axis.horizontal,
+                                  child: Table(
+                                    defaultColumnWidth:
+                                        const IntrinsicColumnWidth(),
+                                    children: [
+                                      const TableRow(
+                                        children: [
+                                          Padding(
+                                            padding: EdgeInsets.symmetric(
+                                                horizontal: 8.0),
+                                            child: Text('Week',
+                                                textAlign: TextAlign.center,
+                                                style: TextStyle(
+                                                    fontWeight:
+                                                        FontWeight.bold)),
+                                          ),
+                                          Padding(
+                                            padding: EdgeInsets.symmetric(
+                                                horizontal: 8.0),
+                                            child: Text('Sta.',
+                                                textAlign: TextAlign.center,
+                                                style: TextStyle(
+                                                    fontWeight:
+                                                        FontWeight.bold)),
+                                          ),
+                                          Padding(
+                                            padding: EdgeInsets.symmetric(
+                                                horizontal: 8.0),
+                                            child: Text('Pac.',
+                                                textAlign: TextAlign.center,
+                                                style: TextStyle(
+                                                    fontWeight:
+                                                        FontWeight.bold)),
+                                          ),
+                                          Padding(
+                                            padding: EdgeInsets.symmetric(
+                                                horizontal: 8.0),
+                                            child: Text('Tec.',
+                                                textAlign: TextAlign.center,
+                                                style: TextStyle(
+                                                    fontWeight:
+                                                        FontWeight.bold)),
+                                          ),
+                                          Padding(
+                                            padding: EdgeInsets.symmetric(
+                                                horizontal: 8.0),
+                                            child: Text('Pas.',
+                                                textAlign: TextAlign.center,
+                                                style: TextStyle(
+                                                    fontWeight:
+                                                        FontWeight.bold)),
+                                          ),
+                                          Padding(
+                                            padding: EdgeInsets.symmetric(
+                                                horizontal: 8.0),
+                                            child: Text('Kp.',
+                                                textAlign: TextAlign.center,
+                                                style: TextStyle(
+                                                    fontWeight:
+                                                        FontWeight.bold)),
+                                          ),
+                                          Padding(
+                                            padding: EdgeInsets.symmetric(
+                                                horizontal: 8.0),
+                                            child: Text('Def.',
+                                                textAlign: TextAlign.center,
+                                                style: TextStyle(
+                                                    fontWeight:
+                                                        FontWeight.bold)),
+                                          ),
+                                          Padding(
+                                            padding: EdgeInsets.symmetric(
+                                                horizontal: 8.0),
+                                            child: Text('Plm.',
+                                                textAlign: TextAlign.center,
+                                                style: TextStyle(
+                                                    fontWeight:
+                                                        FontWeight.bold)),
+                                          ),
+                                          Padding(
+                                            padding: EdgeInsets.symmetric(
+                                                horizontal: 8.0),
+                                            child: Text('Str.',
+                                                textAlign: TextAlign.center,
+                                                style: TextStyle(
+                                                    fontWeight:
+                                                        FontWeight.bold)),
+                                          ),
+                                          Padding(
+                                            padding: EdgeInsets.symmetric(
+                                                horizontal: 8.0),
+                                            child: Text('Type',
+                                                textAlign: TextAlign.center,
+                                                style: TextStyle(
+                                                    fontWeight:
+                                                        FontWeight.bold)),
+                                          ),
+                                          Padding(
+                                            padding: EdgeInsets.symmetric(
+                                                horizontal: 8.0),
+                                            child: Text('Pos.',
+                                                textAlign: TextAlign.center,
+                                                style: TextStyle(
+                                                    fontWeight:
+                                                        FontWeight.bold)),
+                                          ),
+                                          Padding(
+                                            padding: EdgeInsets.symmetric(
+                                                horizontal: 8.0),
+                                            child: Text('Kind',
+                                                textAlign: TextAlign.center,
+                                                style: TextStyle(
+                                                    fontWeight:
+                                                        FontWeight.bold)),
+                                          ),
+                                          Padding(
+                                            padding: EdgeInsets.symmetric(
+                                                horizontal: 8.0),
+                                            child: Text('Games',
+                                                textAlign: TextAlign.center,
+                                                style: TextStyle(
+                                                    fontWeight:
+                                                        FontWeight.bold)),
+                                          ),
+                                          Padding(
+                                            padding: EdgeInsets.symmetric(
+                                                horizontal: 8.0),
+                                            child: Text('Eff.',
+                                                textAlign: TextAlign.center,
+                                                style: TextStyle(
+                                                    fontWeight:
+                                                        FontWeight.bold)),
+                                          ),
+                                        ],
+                                      ),
+                                      ...generateRows()
+                                          .skip(currentPage * rowsPerPage)
+                                          .take(rowsPerPage),
+                                    ],
+                                  ),
+                                ),
+                                const SizedBox(height: 16),
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.end,
+                                  children: [
+                                    IconButton(
+                                      icon: const Icon(Icons.chevron_left),
+                                      onPressed: currentPage > 0
+                                          ? () =>
+                                              handleChangePage(currentPage - 1)
+                                          : null,
+                                    ),
+                                    Text('${currentPage + 1}'),
+                                    IconButton(
+                                      icon: const Icon(Icons.chevron_right),
+                                      onPressed: (currentPage + 1) *
+                                                  rowsPerPage <
+                                              getSelectedPlayerReport()
+                                                  .report
+                                                  .length
+                                          ? () =>
+                                              handleChangePage(currentPage + 1)
+                                          : null,
+                                    ),
+                                  ],
+                                ),
+                                DropdownButton<int>(
+                                  value: rowsPerPage,
+                                  dropdownColor: Colors.blue[900],
+                                  items: [10, 25, 50, 100].map((value) {
+                                    return DropdownMenuItem<int>(
+                                      value: value,
+                                      child: Text('$value rows per page'),
+                                    );
+                                  }).toList(),
+                                  onChanged: (value) =>
+                                      handleChangeRowsPerPage(value!),
+                                ),
+                                const SizedBox(height: 16),
+                                const TableLegend(),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                ],
               ),
             ),
-        ],
-      ),
-    );
+          );
+        }));
   }
 }
