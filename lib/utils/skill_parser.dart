@@ -1,4 +1,4 @@
-import 'constants.dart';
+import '../constants/constants.dart';
 
 String parseSkillToText(int index) {
   if (index < 0 || index >= skillsLevelsList.length) {

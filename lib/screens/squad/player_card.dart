@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../../constants/constants.dart';
 import '../../mixins/skills_mixin.dart';
 import '../../models/player/player.dart';
 import '../../models/player/player_info.dart';
 import '../../state/app_state_notifier.dart';
 import '../../themes/custom_extension.dart';
-import '../../utils/constants.dart';
 import '../../utils/format.dart';
 import '../../utils/get_training_data.dart';
 import '../../utils/skills_checker.dart';

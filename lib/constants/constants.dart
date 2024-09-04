@@ -106,3 +106,15 @@ const newsUrl = '/news?filter[limit]=200';
 String getJuniorNewsURL(int newsId) {
   return '/news/$newsId';
 }
+
+String getNtDeleteURL(int id) {
+  return '/national?action=removeplayer&PID=$id';
+}
+
+String getNtAddURL(int id) {
+  return '/national?action=addplayer&PID=$id';
+}
+
+String getNtObserveURL(int id) {
+  return '/national?action=observe&PID=$id';
+}

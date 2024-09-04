@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import '../models/juniors/juniors.dart';
 import '../models/juniors/juniors_training.dart';
 import '../models/news/news.dart';
@@ -24,6 +26,7 @@ class AppState {
   final Squad? players;
   final SquadTraining? training;
   final String? dataUpdatedOn;
+  final Locale locale;
 
   AppState({
     this.error = false,
@@ -42,6 +45,7 @@ class AppState {
     this.players,
     this.training,
     this.dataUpdatedOn,
+    this.locale = const Locale('en', 'us'),
   });
 
   AppState copyWith(
@@ -60,7 +64,8 @@ class AppState {
       TSummary? tsummary,
       Squad? players,
       SquadTraining? training,
-      String? dataUpdatedOn}) {
+      String? dataUpdatedOn,
+      Locale? locale}) {
     return AppState(
       error: error ?? this.error,
       errorMsg: errorMsg ?? this.errorMsg,
@@ -78,6 +83,7 @@ class AppState {
       players: players ?? this.players,
       training: training ?? this.training,
       dataUpdatedOn: dataUpdatedOn ?? this.dataUpdatedOn,
+      locale: locale ?? this.locale,
     );
   }
 
@@ -99,6 +105,7 @@ class AppState {
       players: payload['players'] ?? players,
       training: payload['training'] ?? training,
       dataUpdatedOn: payload['dataUpdatedOn'] ?? dataUpdatedOn,
+      locale: payload['locale'] ?? locale,
     );
   }
 
@@ -119,7 +126,8 @@ class AppState {
       'juniorsTraining': juniorsTraining?.toJson(),
       'players': players?.toJson(),
       'training': training?.toJson(),
-      'dataUpdatedOn': dataUpdatedOn
+      'dataUpdatedOn': dataUpdatedOn,
+      'locale': locale,
     };
   }
 
@@ -149,6 +157,7 @@ class AppState {
           ? SquadTraining.fromJson(json['training'])
           : null,
       dataUpdatedOn: json['dataUpdatedOn'],
+      locale: json['locale'] ?? const Locale('en', 'us'),
     );
   }
 }

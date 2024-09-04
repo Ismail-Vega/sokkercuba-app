@@ -1,6 +1,6 @@
+import '../constants/constants.dart';
 import '../models/juniors/junior_progress.dart';
 import '../models/juniors/juniors_training.dart';
-import '../utils/constants.dart';
 import 'api_client.dart';
 
 Future<JuniorsTraining> getJuniorsTraining(

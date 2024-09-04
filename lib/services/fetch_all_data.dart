@@ -2,12 +2,12 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
+import '../constants/constants.dart';
 import '../models/team/team_stats.dart';
 import '../models/team/user.dart';
 import '../models/tsummary/tsummary.dart';
 import '../state/actions.dart';
 import '../state/app_state_notifier.dart';
-import '../utils/constants.dart';
 import 'api_client.dart';
 import 'fetch_juniors_training.dart';
 import 'toast_service.dart';

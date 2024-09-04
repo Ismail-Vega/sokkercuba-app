@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../../constants/constants.dart';
 import '../../state/app_state_notifier.dart';
-import '../../utils/constants.dart';
 import '../../utils/format.dart';
 
 class SquadSummaryCard extends StatelessWidget {

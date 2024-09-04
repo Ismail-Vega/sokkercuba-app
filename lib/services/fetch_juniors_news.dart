@@ -1,6 +1,6 @@
+import '../constants/constants.dart';
 import '../models/news/news_item.dart';
 import '../models/news/news_junior.dart';
-import '../utils/constants.dart';
 import 'api_client.dart';
 
 Future<List<NewsJunior>> getJuniorNews(

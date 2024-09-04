@@ -1,3 +1,4 @@
+import '../constants/constants.dart';
 import '../models/juniors/juniors.dart';
 import '../models/news/news.dart';
 import '../models/news/news_item.dart';
@@ -11,7 +12,6 @@ import '../models/training/training_report.dart';
 import '../services/api_client.dart';
 import '../services/fetch_juniors_news.dart';
 import '../utils/app_state_converters.dart';
-import '../utils/constants.dart';
 
 class StoreAction {
   final StoreActionTypes type;

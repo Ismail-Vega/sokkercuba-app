@@ -3,12 +3,12 @@ import 'package:flutter/material.dart';
 import 'package:modal_progress_hud_nsn/modal_progress_hud_nsn.dart';
 import 'package:provider/provider.dart';
 
+import '../../constants/constants.dart';
 import '../../services/api_client.dart';
 import '../../services/fetch_all_data.dart';
 import '../../services/toast_service.dart';
 import '../../state/actions.dart';
 import '../../state/app_state_notifier.dart';
-import '../../utils/constants.dart';
 import '../../widgets/rounded_button.dart';
 
 class LoginScreen extends StatefulWidget {
