@@ -3,9 +3,17 @@ import 'package:provider/provider.dart';
 
 import '../../models/tsummary/tsummary.dart';
 import '../../state/app_state_notifier.dart';
+import 'tsummary_details.dart';
 
-class TSummaryCard extends StatelessWidget {
+class TSummaryCard extends StatefulWidget {
   const TSummaryCard({super.key});
+
+  @override
+  State<TSummaryCard> createState() => _TSummaryCardState();
+}
+
+class _TSummaryCardState extends State<TSummaryCard> {
+  int? selectedWeek;
 
   @override
   Widget build(BuildContext context) {
@@ -40,156 +48,203 @@ class TSummaryCard extends StatelessWidget {
               height: 324.0,
               child: SingleChildScrollView(
                 scrollDirection: Axis.vertical,
-                child: Table(
-                  columnWidths: const {
-                    0: FlexColumnWidth(1.5),
-                    1: FlexColumnWidth(2),
-                    2: FlexColumnWidth(2),
-                  },
-                  defaultVerticalAlignment: TableCellVerticalAlignment.middle,
-                  children: [
-                    TableRow(
-                      decoration: const BoxDecoration(
-                        borderRadius: BorderRadius.only(
-                          topLeft: Radius.circular(12.0),
-                          topRight: Radius.circular(12.0),
-                        ),
-                      ),
-                      children: [
-                        TableCell(
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(vertical: 8.0),
-                            child: const Center(child: Text("")),
-                          ),
-                        ),
-                        TableCell(
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(vertical: 8.0),
-                            child: const Center(
-                                child: Text("MAIN TEAM",
-                                    textAlign: TextAlign.center)),
-                          ),
-                        ),
-                        TableCell(
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(vertical: 8.0),
-                            child: const Center(
-                                child: Text("JUNIORS",
-                                    textAlign: TextAlign.center)),
-                          ),
-                        ),
-                      ],
-                    ),
-                    const TableRow(
-                      children: [
-                        TableCell(
-                          child: SizedBox(height: 8.0),
-                        ),
-                        TableCell(
-                          child: SizedBox(height: 8.0),
-                        ),
-                        TableCell(
-                          child: SizedBox(height: 8.0),
-                        ),
-                      ],
-                    ),
-                    TableRow(
-                      children: [
-                        TableCell(
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(vertical: 8.0),
-                            child: const Center(child: Text("Date")),
-                          ),
-                        ),
-                        TableCell(
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(vertical: 8.0),
-                            child: const Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                              children: [
-                                Expanded(child: Center(child: Text("No."))),
-                                Expanded(
-                                    child: Center(child: Text("Skills Up"))),
-                              ],
-                            ),
-                          ),
-                        ),
-                        TableCell(
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(vertical: 8.0),
-                            child: const Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                              children: [
-                                Expanded(child: Center(child: Text("No."))),
-                                Expanded(
-                                    child: Center(child: Text("Levels Up"))),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                    ...weeks.asMap().entries.where((entry) {
-                      final value = entry.value;
-
-                      return !(trainingWeek != null &&
-                          value.week == (trainingWeek + 1));
-                    }).map((entry) {
-                      final index = entry.key;
-                      final week = entry.value;
-
-                      return TableRow(
-                        decoration: index != weeks.length - 1
-                            ? const BoxDecoration(
-                                border: Border(
-                                    bottom: BorderSide(color: Colors.blue)),
-                              )
-                            : null,
+                child: selectedWeek == null
+                    ? Table(
+                        columnWidths: const {
+                          0: FlexColumnWidth(1.5),
+                          1: FlexColumnWidth(2),
+                          2: FlexColumnWidth(2),
+                        },
+                        defaultVerticalAlignment:
+                            TableCellVerticalAlignment.middle,
                         children: [
-                          TableCell(
-                            child: Container(
-                              padding:
-                                  const EdgeInsets.symmetric(vertical: 8.0),
-                              child: Center(
-                                child: Text(week.gameDay.date.value),
+                          TableRow(
+                            decoration: const BoxDecoration(
+                              borderRadius: BorderRadius.only(
+                                topLeft: Radius.circular(12.0),
+                                topRight: Radius.circular(12.0),
                               ),
                             ),
+                            children: [
+                              TableCell(
+                                child: Container(
+                                  padding:
+                                      const EdgeInsets.symmetric(vertical: 8.0),
+                                  child: const Center(child: Text("")),
+                                ),
+                              ),
+                              TableCell(
+                                child: Container(
+                                  padding:
+                                      const EdgeInsets.symmetric(vertical: 8.0),
+                                  child: const Center(
+                                      child: Text("MAIN TEAM",
+                                          textAlign: TextAlign.center)),
+                                ),
+                              ),
+                              TableCell(
+                                child: Container(
+                                  padding:
+                                      const EdgeInsets.symmetric(vertical: 8.0),
+                                  child: const Center(
+                                      child: Text("JUNIORS",
+                                          textAlign: TextAlign.center)),
+                                ),
+                              ),
+                            ],
                           ),
-                          TableCell(
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          const TableRow(
+                            children: [
+                              TableCell(
+                                child: SizedBox(height: 8.0),
+                              ),
+                              TableCell(
+                                child: SizedBox(height: 8.0),
+                              ),
+                              TableCell(
+                                child: SizedBox(height: 8.0),
+                              ),
+                            ],
+                          ),
+                          TableRow(
+                            children: [
+                              TableCell(
+                                child: Container(
+                                  padding:
+                                      const EdgeInsets.symmetric(vertical: 8.0),
+                                  child: const Center(child: Text("Date")),
+                                ),
+                              ),
+                              TableCell(
+                                child: Container(
+                                  padding:
+                                      const EdgeInsets.symmetric(vertical: 8.0),
+                                  child: const Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceEvenly,
+                                    children: [
+                                      Expanded(
+                                          child: Center(child: Text("No."))),
+                                      Expanded(
+                                          child:
+                                              Center(child: Text("Skills Up"))),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                              TableCell(
+                                child: Container(
+                                  padding:
+                                      const EdgeInsets.symmetric(vertical: 8.0),
+                                  child: const Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceEvenly,
+                                    children: [
+                                      Expanded(
+                                          child: Center(child: Text("No."))),
+                                      Expanded(
+                                          child:
+                                              Center(child: Text("Levels Up"))),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                          ...weeks.asMap().entries.where((entry) {
+                            final value = entry.value;
+
+                            return !(trainingWeek != null &&
+                                value.week == (trainingWeek + 1));
+                          }).map((entry) {
+                            final index = entry.key;
+                            final week = entry.value;
+
+                            return TableRow(
+                              decoration: index != weeks.length - 1
+                                  ? const BoxDecoration(
+                                      border: Border(
+                                          bottom:
+                                              BorderSide(color: Colors.blue)),
+                                    )
+                                  : null,
                               children: [
-                                Expanded(
-                                    child: Center(
-                                        child: Text(
-                                            week.stats.advanced.toString()))),
-                                Expanded(
-                                    child: Center(
-                                        child: Text(
-                                            week.stats.skillsUp.toString()))),
+                                TableCell(
+                                  child: GestureDetector(
+                                    onTap: () {
+                                      setState(() {
+                                        selectedWeek = week.week;
+                                      });
+                                    },
+                                    child: Container(
+                                      padding: const EdgeInsets.symmetric(
+                                          vertical: 8.0),
+                                      child: Center(
+                                        child: Text(week.gameDay.date.value),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                TableCell(
+                                  child: GestureDetector(
+                                    onTap: () {
+                                      setState(() {
+                                        selectedWeek = week.week;
+                                      });
+                                    },
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceEvenly,
+                                      children: [
+                                        Expanded(
+                                            child: Center(
+                                                child: Text(week.stats.advanced
+                                                    .toString()))),
+                                        Expanded(
+                                            child: Center(
+                                                child: Text(week.stats.skillsUp
+                                                    .toString()))),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                                TableCell(
+                                  child: GestureDetector(
+                                    onTap: () {
+                                      setState(() {
+                                        selectedWeek = week.week;
+                                      });
+                                    },
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceEvenly,
+                                      children: [
+                                        Expanded(
+                                            child: Center(
+                                                child: Text(week.juniors.number
+                                                    .toString()))),
+                                        Expanded(
+                                            child: Center(
+                                                child: Text(week
+                                                    .juniors.skillsUp
+                                                    .toString()))),
+                                      ],
+                                    ),
+                                  ),
+                                ),
                               ],
-                            ),
-                          ),
-                          TableCell(
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                              children: [
-                                Expanded(
-                                    child: Center(
-                                        child: Text(
-                                            week.juniors.number.toString()))),
-                                Expanded(
-                                    child: Center(
-                                        child: Text(
-                                            week.juniors.skillsUp.toString()))),
-                              ],
-                            ),
-                          ),
+                            );
+                          }),
                         ],
-                      );
-                    }),
-                  ],
-                ),
+                      )
+                    : TrainingSummaryDetails(
+                        week: selectedWeek!,
+                        onBack: () {
+                          setState(() {
+                            selectedWeek = null;
+                          });
+                        },
+                      ),
               ),
             ),
           ],
