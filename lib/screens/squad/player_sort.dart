@@ -15,9 +15,10 @@ class SortDropdown extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return DropdownButton<SortCriteria>(
+      isDense: true,
       value: selectedCriteria,
       onChanged: onCriteriaChanged,
-      isDense: true,
+      dropdownColor: Colors.blue[900],
       focusColor: Colors.transparent,
       items: const [
         DropdownMenuItem(
