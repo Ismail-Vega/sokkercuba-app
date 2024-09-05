@@ -43,13 +43,10 @@ class _DrawerContentState extends State<DrawerContent> {
         Provider.of<AppStateNotifier>(context, listen: false);
 
     final result = await fetchAllData(apiClient, appStateNotifier, context);
+    final message = result['message'] ?? "Failed to fetch all data!";
 
     if (result['code'] == 200 && result['success'] == true) {
       widget.closeDrawer();
-
-      setState(() {
-        isLoading = false;
-      });
 
       if (!context.mounted) return;
 
@@ -65,10 +62,14 @@ class _DrawerContentState extends State<DrawerContent> {
       );
     } else {
       toastService.showToast(
-        "Failed to fetch all data!",
+        message,
         backgroundColor: Colors.red,
       );
     }
+
+    setState(() {
+      isLoading = false;
+    });
   }
 
   @override

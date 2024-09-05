@@ -53,6 +53,7 @@ class _LoginScreenState extends State<LoginScreen> {
               Provider.of<AppStateNotifier>(context, listen: false);
           final result =
               await fetchAllData(apiClient, appStateNotifier, context);
+          final message = result['message'] ?? "Failed to fetch all data!";
 
           if (result['code'] == 200 && result['success'] == true) {
             appStateNotifier
@@ -61,7 +62,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 .dispatch(StoreAction(StoreActionTypes.setUsername, login));
           } else {
             toastService.showToast(
-              "Failed to fetch all data!",
+              message,
               backgroundColor: Colors.red,
             );
           }

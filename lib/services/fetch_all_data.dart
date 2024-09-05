@@ -24,11 +24,12 @@ Future<Map<String, dynamic>> fetchAllData(ApiClient apiClient,
       final readOnlyMode = user['lock']?['readOnlyMode'];
 
       if (readOnlyMode) {
-        toastService.showToast(
-          "Sokker data is temporarily unavailable. Please try again later.",
-          backgroundColor: Colors.red,
-        );
-        return {'success': false, 'code': 500};
+        return {
+          'success': false,
+          'code': 500,
+          'message':
+              "Sokker data is temporarily unavailable. Please try again later."
+        };
       }
 
       final teamId = user['team']?['id'];

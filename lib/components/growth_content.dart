@@ -12,41 +12,34 @@ class GrowthDisplay extends StatelessWidget {
     final secondHalf = entries.sublist(4, 8);
 
     return Card(
+      margin: const EdgeInsets.all(0),
       color: Colors.blue[900],
-      child: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(8),
-          child: Column(
-            children: [
-              const Row(
-                children: [
-                  Expanded(
-                    child: Text(
-                      'Skill Avg. Talent:',
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
-                  ),
-                ],
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Column(
+          children: [
+            const Text(
+              'Skill Avg. Talent:',
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                overflow: TextOverflow.ellipsis,
               ),
-              const Divider(thickness: 1, color: Colors.grey),
-              Table(
-                columnWidths: const {
-                  0: FlexColumnWidth(),
-                  1: FlexColumnWidth(),
-                  2: FlexColumnWidth(),
-                  3: FlexColumnWidth(),
-                },
-                defaultVerticalAlignment: TableCellVerticalAlignment.middle,
-                children: [
-                  _buildTableRow(firstHalf),
-                  _buildTableRow(secondHalf),
-                ],
-              ),
-            ],
-          ),
+            ),
+            const Divider(thickness: 1, color: Colors.grey),
+            Table(
+              columnWidths: const {
+                0: FlexColumnWidth(),
+                1: FlexColumnWidth(),
+                2: FlexColumnWidth(),
+                3: FlexColumnWidth(),
+              },
+              defaultVerticalAlignment: TableCellVerticalAlignment.middle,
+              children: [
+                _buildTableRow(firstHalf),
+                _buildTableRow(secondHalf),
+              ],
+            ),
+          ],
         ),
       ),
     );

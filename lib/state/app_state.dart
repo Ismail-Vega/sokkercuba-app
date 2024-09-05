@@ -127,7 +127,10 @@ class AppState {
       'players': players?.toJson(),
       'training': training?.toJson(),
       'dataUpdatedOn': dataUpdatedOn,
-      'locale': locale,
+      'locale': {
+        'languageCode': locale.languageCode,
+        'countryCode': locale.countryCode,
+      },
     };
   }
 
@@ -157,7 +160,10 @@ class AppState {
           ? SquadTraining.fromJson(json['training'])
           : null,
       dataUpdatedOn: json['dataUpdatedOn'],
-      locale: json['locale'] ?? const Locale('en', 'us'),
+      locale: json['locale'] != null
+          ? Locale(
+              json['locale']['languageCode'], json['locale']['countryCode'])
+          : const Locale('en', 'US'),
     );
   }
 }

@@ -136,6 +136,16 @@ Future<SquadTraining?> setTrainingData(ApiClient apiClient, bool plus,
           if (training.players[tIndex].report[0].week != week) {
             training.players[tIndex].report.insert(0, report);
           }
+
+          final sortedReports =
+              List<TrainingReport>.from(training.players[tIndex].report)
+                ..sort((a, b) => b.week.compareTo(a.week));
+
+          training.players[tIndex] = PlayerTrainingReport(
+            id: training.players[tIndex].id,
+            player: training.players[tIndex].player,
+            report: sortedReports,
+          );
         } else {
           training.players.add(playerTrainingReport);
         }
