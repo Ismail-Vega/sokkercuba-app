@@ -25,9 +25,12 @@ class _PlayerCardState extends State<PlayerCard> {
   PlayerInfo? selectedPlayerInfo;
 
   @override
-  void initState() {
-    super.initState();
-    selectedPlayerInfo = widget.player.info;
+  void didUpdateWidget(covariant PlayerCard oldWidget) {
+    super.didUpdateWidget(oldWidget);
+
+    if (oldWidget.player.info != widget.player.info) {
+      selectedPlayerInfo = widget.player.info;
+    }
   }
 
   void _onWeekSelected(int? week) {
@@ -134,6 +137,7 @@ class _PlayerCardState extends State<PlayerCard> {
                       widget.player.skillsHistory!.isNotEmpty)
                     DropdownButton<int>(
                       value: selectedWeek,
+                      padding: const EdgeInsets.only(top: 2),
                       dropdownColor: Colors.blue[900],
                       hint: const Padding(
                         padding: EdgeInsets.zero,

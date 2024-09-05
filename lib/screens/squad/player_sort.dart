@@ -1,0 +1,70 @@
+import 'package:flutter/material.dart';
+
+import '../../constants/squad.dart';
+
+class SortDropdown extends StatelessWidget {
+  final SortCriteria selectedCriteria;
+  final ValueChanged<SortCriteria?> onCriteriaChanged;
+
+  const SortDropdown({
+    super.key,
+    required this.selectedCriteria,
+    required this.onCriteriaChanged,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return DropdownButton<SortCriteria>(
+      value: selectedCriteria,
+      onChanged: onCriteriaChanged,
+      isDense: true,
+      focusColor: Colors.transparent,
+      items: const [
+        DropdownMenuItem(
+          value: SortCriteria.hasSkillChanges,
+          child: Text('Has Skill Changes'),
+        ),
+        DropdownMenuItem(
+          value: SortCriteria.name,
+          child: Text('Name'),
+        ),
+        DropdownMenuItem(
+          value: SortCriteria.age,
+          child: Text('Age'),
+        ),
+        DropdownMenuItem(
+          value: SortCriteria.stamina,
+          child: Text('Stamina'),
+        ),
+        DropdownMenuItem(
+          value: SortCriteria.pace,
+          child: Text('Pace'),
+        ),
+        DropdownMenuItem(
+          value: SortCriteria.technique,
+          child: Text('Technique'),
+        ),
+        DropdownMenuItem(
+          value: SortCriteria.passing,
+          child: Text('Passing'),
+        ),
+        DropdownMenuItem(
+          value: SortCriteria.keeper,
+          child: Text('Keeper'),
+        ),
+        DropdownMenuItem(
+          value: SortCriteria.defending,
+          child: Text('Defending'),
+        ),
+        DropdownMenuItem(
+          value: SortCriteria.playmaking,
+          child: Text('Playmaking'),
+        ),
+        DropdownMenuItem(
+          value: SortCriteria.striker,
+          child: Text('Striker'),
+        ),
+      ],
+    );
+  }
+}
