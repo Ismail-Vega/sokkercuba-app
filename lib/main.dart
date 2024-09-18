@@ -29,19 +29,19 @@ void main() async {
   final prefs = await SharedPreferences.getInstance();
   final stateString = prefs.getString('appState');
   AppState initialState = AppState(
-    error: false,
-    errorMsg: null,
-    username: '',
-    teamId: null,
-    loading: false,
-    loggedIn: false,
-    user: null,
-    userStats: null,
-    juniors: null,
-    tsummary: null,
-    players: null,
-    training: null,
-  );
+      error: false,
+      errorMsg: null,
+      username: '',
+      teamId: null,
+      loading: false,
+      loggedIn: false,
+      user: null,
+      userStats: null,
+      juniors: null,
+      tsummary: null,
+      players: null,
+      training: null,
+      observedPlayers: []);
 
   if (stateString != null) {
     initialState = AppState.fromJson(jsonDecode(stateString));
@@ -140,7 +140,12 @@ class _SokkerProState extends State<SokkerPro> {
             builder: (context) => const ResponsiveDrawer(child: Xtreme()));
       case '/scouting':
         return MaterialPageRoute(
-            builder: (context) => const ResponsiveDrawer(child: Scouting()));
+            builder: (context) => ResponsiveDrawer(
+                child: Scouting(
+                    players: appState.observedPlayers,
+                    countryName: (appState.user?.nationalTeam
+                            as Map<String, dynamic>)['country']?['name'] ??
+                        "")));
       case '/contact':
         return MaterialPageRoute(
             builder: (context) => const ResponsiveDrawer(child: Contact()));

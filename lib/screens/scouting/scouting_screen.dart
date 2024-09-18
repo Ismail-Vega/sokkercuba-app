@@ -1,31 +1,362 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
-class Scouting extends StatelessWidget {
-  const Scouting({super.key});
+import '../../models/player/player.dart';
+import '../../services/api_client.dart';
+import '../../services/transfers.dart';
+import '../../utils/transfers_parser.dart';
+import 'scoring_system.dart';
+
+class Scouting extends StatefulWidget {
+  final String countryName;
+  final List<TeamPlayer> players;
+
+  const Scouting({super.key, required this.players, required this.countryName});
+
+  @override
+  State<Scouting> createState() => _ScoutingState();
+}
+
+class _ScoutingState extends State<Scouting>
+    with SingleTickerProviderStateMixin {
+  List<TeamPlayer> transfersPlayers = [];
+  bool isLoading = false;
+  ApiClient apiClient = ApiClient();
+  TabController? _tabController;
+
+  @override
+  void initState() {
+    super.initState();
+    _tabController = TabController(length: 2, vsync: this);
+  }
+
+  Future<void> _fetchTransfers() async {
+    setState(() {
+      isLoading = true;
+    });
+
+    try {
+      List<TeamPlayer> fetchedPlayers =
+          await fetchTransfersByCountry(apiClient, widget.countryName);
+
+      setState(() {
+        transfersPlayers = fetchedPlayers;
+      });
+
+      if (_tabController != null) {
+        _tabController!.animateTo(1);
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error fetching transfers: $e');
+      }
+    } finally {
+      setState(() {
+        isLoading = false;
+      });
+    }
+  }
+
+  @override
+  void dispose() {
+    _tabController?.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
-    return DefaultTextStyle(
-      style: Theme.of(context).textTheme.bodyMedium!,
-      child: SizedBox(
-        width: double.infinity,
-        height: double.infinity,
+    String lastDisplayedPos = "";
+
+    final players = filteredPlayers(widget.players);
+    final transfersPlayersFiltered = filteredPlayers(transfersPlayers);
+    print('transfersPlayersFiltered: $transfersPlayersFiltered');
+    final observedPlayers = sortedPlayers(players);
+    final transfersPlayersSorted = sortedPlayers(transfersPlayersFiltered);
+    print('transfersPlayersSorted: $transfersPlayersSorted');
+
+    return Scaffold(
+      backgroundColor: Colors.blue[900],
+      appBar: AppBar(
+        title: const Text('Player Position Scores'),
+      ),
+      body: ClipRRect(
+        borderRadius: BorderRadius.circular(16.0),
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            const Text(
-              'Coming Soon',
-              style: TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  ElevatedButton.icon(
+                    onPressed: isLoading ? null : _fetchTransfers,
+                    icon: SizedBox(
+                      height: 24.0,
+                      width: 24.0,
+                      child: Align(
+                        alignment: Alignment.center,
+                        child: isLoading
+                            ? const CircularProgressIndicator(
+                                color: Colors.white, strokeWidth: 2.0)
+                            : const Icon(Icons.sync, color: Colors.white),
+                      ),
+                    ),
+                    label: const Text('Fetch Transfers'),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.blueAccent,
+                      foregroundColor: Colors.white,
+                      elevation: 8.0,
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 8.0, horizontal: 16.0),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8.0),
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
-            const SizedBox(height: 20),
-            Icon(
-              Icons.construction,
-              size: 50,
-              color: Colors.grey[600],
+            Expanded(
+              child: DefaultTabController(
+                length: 2,
+                child: Column(
+                  children: [
+                    TabBar(
+                      controller: _tabController,
+                      tabs: const [
+                        Tab(text: "Observed Players"),
+                        Tab(text: "Transfer Players"),
+                      ],
+                    ),
+                    Expanded(
+                      child: TabBarView(
+                        controller: _tabController,
+                        children: [
+                          SingleChildScrollView(
+                            child: Table(
+                              columnWidths: const {
+                                0: FlexColumnWidth(2),
+                                1: FlexColumnWidth(1),
+                                2: FlexColumnWidth(1),
+                                3: FlexColumnWidth(1),
+                              },
+                              children: [
+                                const TableRow(
+                                  children: [
+                                    TableCell(
+                                      child: Padding(
+                                        padding: EdgeInsets.all(8.0),
+                                        child: Text(
+                                          'Name',
+                                          style: TextStyle(
+                                              fontWeight: FontWeight.bold),
+                                        ),
+                                      ),
+                                    ),
+                                    TableCell(
+                                      child: Padding(
+                                        padding: EdgeInsets.all(8.0),
+                                        child: Text(
+                                          'Age',
+                                          style: TextStyle(
+                                              fontWeight: FontWeight.bold),
+                                        ),
+                                      ),
+                                    ),
+                                    TableCell(
+                                      child: Padding(
+                                        padding: EdgeInsets.all(8.0),
+                                        child: Text(
+                                          'Score',
+                                          style: TextStyle(
+                                              fontWeight: FontWeight.bold),
+                                        ),
+                                      ),
+                                    ),
+                                    TableCell(
+                                      child: Padding(
+                                        padding: EdgeInsets.all(8.0),
+                                        child: Text(
+                                          'Pos',
+                                          style: TextStyle(
+                                              fontWeight: FontWeight.bold),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                ...observedPlayers.map((player) {
+                                  List<MapEntry<String, double>> scores =
+                                      filterAndSortPlayerScores(player.info);
+
+                                  TableRow row = TableRow(
+                                    decoration: BoxDecoration(
+                                      border:
+                                          lastDisplayedPos != scores.first.key
+                                              ? const Border(
+                                                  top: BorderSide(
+                                                      color: Colors.blue),
+                                                )
+                                              : null,
+                                    ),
+                                    children: [
+                                      TableCell(
+                                        child: Padding(
+                                          padding: const EdgeInsets.all(8.0),
+                                          child: Text(
+                                              '${player.info.name.name} ${player.info.name.surname}'),
+                                        ),
+                                      ),
+                                      TableCell(
+                                        child: Padding(
+                                          padding: const EdgeInsets.all(8.0),
+                                          child: Text(player
+                                              .info.characteristics.age
+                                              .toString()),
+                                        ),
+                                      ),
+                                      TableCell(
+                                        child: Padding(
+                                          padding: const EdgeInsets.all(8.0),
+                                          child: Text(scores.first.value
+                                              .toStringAsFixed(2)),
+                                        ),
+                                      ),
+                                      TableCell(
+                                        child: Padding(
+                                          padding: const EdgeInsets.all(8.0),
+                                          child: Text(scores.first.key),
+                                        ),
+                                      ),
+                                    ],
+                                  );
+
+                                  lastDisplayedPos = scores.first.key;
+                                  return row;
+                                }),
+                              ],
+                            ),
+                          ),
+                          transfersPlayersSorted.isEmpty
+                              ? const Center(
+                                  child: Text('No transfer players available.'))
+                              : SingleChildScrollView(
+                                  child: Table(
+                                    columnWidths: const {
+                                      0: FlexColumnWidth(2),
+                                      1: FlexColumnWidth(1),
+                                      2: FlexColumnWidth(1),
+                                      3: FlexColumnWidth(1),
+                                    },
+                                    children: [
+                                      const TableRow(
+                                        children: [
+                                          TableCell(
+                                            child: Padding(
+                                              padding: EdgeInsets.all(8.0),
+                                              child: Text(
+                                                'Name',
+                                                style: TextStyle(
+                                                    fontWeight:
+                                                        FontWeight.bold),
+                                              ),
+                                            ),
+                                          ),
+                                          TableCell(
+                                            child: Padding(
+                                              padding: EdgeInsets.all(8.0),
+                                              child: Text(
+                                                'Age',
+                                                style: TextStyle(
+                                                    fontWeight:
+                                                        FontWeight.bold),
+                                              ),
+                                            ),
+                                          ),
+                                          TableCell(
+                                            child: Padding(
+                                              padding: EdgeInsets.all(8.0),
+                                              child: Text(
+                                                'Score',
+                                                style: TextStyle(
+                                                    fontWeight:
+                                                        FontWeight.bold),
+                                              ),
+                                            ),
+                                          ),
+                                          TableCell(
+                                            child: Padding(
+                                              padding: EdgeInsets.all(8.0),
+                                              child: Text(
+                                                'Pos',
+                                                style: TextStyle(
+                                                    fontWeight:
+                                                        FontWeight.bold),
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      ...transfersPlayersSorted.map((player) {
+                                        List<MapEntry<String, double>> scores =
+                                            filterAndSortPlayerScores(
+                                                player.info);
+
+                                        return TableRow(
+                                          decoration: BoxDecoration(
+                                            border: lastDisplayedPos !=
+                                                    scores.first.key
+                                                ? const Border(
+                                                    top: BorderSide(
+                                                        color: Colors.blue),
+                                                  )
+                                                : null,
+                                          ),
+                                          children: [
+                                            TableCell(
+                                              child: Padding(
+                                                padding:
+                                                    const EdgeInsets.all(8.0),
+                                                child: Text(
+                                                    '${player.info.name.name} ${player.info.name.surname}'),
+                                              ),
+                                            ),
+                                            TableCell(
+                                              child: Padding(
+                                                padding:
+                                                    const EdgeInsets.all(8.0),
+                                                child: Text(player
+                                                    .info.characteristics.age
+                                                    .toString()),
+                                              ),
+                                            ),
+                                            TableCell(
+                                              child: Padding(
+                                                padding:
+                                                    const EdgeInsets.all(8.0),
+                                                child: Text(scores.first.value
+                                                    .toStringAsFixed(2)),
+                                              ),
+                                            ),
+                                            TableCell(
+                                              child: Padding(
+                                                padding:
+                                                    const EdgeInsets.all(8.0),
+                                                child: Text(scores.first.key),
+                                              ),
+                                            ),
+                                          ],
+                                        );
+                                      }),
+                                    ],
+                                  ),
+                                ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             ),
           ],
         ),

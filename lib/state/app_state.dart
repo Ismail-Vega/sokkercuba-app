@@ -3,6 +3,7 @@ import 'dart:ui';
 import '../models/juniors/juniors.dart';
 import '../models/juniors/juniors_training.dart';
 import '../models/news/news.dart';
+import '../models/player/player.dart';
 import '../models/squad/squad.dart';
 import '../models/team/team_stats.dart';
 import '../models/team/user.dart';
@@ -27,6 +28,7 @@ class AppState {
   final SquadTraining? training;
   final String? dataUpdatedOn;
   final Locale locale;
+  final List<TeamPlayer> observedPlayers;
 
   AppState({
     this.error = false,
@@ -46,6 +48,7 @@ class AppState {
     this.training,
     this.dataUpdatedOn,
     this.locale = const Locale('en', 'us'),
+    this.observedPlayers = const [],
   });
 
   AppState copyWith(
@@ -65,6 +68,7 @@ class AppState {
       Squad? players,
       SquadTraining? training,
       String? dataUpdatedOn,
+      List<TeamPlayer>? observedPlayers,
       Locale? locale}) {
     return AppState(
       error: error ?? this.error,
@@ -83,6 +87,7 @@ class AppState {
       players: players ?? this.players,
       training: training ?? this.training,
       dataUpdatedOn: dataUpdatedOn ?? this.dataUpdatedOn,
+      observedPlayers: observedPlayers ?? this.observedPlayers,
       locale: locale ?? this.locale,
     );
   }
@@ -106,6 +111,7 @@ class AppState {
       training: payload['training'] ?? training,
       dataUpdatedOn: payload['dataUpdatedOn'] ?? dataUpdatedOn,
       locale: payload['locale'] ?? locale,
+      observedPlayers: payload['observedPlayers'] ?? observedPlayers,
     );
   }
 
@@ -131,6 +137,8 @@ class AppState {
         'languageCode': locale.languageCode,
         'countryCode': locale.countryCode,
       },
+      'observedPlayers':
+          observedPlayers.map((player) => player.toJson()).toList(),
     };
   }
 
@@ -164,6 +172,10 @@ class AppState {
           ? Locale(
               json['locale']['languageCode'], json['locale']['countryCode'])
           : const Locale('en', 'US'),
+      observedPlayers: (json['observedPlayers'] as List<dynamic>?)
+              ?.map((e) => TeamPlayer.fromJson(e as Map<String, dynamic>))
+              .toList() ??
+          [],
     );
   }
 }

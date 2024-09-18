@@ -81,7 +81,7 @@ Future<Map<String, dynamic>> fetchAllData(ApiClient apiClient,
         'training': training,
         'news': news,
         'trainingWeek': stateWeek,
-        'dataUpdatedOn': dataUpdatedOn
+        'dataUpdatedOn': dataUpdatedOn,
       };
 
       appStateNotifier
