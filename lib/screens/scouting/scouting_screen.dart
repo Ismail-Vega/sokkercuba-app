@@ -141,8 +141,8 @@ class _ScoutingState extends State<Scouting>
         final observedPlayers = sortedPlayers(players);
         final transfersPlayersSorted = sortedPlayers(transfersPlayersFiltered);
 
-        final countryName = (appStateNotifier.state.user?.nationalTeam
-            as Map<String, dynamic>)['country']?['name'];
+        final countryName =
+            appStateNotifier.state.user?.team.country?.name ?? "";
 
         return ClipRRect(
           borderRadius: BorderRadius.circular(16.0),
