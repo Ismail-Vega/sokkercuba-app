@@ -1,7 +1,9 @@
 import '../models/player/player.dart';
 import '../screens/scouting/scoring_system.dart';
 
-List<TeamPlayer> filteredPlayers(List<TeamPlayer> players) {
+List<TeamPlayer> filteredPlayers(List<TeamPlayer>? players) {
+  if (players == null) return [];
+
   return players.where((player) {
     final scores = filterAndSortPlayerScores(player.info);
     final bestPosition = scores.isNotEmpty ? scores.first.key : 'N/A';
@@ -10,7 +12,9 @@ List<TeamPlayer> filteredPlayers(List<TeamPlayer> players) {
   }).toList();
 }
 
-List<TeamPlayer> sortedPlayers(List<TeamPlayer> players) {
+List<TeamPlayer> sortedPlayers(List<TeamPlayer>? players) {
+  if (players == null) return [];
+
   return players
     ..sort((a, b) {
       final aScores = filterAndSortPlayerScores(a.info);
