@@ -14,6 +14,7 @@ TeamPlayer _$TeamPlayerFromJson(Map<String, dynamic> json) => TeamPlayer(
         (k, e) => MapEntry(
             int.parse(k), PlayerHistory.fromJson(e as Map<String, dynamic>)),
       ),
+      isObserved: json['isObserved'] as bool?,
     );
 
 Map<String, dynamic> _$TeamPlayerToJson(TeamPlayer instance) =>
@@ -21,6 +22,7 @@ Map<String, dynamic> _$TeamPlayerToJson(TeamPlayer instance) =>
       'id': instance.id,
       'info': instance.info,
       'transfer': instance.transfer,
+      'isObserved': instance.isObserved,
       'skillsHistory':
           instance.skillsHistory?.map((k, e) => MapEntry(k.toString(), e)),
     };

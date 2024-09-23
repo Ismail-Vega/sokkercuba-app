@@ -140,12 +140,7 @@ class _SokkerProState extends State<SokkerPro> {
             builder: (context) => const ResponsiveDrawer(child: Xtreme()));
       case '/scouting':
         return MaterialPageRoute(
-            builder: (context) => ResponsiveDrawer(
-                child: Scouting(
-                    players: appState.observedPlayers,
-                    countryName: (appState.user?.nationalTeam
-                            as Map<String, dynamic>)['country']?['name'] ??
-                        "")));
+            builder: (context) => const ResponsiveDrawer(child: Scouting()));
       case '/contact':
         return MaterialPageRoute(
             builder: (context) => const ResponsiveDrawer(child: Contact()));

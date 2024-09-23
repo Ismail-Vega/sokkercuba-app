@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../models/player/player.dart';
 import '../services/toast_service.dart';
 import 'actions.dart';
 import 'app_state.dart';
@@ -167,12 +168,39 @@ class AppStateNotifier extends ChangeNotifier {
       case StoreActionTypes.setTraining:
         _state = _state.copyWith(training: action.payload);
         break;
+      case StoreActionTypes.addObservedPlayer:
+        final TeamPlayer newPlayer = TeamPlayer(
+            id: action.payload.id,
+            info: action.payload.info,
+            isObserved: true,
+            transfer: null);
+
+        final List<TeamPlayer> updatedObservedPlayers =
+            List.from(_state.observedPlayers);
+
+        if (!updatedObservedPlayers
+            .any((player) => player.id == newPlayer.id)) {
+          updatedObservedPlayers.add(newPlayer);
+        }
+
+        _state = _state.copyWith(observedPlayers: updatedObservedPlayers);
+        break;
+
+      case StoreActionTypes.delObservedPlayer:
+        final TeamPlayer playerToRemove = action.payload as TeamPlayer;
+        final List<TeamPlayer> updatedObservedPlayers =
+            List.from(_state.observedPlayers);
+
+        updatedObservedPlayers
+            .removeWhere((player) => player.id == playerToRemove.id);
+
+        _state = _state.copyWith(observedPlayers: updatedObservedPlayers);
+        break;
       case StoreActionTypes.setAll:
         _state = _state.copyWithAll(action.payload);
         break;
     }
-    if (action.notify) notifyListeners();
     _saveState();
-    notifyListeners();
+    if (action.notify) notifyListeners();
   }
 }

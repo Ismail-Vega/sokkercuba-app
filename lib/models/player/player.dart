@@ -10,6 +10,7 @@ class TeamPlayer {
   final int id;
   final PlayerInfo info;
   final dynamic transfer;
+  bool? isObserved;
   Map<int, PlayerHistory>? skillsHistory;
 
   TeamPlayer({
@@ -17,8 +18,10 @@ class TeamPlayer {
     required this.info,
     required this.transfer,
     this.skillsHistory,
+    this.isObserved,
   }) {
     skillsHistory ??= {};
+    isObserved ??= false;
   }
 
   factory TeamPlayer.fromJson(Map<String, dynamic> json) =>
