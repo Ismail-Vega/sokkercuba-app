@@ -79,7 +79,7 @@ List<MapEntry<String, double>> filterAndSortPlayerScores(PlayerInfo info) {
   double wingScore = positionScores.wingerScore(skills);
   double attScore = positionScores.scorerScore(skills);
 
-  Map<String, int> minScores = minimumScores[age] ?? {};
+  Map<String, int> minScores = minimumScores[age > 30 ? 30 : age] ?? {};
 
   Map<String, double> filteredScores = {
     'GK': gkScore,

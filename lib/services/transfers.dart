@@ -3,11 +3,13 @@ import '../models/player/player_info.dart';
 import 'api_client.dart';
 
 Future<List<TeamPlayer>> fetchTransfersByCountry(
-    ApiClient apiClient, String country) async {
+    ApiClient apiClient, String country, List<TeamPlayer> statePlayers) async {
   List<TeamPlayer> allTransfers = [];
   int offset = 0;
   int limit = 200;
   bool hasMoreData = true;
+
+  Set<int> statePlayerIds = statePlayers.map((player) => player.id).toSet();
 
   while (hasMoreData) {
     final endpoint =
@@ -20,12 +22,19 @@ Future<List<TeamPlayer>> fetchTransfersByCountry(
       List<dynamic> transfers = response['transfers'];
 
       for (var transfer in transfers) {
+        int playerId = transfer['player']['id'];
+
+        if (statePlayerIds.contains(playerId)) {
+          continue;
+        }
+
         if (transfer['player']['info']['country']['name'] == country) {
           TeamPlayer player = TeamPlayer(
-            id: transfer['player']['id'],
+            id: playerId,
             info: PlayerInfo.fromJson(transfer['player']['info']),
             transfer: null,
             skillsHistory: {},
+            isObserved: false,
           );
           allTransfers.add(player);
         }

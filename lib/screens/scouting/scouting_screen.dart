@@ -34,7 +34,8 @@ class _ScoutingState extends State<Scouting>
     _tabController = TabController(length: 2, vsync: this);
   }
 
-  Future<void> _fetchTransfers(String? countryName) async {
+  Future<void> _fetchTransfers(
+      String? countryName, List<TeamPlayer> statePlayers) async {
     if (countryName == null) return;
 
     setState(() {
@@ -43,7 +44,7 @@ class _ScoutingState extends State<Scouting>
 
     try {
       List<TeamPlayer> fetchedPlayers =
-          await fetchTransfersByCountry(apiClient, countryName);
+          await fetchTransfersByCountry(apiClient, countryName, statePlayers);
 
       setState(() {
         transfersPlayers = fetchedPlayers;
@@ -154,8 +155,9 @@ class _ScoutingState extends State<Scouting>
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
                     ElevatedButton.icon(
-                      onPressed:
-                          isLoading ? null : () => _fetchTransfers(countryName),
+                      onPressed: isLoading
+                          ? null
+                          : () => _fetchTransfers(countryName, observedPlayers),
                       icon: SizedBox(
                         height: 24.0,
                         width: 24.0,
