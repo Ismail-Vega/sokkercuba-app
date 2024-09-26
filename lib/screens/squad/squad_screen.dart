@@ -17,27 +17,37 @@ class SquadScreen extends StatefulWidget {
   State<SquadScreen> createState() => _SquadScreenState();
 }
 
-class _SquadScreenState extends State<SquadScreen> {
+class _SquadScreenState extends State<SquadScreen>
+    with SingleTickerProviderStateMixin {
   SortCriteria _sortCriteria = SortCriteria.hasSkillChanges;
   List<TeamPlayer> _sortedSquad = [];
+  List<TeamPlayer> _sortedPrevSquad = [];
+  late TabController _tabController;
 
   @override
   void initState() {
     super.initState();
+    _tabController = TabController(length: 2, vsync: this);
     _updateSortedSquad();
+    _updateSortedPrevSquad();
   }
 
   @override
   Widget build(BuildContext context) {
     final appStateNotifier = Provider.of<AppStateNotifier>(context);
     final squad = appStateNotifier.state.players?.players;
+    final prevSquad = appStateNotifier.state.players?.prevPlayers;
 
-    if (squad == null) {
+    if (squad == null || prevSquad == null) {
       return const NoDataFoundScreen();
     }
 
     if (_sortedSquad != squad) {
       _updateSortedSquad();
+    }
+
+    if (_sortedPrevSquad != prevSquad) {
+      _updateSortedPrevSquad();
     }
 
     final screenWidth = MediaQuery.of(context).size.width;
@@ -59,41 +69,63 @@ class _SquadScreenState extends State<SquadScreen> {
       childAspectRatio = 0.9;
     }
 
-    return Column(
-      children: [
-        Padding(
-          padding: const EdgeInsets.all(8),
-          child: Row(
-            children: [
-              const Text('Sort by: '),
-              SortDropdown(
-                selectedCriteria: _sortCriteria,
-                onCriteriaChanged: (criteria) {
-                  setState(() {
-                    _sortCriteria = criteria ?? _sortCriteria;
-                    _updateSortedSquad();
-                  });
-                },
-              ),
+    return Scaffold(
+      backgroundColor: Colors.blue,
+      body: Column(
+        children: [
+          TabBar(
+            controller: _tabController,
+            tabs: const [
+              Tab(text: 'Squad'),
+              Tab(text: 'Previous Players'),
             ],
           ),
-        ),
-        Expanded(
-          child: GridView.builder(
-            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: crossAxisCount,
-              mainAxisSpacing: 8,
-              crossAxisSpacing: 8,
-              childAspectRatio: childAspectRatio,
+          Padding(
+            padding: const EdgeInsets.all(8),
+            child: Row(
+              children: [
+                const Text('Sort by: '),
+                SortDropdown(
+                  selectedCriteria: _sortCriteria,
+                  onCriteriaChanged: (criteria) {
+                    setState(() {
+                      _sortCriteria = criteria ?? _sortCriteria;
+                      _updateSortedSquad();
+                      _updateSortedPrevSquad();
+                    });
+                  },
+                ),
+              ],
             ),
-            itemCount: _sortedSquad.length,
-            itemBuilder: (context, index) {
-              final player = _sortedSquad[index];
-              return PlayerCard(player: player);
-            },
           ),
-        ),
-      ],
+          Expanded(
+            child: TabBarView(
+              controller: _tabController,
+              children: [
+                _buildGrid(_sortedSquad, crossAxisCount, childAspectRatio),
+                _buildGrid(_sortedPrevSquad, crossAxisCount, childAspectRatio),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildGrid(
+      List<TeamPlayer> players, int crossAxisCount, double childAspectRatio) {
+    return GridView.builder(
+      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: crossAxisCount,
+        mainAxisSpacing: 8,
+        crossAxisSpacing: 8,
+        childAspectRatio: childAspectRatio,
+      ),
+      itemCount: players.length,
+      itemBuilder: (context, index) {
+        final player = players[index];
+        return PlayerCard(player: player);
+      },
     );
   }
 
@@ -105,10 +137,32 @@ class _SquadScreenState extends State<SquadScreen> {
     if (squad == null) return;
 
     List<TeamPlayer> sortedSquad = List.from(squad);
+    _sortPlayers(sortedSquad);
 
+    setState(() {
+      _sortedSquad = sortedSquad;
+    });
+  }
+
+  void _updateSortedPrevSquad() {
+    final appStateNotifier =
+        Provider.of<AppStateNotifier>(context, listen: false);
+    final prevSquad = appStateNotifier.state.players?.prevPlayers;
+
+    if (prevSquad == null) return;
+
+    List<TeamPlayer> sortedPrevSquad = List.from(prevSquad);
+    _sortPlayers(sortedPrevSquad);
+
+    setState(() {
+      _sortedPrevSquad = sortedPrevSquad;
+    });
+  }
+
+  void _sortPlayers(List<TeamPlayer> players) {
     switch (_sortCriteria) {
       case SortCriteria.hasSkillChanges:
-        sortedSquad.sort((a, b) {
+        players.sort((a, b) {
           final aHasChanges =
               a.info.skillsChange?.up != 0 || a.info.skillsChange?.down != 0;
           final bHasChanges =
@@ -119,49 +173,44 @@ class _SquadScreenState extends State<SquadScreen> {
         });
         break;
       case SortCriteria.name:
-        sortedSquad
-            .sort((a, b) => a.info.name.full.compareTo(b.info.name.full));
+        players.sort((a, b) => a.info.name.full.compareTo(b.info.name.full));
         break;
       case SortCriteria.age:
-        sortedSquad.sort((a, b) =>
+        players.sort((a, b) =>
             a.info.characteristics.age.compareTo(b.info.characteristics.age));
         break;
       case SortCriteria.stamina:
-        sortedSquad.sort(
+        players.sort(
             (a, b) => b.info.skills.stamina.compareTo(a.info.skills.stamina));
         break;
       case SortCriteria.pace:
-        sortedSquad
+        players
             .sort((a, b) => b.info.skills.pace.compareTo(a.info.skills.pace));
         break;
       case SortCriteria.technique:
-        sortedSquad.sort((a, b) =>
+        players.sort((a, b) =>
             b.info.skills.technique.compareTo(a.info.skills.technique));
         break;
       case SortCriteria.passing:
-        sortedSquad.sort(
+        players.sort(
             (a, b) => b.info.skills.passing.compareTo(a.info.skills.passing));
         break;
       case SortCriteria.keeper:
-        sortedSquad.sort(
+        players.sort(
             (a, b) => b.info.skills.keeper.compareTo(a.info.skills.keeper));
         break;
       case SortCriteria.defending:
-        sortedSquad.sort((a, b) =>
+        players.sort((a, b) =>
             b.info.skills.defending.compareTo(a.info.skills.defending));
         break;
       case SortCriteria.playmaking:
-        sortedSquad.sort((a, b) =>
+        players.sort((a, b) =>
             b.info.skills.playmaking.compareTo(a.info.skills.playmaking));
         break;
       case SortCriteria.striker:
-        sortedSquad.sort(
+        players.sort(
             (a, b) => b.info.skills.striker.compareTo(a.info.skills.striker));
         break;
     }
-
-    setState(() {
-      _sortedSquad = sortedSquad;
-    });
   }
 }

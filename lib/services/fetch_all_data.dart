@@ -66,8 +66,8 @@ Future<Map<String, dynamic>> fetchAllData(ApiClient apiClient,
       final userStats = UserStats.fromJson(responses[4]);
       final news = await setNewsData(apiClient, state.news, responses[5]);
 
-      final juniorsTraining =
-          await getJuniorsTraining(apiClient, responses[0]['juniors']);
+      final juniorsTraining = await getJuniorsTraining(
+          apiClient, responses[0]['juniors'], state.juniorsTraining);
 
       final dataUpdatedOn = DateTime.now().toIso8601String();
       final filteredPayload = {

@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import '../../models/juniors/junior_progress.dart';
 import '../../models/juniors/juniors.dart';
 import '../../models/news/news_junior.dart';
+import '../../services/toast_service.dart';
 import '../../state/app_state_notifier.dart';
 import '../../utils/junior_utils.dart';
 import '../../utils/skill_parser.dart';
@@ -28,22 +29,61 @@ class JuniorsScreen extends StatefulWidget {
   State<JuniorsScreen> createState() => _JuniorsScreenState();
 }
 
-class _JuniorsScreenState extends State<JuniorsScreen> {
+class _JuniorsScreenState extends State<JuniorsScreen>
+    with SingleTickerProviderStateMixin {
+  late TabController _tabController;
   late Map<int, bool> _expandedStates;
 
   @override
   void initState() {
     super.initState();
+    _tabController = TabController(length: 2, vsync: this);
     _expandedStates = {};
+
     widget.juniors?.juniors?.forEach((junior) {
+      _expandedStates[junior.id] = false;
+    });
+    widget.juniors?.prevJuniors?.forEach((junior) {
       _expandedStates[junior.id] = false;
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    final juniorsList = widget.juniors?.juniors;
-    if (juniorsList == null || juniorsList.isEmpty) {
+    final currentJuniorsList = widget.juniors?.juniors ?? [];
+    final prevJuniorsList = widget.juniors?.prevJuniors ?? [];
+
+    return Scaffold(
+      backgroundColor: Colors.blue,
+      body: Column(
+        children: [
+          TabBar(
+            controller: _tabController,
+            tabs: const [
+              Tab(text: 'Current Juniors'),
+              Tab(text: 'Previous Juniors'),
+            ],
+            labelColor: Colors.white,
+            indicatorColor: Colors.white,
+          ),
+          Expanded(
+            child: TabBarView(
+              controller: _tabController,
+              children: [
+                _buildJuniorsTable(
+                    currentJuniorsList, 'No current juniors found.'),
+                _buildJuniorsTable(
+                    prevJuniorsList, 'No previous juniors found.'),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildJuniorsTable(List<Junior> juniorsList, String noDataMessage) {
+    if (juniorsList.isEmpty) {
       return const NoDataFoundScreen();
     }
 
@@ -58,12 +98,12 @@ class _JuniorsScreenState extends State<JuniorsScreen> {
             child: Column(
               children: [
                 Expanded(
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(16.0),
-                    child: Container(
-                      color: Colors.blue[900],
-                      child: Padding(
-                        padding: const EdgeInsets.all(8.0),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 8.0),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(16.0),
+                      child: Container(
+                        color: Colors.blue[900],
                         child: ListView(
                           children: [
                             SingleChildScrollView(
@@ -103,12 +143,12 @@ class _JuniorsScreenState extends State<JuniorsScreen> {
                                         : null;
                                     return [
                                       _buildDataRow(junior, progress, potential,
-                                          isExpanded)
+                                          isExpanded),
                                     ];
                                   }),
                                 ],
                               ),
-                            )
+                            ),
                           ],
                         ),
                       ),
@@ -156,43 +196,46 @@ class _JuniorsScreenState extends State<JuniorsScreen> {
         ),
       ),
       children: [
-        Stack(
-          children: [
-            GestureDetector(
-              onTap: () => _toggleExpansion(junior.id, progress),
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Text(
-                  junior.name,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                  ),
+        Stack(children: [
+          GestureDetector(
+            onTap: () => _toggleExpansion(junior.id, progress, context),
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Text(
+                junior.name,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
                 ),
               ),
             ),
-            Positioned(
-              top: 4,
-              right: 4,
-              child: JuniorBadge(
-                weeksLeft: junior.weeksLeft,
-                isNew: junior.startWeek == trainingWeek,
-                showAnimation: showBadgeAnimation,
-              ),
+          ),
+          Positioned(
+            top: 4,
+            right: 4,
+            child: JuniorBadge(
+              weeksLeft: junior.weeksLeft,
+              isNew: junior.startWeek == trainingWeek,
+              showAnimation: showBadgeAnimation,
             ),
-          ],
+          ),
+        ]),
+        _buildDataCell(
+          '${junior.age}',
+          junior.id,
+          progress,
         ),
-        _buildDataCell('${junior.age}', junior.id, progress),
         TableCell(
           child: GestureDetector(
-            onTap: () => _toggleExpansion(junior.id, progress),
+            onTap: () => _toggleExpansion(junior.id, progress, context),
             child: Padding(
               padding: const EdgeInsets.all(8.0),
               child: Text.rich(
                 TextSpan(
                   text: '${parseSkillToText(junior.skill)} [${junior.skill}]',
-                  style:
-                      TextStyle(color: getJuniorLevelColor(progress?.values)),
+                  style: TextStyle(
+                    color: getJuniorLevelColor(progress?.values),
+                  ),
                 ),
               ),
             ),
@@ -205,45 +248,72 @@ class _JuniorsScreenState extends State<JuniorsScreen> {
                   progress?.values ?? [],
                   potential.potentialMin,
                   potential.potentialMax,
-                  junior.weeksLeft),
+                  junior.weeksLeft,
+                ),
           junior.id,
           progress,
         ),
-        _buildDataCell('${calculateSkillPops(progress?.values ?? [])}',
-            junior.id, progress),
         _buildDataCell(
-            calculateAverageWeeksPop(progress?.values ?? []).toStringAsFixed(2),
-            junior.id,
-            progress),
-        _buildDataCell('${junior.weeksLeft}', junior.id, progress),
-        _buildDataCell(potential?.position ?? 'outfield', junior.id, progress),
+          '${calculateSkillPops(progress?.values ?? [])}',
+          junior.id,
+          progress,
+        ),
+        _buildDataCell(
+          calculateAverageWeeksPop(progress?.values ?? []).toStringAsFixed(2),
+          junior.id,
+          progress,
+        ),
+        _buildDataCell(
+          '${junior.weeksLeft}',
+          junior.id,
+          progress,
+        ),
+        _buildDataCell(
+          potential?.position ?? 'outfield',
+          junior.id,
+          progress,
+        ),
       ],
     );
   }
 
-  Widget _buildDataCell(String text, int id, JuniorProgress? progress,
-      {Color textColor = Colors.white, bool isBold = false}) {
+  Widget _buildDataCell(
+    String text,
+    int id,
+    JuniorProgress? progress, {
+    Color textColor = Colors.white,
+    bool isBold = false,
+  }) {
     return GestureDetector(
-      onTap: () => _toggleExpansion(id, progress),
+      onTap: () => _toggleExpansion(id, progress, context),
       child: Padding(
         padding: const EdgeInsets.all(8.0),
         child: Text(
           text,
           style: TextStyle(
-              color: textColor,
-              fontWeight: isBold ? FontWeight.bold : FontWeight.normal),
+            color: textColor,
+            fontWeight: isBold ? FontWeight.bold : FontWeight.normal,
+          ),
         ),
       ),
     );
   }
 
-  void _toggleExpansion(int id, JuniorProgress? progress) {
+  void _toggleExpansion(
+      int id, JuniorProgress? progress, BuildContext context) {
+    final toastService = ToastService(context);
+
     setState(() {
       _expandedStates[id] = !_expandedStates[id]!;
-      if (_expandedStates[id]!) {
+      if (_expandedStates[id]! && progress != null) {
         WidgetsBinding.instance.addPostFrameCallback((_) {
           _showDetailsDialog(id, progress);
         });
+      } else {
+        toastService.showToast(
+          "This junior doesn't have graph data!",
+          backgroundColor: Colors.deepOrangeAccent,
+        );
       }
     });
   }
@@ -282,21 +352,13 @@ class _JuniorsScreenState extends State<JuniorsScreen> {
                       _expandedStates[id] = false;
                     });
                   },
-                  child: const Text(
-                    'Close',
-                    style: TextStyle(
-                        color: Colors.red, fontWeight: FontWeight.bold),
-                  ),
+                  child: const Text('Close'),
                 ),
-              ),
+              )
             ],
           ),
         ),
       ),
-    ).then((_) {
-      setState(() {
-        _expandedStates[id] = false;
-      });
-    });
+    );
   }
 }

@@ -20,6 +20,10 @@ class SortDropdown extends StatelessWidget {
       onChanged: onCriteriaChanged,
       dropdownColor: Colors.blue[900],
       focusColor: Colors.transparent,
+      style: const TextStyle(
+        fontSize: 10,
+        height: 1.0,
+      ),
       items: const [
         DropdownMenuItem(
           value: SortCriteria.hasSkillChanges,
