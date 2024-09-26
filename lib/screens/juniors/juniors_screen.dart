@@ -35,18 +35,14 @@ class _JuniorsScreenState extends State<JuniorsScreen> {
   void initState() {
     super.initState();
     _expandedStates = {};
-
-    if (widget.juniors?.juniors != null) {
-      for (var junior in widget.juniors!.juniors!) {
-        _expandedStates[junior.id] = false;
-      }
-    }
+    widget.juniors?.juniors?.forEach((junior) {
+      _expandedStates[junior.id] = false;
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     final juniorsList = widget.juniors?.juniors;
-
     if (juniorsList == null || juniorsList.isEmpty) {
       return const NoDataFoundScreen();
     }
@@ -55,12 +51,10 @@ class _JuniorsScreenState extends State<JuniorsScreen> {
       backgroundColor: Colors.blue,
       body: LayoutBuilder(builder: (context, constraints) {
         final isWideScreen = constraints.maxWidth > 764;
-
         return Center(
           child: ConstrainedBox(
-            constraints: BoxConstraints(
-              maxWidth: isWideScreen ? 764 : double.infinity,
-            ),
+            constraints:
+                BoxConstraints(maxWidth: isWideScreen ? 764 : double.infinity),
             child: Column(
               children: [
                 Expanded(
@@ -101,15 +95,15 @@ class _JuniorsScreenState extends State<JuniorsScreen> {
                                         _expandedStates[junior.id] ?? false;
                                     final progress =
                                         widget.progress?[junior.id];
-                                    int index = widget.potentialData.indexWhere(
-                                        (item) => item.id == junior.id);
-                                    NewsJunior? potential = index != -1
+                                    final index = widget.potentialData
+                                        .indexWhere(
+                                            (item) => item.id == junior.id);
+                                    final potential = index != -1
                                         ? widget.potentialData[index]
                                         : null;
-
                                     return [
                                       _buildDataRow(junior, progress, potential,
-                                          isExpanded),
+                                          isExpanded)
                                     ];
                                   }),
                                 ],
@@ -151,7 +145,7 @@ class _JuniorsScreenState extends State<JuniorsScreen> {
     final trainingWeek =
         Provider.of<AppStateNotifier>(context).state.trainingWeek;
     final isNewJunior =
-        progress?.values == null ? true : progress!.values.length <= 1;
+        progress?.values == null || progress!.values.length <= 1;
     final showBadgeAnimation = junior.weeksLeft == 0 ||
         (junior.startWeek == trainingWeek && isNewJunior);
 
@@ -162,64 +156,43 @@ class _JuniorsScreenState extends State<JuniorsScreen> {
         ),
       ),
       children: [
-        Stack(children: [
-          GestureDetector(
-            onTap: () {
-              setState(() {
-                _expandedStates[junior.id] = !_expandedStates[junior.id]!;
-                WidgetsBinding.instance.addPostFrameCallback((_) {
-                  if (_expandedStates[junior.id]!) {
-                    _showDetailsDialog(junior.id, progress);
-                  }
-                });
-              });
-            },
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Text(
-                junior.name,
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
+        Stack(
+          children: [
+            GestureDetector(
+              onTap: () => _toggleExpansion(junior.id, progress),
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Text(
+                  junior.name,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ),
             ),
-          ),
-          Positioned(
-            top: 4,
-            right: 4,
-            child: JuniorBadge(
-              weeksLeft: junior.weeksLeft,
-              isNew: junior.startWeek == trainingWeek,
-              showAnimation: showBadgeAnimation,
+            Positioned(
+              top: 4,
+              right: 4,
+              child: JuniorBadge(
+                weeksLeft: junior.weeksLeft,
+                isNew: junior.startWeek == trainingWeek,
+                showAnimation: showBadgeAnimation,
+              ),
             ),
-          ),
-        ]),
-        _buildDataCell(
-          '${junior.age}',
-          junior.id,
-          progress,
+          ],
         ),
+        _buildDataCell('${junior.age}', junior.id, progress),
         TableCell(
           child: GestureDetector(
-            onTap: () {
-              setState(() {
-                _expandedStates[junior.id] = !isExpanded;
-                WidgetsBinding.instance.addPostFrameCallback((_) {
-                  if (_expandedStates[junior.id]!) {
-                    _showDetailsDialog(junior.id, progress);
-                  }
-                });
-              });
-            },
+            onTap: () => _toggleExpansion(junior.id, progress),
             child: Padding(
               padding: const EdgeInsets.all(8.0),
               child: Text.rich(
                 TextSpan(
                   text: '${parseSkillToText(junior.skill)} [${junior.skill}]',
-                  style: TextStyle(
-                    color: getJuniorLevelColor(progress?.values),
-                  ),
+                  style:
+                      TextStyle(color: getJuniorLevelColor(progress?.values)),
                 ),
               ),
             ),
@@ -232,123 +205,91 @@ class _JuniorsScreenState extends State<JuniorsScreen> {
                   progress?.values ?? [],
                   potential.potentialMin,
                   potential.potentialMax,
-                  junior.weeksLeft,
-                ),
+                  junior.weeksLeft),
           junior.id,
           progress,
         ),
+        _buildDataCell('${calculateSkillPops(progress?.values ?? [])}',
+            junior.id, progress),
         _buildDataCell(
-          '${calculateSkillPops(progress?.values ?? [])}',
-          junior.id,
-          progress,
-        ),
-        _buildDataCell(
-          calculateAverageWeeksPop(progress?.values ?? []).toStringAsFixed(2),
-          junior.id,
-          progress,
-        ),
-        _buildDataCell(
-          '${junior.weeksLeft}',
-          junior.id,
-          progress,
-        ),
-        _buildDataCell(
-          potential?.position ?? 'outfield',
-          junior.id,
-          progress,
-        ),
+            calculateAverageWeeksPop(progress?.values ?? []).toStringAsFixed(2),
+            junior.id,
+            progress),
+        _buildDataCell('${junior.weeksLeft}', junior.id, progress),
+        _buildDataCell(potential?.position ?? 'outfield', junior.id, progress),
       ],
     );
   }
 
-  Widget _buildDataCell(
-    String text,
-    int id,
-    JuniorProgress? progress, {
-    Color textColor = Colors.white,
-    bool isBold = false,
-  }) {
+  Widget _buildDataCell(String text, int id, JuniorProgress? progress,
+      {Color textColor = Colors.white, bool isBold = false}) {
     return GestureDetector(
-      onTap: () {
-        setState(() {
-          _expandedStates[id] = !_expandedStates[id]!;
-          WidgetsBinding.instance.addPostFrameCallback((_) {
-            if (_expandedStates[id]!) {
-              _showDetailsDialog(id, progress);
-            }
-          });
-        });
-      },
+      onTap: () => _toggleExpansion(id, progress),
       child: Padding(
         padding: const EdgeInsets.all(8.0),
         child: Text(
           text,
           style: TextStyle(
-            color: textColor,
-            fontWeight: isBold ? FontWeight.bold : FontWeight.normal,
-          ),
+              color: textColor,
+              fontWeight: isBold ? FontWeight.bold : FontWeight.normal),
         ),
       ),
     );
   }
 
+  void _toggleExpansion(int id, JuniorProgress? progress) {
+    setState(() {
+      _expandedStates[id] = !_expandedStates[id]!;
+      if (_expandedStates[id]!) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          _showDetailsDialog(id, progress);
+        });
+      }
+    });
+  }
+
   void _showDetailsDialog(int id, JuniorProgress? progress) {
     showDialog(
       context: context,
-      builder: (context) => PopScope(
-        onPopInvokedWithResult: (didPop, result) {
-          if (didPop) {
-            setState(() {
-              _expandedStates[id] = false;
-            });
-          }
-        },
-        child: Dialog(
-          shape: const RoundedRectangleBorder(
-              borderRadius: BorderRadius.all(Radius.circular(16.0))),
-          insetPadding: const EdgeInsets.all(8.0),
-          child: Container(
-            padding: EdgeInsets.zero,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                const Padding(
-                  padding: EdgeInsets.all(8.0),
-                  child: Text(
-                    'Skill level chart',
-                    style: TextStyle(fontWeight: FontWeight.bold),
-                    textAlign: TextAlign.center,
+      builder: (context) => Dialog(
+        shape: const RoundedRectangleBorder(
+            borderRadius: BorderRadius.all(Radius.circular(16.0))),
+        insetPadding: const EdgeInsets.all(8.0),
+        child: Container(
+          padding: EdgeInsets.zero,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              const Padding(
+                padding: EdgeInsets.all(8.0),
+                child: Text(
+                  'Skill level chart',
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+              progress != null
+                  ? SizedBox(
+                      height: 364, child: ProgressLineChart(data: progress))
+                  : const Center(child: NoDataFoundScreen()),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                    setState(() {
+                      _expandedStates[id] = false;
+                    });
+                  },
+                  child: const Text(
+                    'Close',
+                    style: TextStyle(
+                        color: Colors.red, fontWeight: FontWeight.bold),
                   ),
                 ),
-                progress != null
-                    ? SizedBox(
-                        height: 364,
-                        child: ProgressLineChart(data: progress),
-                      )
-                    : const Center(
-                        child: NoDataFoundScreen(),
-                      ),
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: TextButton(
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                      setState(() {
-                        _expandedStates[id] = false;
-                      });
-                    },
-                    child: const Text(
-                      'Close',
-                      style: TextStyle(
-                        color: Colors.red,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
       ),
