@@ -67,7 +67,19 @@ const Map<int, Map<String, int>> minimumScores = {
   30: {'GK': 90, 'DEF': 90, 'MDEF': 90, 'MOFF': 90, 'WING': 90, 'ATT': 90},
 };
 
-List<MapEntry<String, double>> filterAndSortPlayerScores(PlayerInfo info) {
+int calculateStars(double score, int minScore) {
+  if (score >= minScore + 8) {
+    return 3;
+  } else if (score >= minScore + 6) {
+    return 2;
+  } else if (score >= minScore + 3) {
+    return 1;
+  }
+  return 0;
+}
+
+List<MapEntry<String, Map<String, dynamic>>> filterAndSortPlayerScores(
+    PlayerInfo info) {
   PositionScores positionScores = PositionScores();
   Skills skills = info.skills;
   int age = info.characteristics.age;
@@ -90,8 +102,17 @@ List<MapEntry<String, double>> filterAndSortPlayerScores(PlayerInfo info) {
     'ATT': attScore,
   }..removeWhere((position, score) => score < (minScores[position] ?? 0));
 
-  var sortedScores = filteredScores.entries.toList()
-    ..sort((a, b) => b.value.compareTo(a.value));
+  Map<String, Map<String, dynamic>> scoresWithStars = {};
+  filteredScores.forEach((position, score) {
+    int minScore = minScores[position] ?? 0;
+    scoresWithStars[position] = {
+      'score': score,
+      'stars': calculateStars(score, minScore),
+    };
+  });
+
+  var sortedScores = scoresWithStars.entries.toList()
+    ..sort((a, b) => b.value['score'].compareTo(a.value['score']));
 
   return sortedScores;
 }

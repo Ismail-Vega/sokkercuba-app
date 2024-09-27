@@ -7,7 +7,7 @@ List<TeamPlayer> filteredPlayers(List<TeamPlayer>? players) {
   return players.where((player) {
     final scores = filterAndSortPlayerScores(player.info);
     final bestPosition = scores.isNotEmpty ? scores.first.key : 'N/A';
-    final bestScore = scores.isNotEmpty ? scores.first.value : 0.0;
+    final bestScore = scores.isNotEmpty ? scores.first.value['score'] : 0.0;
     return bestPosition != 'N/A' && bestScore > 0.0;
   }).toList();
 }
@@ -23,6 +23,7 @@ List<TeamPlayer> sortedPlayers(List<TeamPlayer>? players) {
       final positionComparison = aScores.first.key.compareTo(bScores.first.key);
       if (positionComparison != 0) return positionComparison;
 
-      return bScores.first.value.compareTo(aScores.first.value);
+      return bScores.first.value['score']
+          .compareTo(aScores.first.value['score']);
     });
 }

@@ -59,7 +59,7 @@ class _TSummaryCardState extends State<TSummaryCard> {
             ),
             const SizedBox(height: 8),
             SizedBox(
-              height: 324.0,
+              height: 364.0,
               child: SingleChildScrollView(
                 scrollDirection: Axis.vertical,
                 child: selectedWeek == null

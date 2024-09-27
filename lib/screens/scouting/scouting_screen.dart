@@ -255,7 +255,7 @@ class _ScoutingState extends State<Scouting>
                                     ],
                                   ),
                                   ...observedPlayers.map((player) {
-                                    List<MapEntry<String, double>> scores =
+                                    List<MapEntry<String, dynamic>> scores =
                                         filterAndSortPlayerScores(player.info);
 
                                     TableRow row = TableRow(
@@ -295,7 +295,8 @@ class _ScoutingState extends State<Scouting>
                                               context, player),
                                           child: Padding(
                                             padding: const EdgeInsets.all(8.0),
-                                            child: Text(scores.first.value
+                                            child: Text(scores
+                                                .first.value['score']
                                                 .toStringAsFixed(2)),
                                           ),
                                         ),
@@ -345,8 +346,8 @@ class _ScoutingState extends State<Scouting>
                                       columnWidths: const {
                                         0: FlexColumnWidth(2),
                                         1: FlexColumnWidth(1),
-                                        2: FlexColumnWidth(1),
-                                        3: FlexColumnWidth(1.5),
+                                        2: FlexColumnWidth(1.5),
+                                        3: FlexColumnWidth(1),
                                       },
                                       children: [
                                         const TableRow(
@@ -399,7 +400,7 @@ class _ScoutingState extends State<Scouting>
                                           ],
                                         ),
                                         ...transfersPlayersSorted.map((player) {
-                                          List<MapEntry<String, double>>
+                                          List<MapEntry<String, dynamic>>
                                               scores =
                                               filterAndSortPlayerScores(
                                                   player.info);
@@ -444,8 +445,27 @@ class _ScoutingState extends State<Scouting>
                                                 child: Padding(
                                                   padding:
                                                       const EdgeInsets.all(8.0),
-                                                  child: Text(scores.first.value
-                                                      .toStringAsFixed(2)),
+                                                  child: Row(
+                                                    children: [
+                                                      Text(scores
+                                                          .first.value['score']
+                                                          .toStringAsFixed(2)),
+                                                      const SizedBox(
+                                                          width: 4.0),
+                                                      Row(
+                                                        children: List.generate(
+                                                          scores.first
+                                                              .value['stars'],
+                                                          (index) => const Icon(
+                                                            Icons.star,
+                                                            size: 10.0,
+                                                            color:
+                                                                Colors.yellow,
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
                                                 ),
                                               ),
                                               TableCell(
