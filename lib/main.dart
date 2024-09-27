@@ -154,12 +154,8 @@ class _SokkerProState extends State<SokkerPro> {
             builder: (context) => const ResponsiveDrawer(child: Training()));
       case '/juniors':
         return MaterialPageRoute(
-            builder: (context) => ResponsiveDrawer(
-                    child: JuniorsScreen(
-                  juniors: appState.juniors,
-                  progress: appState.juniorsTraining?.juniors ?? {},
-                  potentialData: appState.news?.juniors ?? [],
-                )));
+            builder: (context) =>
+                const ResponsiveDrawer(child: JuniorsScreen()));
       default:
         return MaterialPageRoute(
             builder: (context) =>

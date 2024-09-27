@@ -14,16 +14,9 @@ import 'junior_badge.dart';
 import 'progress_line_chart.dart';
 
 class JuniorsScreen extends StatefulWidget {
-  final Juniors? juniors;
-  final Map<int, JuniorProgress>? progress;
-  final List<NewsJunior> potentialData;
+  static const String id = 'juniors_screen';
 
-  const JuniorsScreen({
-    super.key,
-    required this.juniors,
-    required this.progress,
-    required this.potentialData,
-  });
+  const JuniorsScreen({super.key});
 
   @override
   State<JuniorsScreen> createState() => _JuniorsScreenState();
@@ -39,19 +32,25 @@ class _JuniorsScreenState extends State<JuniorsScreen>
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
     _expandedStates = {};
-
-    widget.juniors?.juniors?.forEach((junior) {
-      _expandedStates[junior.id] = false;
-    });
-    widget.juniors?.prevJuniors?.forEach((junior) {
-      _expandedStates[junior.id] = false;
-    });
   }
 
   @override
   Widget build(BuildContext context) {
-    final currentJuniorsList = widget.juniors?.juniors ?? [];
-    final prevJuniorsList = widget.juniors?.prevJuniors ?? [];
+    final appStateNotifier = Provider.of<AppStateNotifier>(context);
+    final juniors = appStateNotifier.state.juniors;
+    final progress = appStateNotifier.state.juniorsTraining?.juniors ?? {};
+    final potentialData = appStateNotifier.state.news?.juniors ?? [];
+
+    final currentJuniorsList = juniors?.juniors ?? [];
+    final prevJuniorsList = juniors?.prevJuniors ?? [];
+
+    if (_expandedStates.isEmpty) {
+      final allJuniors = [
+        ...currentJuniorsList,
+        ...prevJuniorsList,
+      ];
+      _expandedStates = {for (var junior in allJuniors) junior.id: false};
+    }
 
     return Scaffold(
       backgroundColor: Colors.blue,
@@ -70,10 +69,10 @@ class _JuniorsScreenState extends State<JuniorsScreen>
             child: TabBarView(
               controller: _tabController,
               children: [
-                _buildJuniorsTable(
-                    currentJuniorsList, 'No current juniors found.'),
-                _buildJuniorsTable(
-                    prevJuniorsList, 'No previous juniors found.'),
+                _buildJuniorsTable(currentJuniorsList, progress, potentialData,
+                    'No current juniors found.'),
+                _buildJuniorsTable(prevJuniorsList, progress, potentialData,
+                    'No previous juniors found.'),
               ],
             ),
           ),
@@ -82,7 +81,11 @@ class _JuniorsScreenState extends State<JuniorsScreen>
     );
   }
 
-  Widget _buildJuniorsTable(List<Junior> juniorsList, String noDataMessage) {
+  Widget _buildJuniorsTable(
+      List<Junior> juniorsList,
+      Map<int, JuniorProgress>? progress,
+      List<NewsJunior> potentialData,
+      String noDataMessage) {
     if (juniorsList.isEmpty) {
       return const NoDataFoundScreen();
     }
@@ -133,17 +136,15 @@ class _JuniorsScreenState extends State<JuniorsScreen>
                                   ...juniorsList.expand((junior) {
                                     final isExpanded =
                                         _expandedStates[junior.id] ?? false;
-                                    final progress =
-                                        widget.progress?[junior.id];
-                                    final index = widget.potentialData
-                                        .indexWhere(
-                                            (item) => item.id == junior.id);
+                                    final juniorProgress = progress?[junior.id];
+                                    final index = potentialData.indexWhere(
+                                        (item) => item.id == junior.id);
                                     final potential = index != -1
-                                        ? widget.potentialData[index]
+                                        ? potentialData[index]
                                         : null;
                                     return [
-                                      _buildDataRow(junior, progress, potential,
-                                          isExpanded),
+                                      _buildDataRow(junior, juniorProgress,
+                                          potential, isExpanded),
                                     ];
                                   }),
                                 ],
@@ -184,10 +185,14 @@ class _JuniorsScreenState extends State<JuniorsScreen>
   ) {
     final trainingWeek =
         Provider.of<AppStateNotifier>(context).state.trainingWeek;
-    final isNewJunior =
-        progress?.values == null || progress!.values.length <= 1;
-    final showBadgeAnimation = junior.weeksLeft == 0 ||
-        (junior.startWeek == trainingWeek && isNewJunior);
+    final isNewJunior = junior.startWeek == trainingWeek &&
+        (progress?.values == null || progress!.values.length <= 1);
+
+    final skillPops = calculateSkillPops(progress?.values ?? []);
+    final avgWeeksPop = calculateAverageWeeksPop(progress?.values ?? []);
+    final isCrack = skillPops >= 6 && avgWeeksPop < 3.6;
+
+    final showBadgeAnimation = junior.weeksLeft == 0 || isNewJunior || isCrack;
 
     return TableRow(
       decoration: const BoxDecoration(
@@ -211,12 +216,13 @@ class _JuniorsScreenState extends State<JuniorsScreen>
             ),
           ),
           Positioned(
-            top: 4,
-            right: 4,
+            top: 0,
+            right: 0,
             child: JuniorBadge(
               weeksLeft: junior.weeksLeft,
-              isNew: junior.startWeek == trainingWeek,
+              isNew: isNewJunior,
               showAnimation: showBadgeAnimation,
+              isCrack: isCrack,
             ),
           ),
         ]),

@@ -45,21 +45,25 @@ Juniors setJuniorsData(
     Juniors? stateJuniors, Map<String, dynamic> data, int? stateWeek) {
   final currentJuniors = parseJuniors(data['juniors'] ?? []);
   final currentJuniorsIds = currentJuniors.map((junior) => junior.id).toSet();
-  final juniors = stateJuniors != null ? stateJuniors.toJson()['juniors'] : [];
-  final stateJuniorsIds = juniors.map((junior) => junior.id).toSet();
-  final prevJuniors =
-      stateJuniors != null ? stateJuniors.toJson()['prevJuniors'] : [];
-  final leftJuniors = juniors
+
+  final stateJuniorsList = stateJuniors?.juniors ?? [];
+  final prevJuniors = stateJuniors?.prevJuniors ?? [];
+
+  final leftJuniors = stateJuniorsList
       .where((junior) => !currentJuniorsIds.contains(junior.id))
       .toList();
 
   final List<Junior> newPrevJuniors = [...prevJuniors, ...leftJuniors];
 
   final List<Junior> updatedCurrentJuniors = currentJuniors.map((junior) {
-    if (!stateJuniorsIds.contains(junior.id) || junior.startWeek == null) {
-      return junior.copyWith(startWeek: stateWeek);
+    final existingJuniorIndex = stateJuniorsList
+        .indexWhere((stateJunior) => stateJunior.id == junior.id);
+
+    if (existingJuniorIndex != -1) {
+      final existingJunior = stateJuniorsList[existingJuniorIndex];
+      return junior.copyWith(startWeek: existingJunior.startWeek ?? stateWeek);
     } else {
-      return junior;
+      return junior.copyWith(startWeek: stateWeek);
     }
   }).toList();
 

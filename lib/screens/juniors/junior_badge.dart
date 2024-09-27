@@ -5,12 +5,14 @@ class JuniorBadge extends StatefulWidget {
   final int weeksLeft;
   final bool isNew;
   final bool showAnimation;
+  final bool isCrack;
 
   const JuniorBadge({
     super.key,
     required this.weeksLeft,
     required this.isNew,
     required this.showAnimation,
+    required this.isCrack,
   });
 
   @override
@@ -19,7 +21,6 @@ class JuniorBadge extends StatefulWidget {
 
 class _JuniorBadgeState extends State<JuniorBadge> {
   bool _isAnimationCompleted = false;
-  String text = '';
 
   @override
   Widget build(BuildContext context) {
@@ -27,15 +28,18 @@ class _JuniorBadgeState extends State<JuniorBadge> {
       return const SizedBox.shrink();
     }
 
+    String baseText = '';
     if (widget.weeksLeft == 0) {
-      text = 'READY!';
+      baseText = 'READY!';
     } else if (widget.isNew) {
-      text = 'NEW!';
+      baseText = 'NEW!';
     }
+
+    final fullText = widget.isCrack ? 'CRACK! $baseText' : baseText;
 
     if (_isAnimationCompleted) {
       return Text(
-        text,
+        fullText,
         style: const TextStyle(
           fontSize: 8.0,
           fontWeight: FontWeight.bold,
@@ -44,28 +48,30 @@ class _JuniorBadgeState extends State<JuniorBadge> {
       );
     }
 
+    final bool shouldRepeat = widget.weeksLeft == 0;
+
     return AnimatedTextKit(
       animatedTexts: [
         ScaleAnimatedText(
-          text,
+          fullText,
           textStyle: const TextStyle(
             fontSize: 8.0,
             fontWeight: FontWeight.bold,
             color: Colors.green,
           ),
-          duration: const Duration(milliseconds: 1000),
-          scalingFactor: 1.1,
+          duration: const Duration(milliseconds: 2000),
+          scalingFactor: 0.5,
         ),
       ],
-      repeatForever: text == 'READY!',
-      isRepeatingAnimation: text == 'READY!',
-      onFinished: text == 'NEW!'
-          ? () {
+      repeatForever: shouldRepeat,
+      isRepeatingAnimation: shouldRepeat,
+      onFinished: shouldRepeat
+          ? null
+          : () {
               setState(() {
                 _isAnimationCompleted = true;
               });
-            }
-          : null,
+            },
     );
   }
 }
