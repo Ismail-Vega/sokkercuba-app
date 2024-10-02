@@ -25,7 +25,7 @@ class GrowthDisplay extends StatelessWidget {
                 overflow: TextOverflow.ellipsis,
               ),
             ),
-            const Divider(thickness: 1, color: Colors.grey),
+            const Divider(thickness: 1, color: Colors.lightBlue),
             Table(
               columnWidths: const {
                 0: FlexColumnWidth(),

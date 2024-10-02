@@ -36,6 +36,7 @@ class PlayerInfo with SkillMethods {
   final int? youthTeamId;
   final Injury injury;
   final bool nationalSharing;
+  final Map<String, double> skillProgress;
 
   PlayerInfo({
     required this.name,
@@ -55,7 +56,49 @@ class PlayerInfo with SkillMethods {
     required this.youthTeamId,
     required this.injury,
     required this.nationalSharing,
-  });
+    Map<String, double>? skillProgress,
+  }) : skillProgress = skillProgress ??
+            {
+              'form': 0.0,
+              'tacticalDiscipline': 0.0,
+              'teamwork': 0.0,
+              'experience': 0.0,
+              'stamina': 0.0,
+              'keeper': 0.0,
+              'playmaking': 0.0,
+              'passing': 0.0,
+              'technique': 0.0,
+              'defending': 0.0,
+              'striker': 0.0,
+              'pace': 0.0,
+            };
+
+  PlayerInfo copyWith({
+    Skills? skills,
+    SkillsChange? skillsChange,
+    Map<String, double>? skillProgress,
+  }) {
+    return PlayerInfo(
+      name: name,
+      formation: formation,
+      number: number,
+      team: team,
+      country: country,
+      value: value,
+      previousValue: previousValue,
+      wage: wage,
+      characteristics: characteristics,
+      skills: skills ?? this.skills,
+      skillsChange: skillsChange ?? this.skillsChange,
+      stats: stats,
+      nationalStats: nationalStats,
+      face: face,
+      youthTeamId: youthTeamId,
+      injury: injury,
+      nationalSharing: nationalSharing,
+      skillProgress: skillProgress ?? this.skillProgress,
+    );
+  }
 
   factory PlayerInfo.fromJson(Map<String, dynamic> json) =>
       _$PlayerInfoFromJson(json);

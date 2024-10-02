@@ -1,3 +1,4 @@
+import '../models/coach/trainer.dart';
 import '../models/juniors/juniors.dart';
 import '../models/news/news_item.dart';
 import '../models/player/player.dart';
@@ -14,3 +15,6 @@ List<PlayerTrainingReport> parsePlayerReports(List<dynamic> payload) =>
 
 List<NewsItem> parseNews(List<dynamic> payload) =>
     payload.map((json) => NewsItem.fromJson(json)).toList();
+
+List<Trainer> parseTrainers(List<dynamic> payload) =>
+    payload.map((json) => Trainer.fromJson(json)).toList();

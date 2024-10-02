@@ -8,6 +8,7 @@ import '../models/team/user.dart';
 import '../models/tsummary/tsummary.dart';
 import '../state/actions.dart';
 import '../state/app_state_notifier.dart';
+import '../utils/app_state_converters.dart';
 import 'api_client.dart';
 import 'fetch_juniors_training.dart';
 import 'toast_service.dart';
@@ -41,6 +42,7 @@ Future<Map<String, dynamic>> fetchAllData(ApiClient apiClient,
         apiClient.fetchData(getTeamPlayersURL(teamId)),
         apiClient.fetchData(getTeamStatsURL(teamId)),
         apiClient.fetchData(newsUrl),
+        apiClient.fetchData('/trainer'),
       ];
 
       final responses = await Future.wait(initialPromises);
@@ -59,8 +61,9 @@ Future<Map<String, dynamic>> fetchAllData(ApiClient apiClient,
       }
 
       final juniors = setJuniorsData(state.juniors, responses[0], stateWeek);
+      final trainers = parseTrainers(responses[6]?['trainers'] ?? []);
       final training = await setTrainingData(
-          apiClient, plus, stateWeek, state.training, responses[1]);
+          apiClient, plus, stateWeek, state.training, responses[1], trainers);
       final tsummary = TSummary.fromJson(responses[2]);
       final players = setSquadData(state.players, responses[3], stateWeek);
       final userStats = UserStats.fromJson(responses[4]);
@@ -82,6 +85,7 @@ Future<Map<String, dynamic>> fetchAllData(ApiClient apiClient,
         'news': news,
         'trainingWeek': stateWeek,
         'dataUpdatedOn': dataUpdatedOn,
+        'trainers': trainers,
       };
 
       appStateNotifier

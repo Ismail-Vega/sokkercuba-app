@@ -1,4 +1,5 @@
 import '../constants/constants.dart';
+import '../models/coach/trainer.dart';
 import '../models/juniors/juniors.dart';
 import '../models/news/news.dart';
 import '../models/news/news_item.dart';
@@ -11,7 +12,9 @@ import '../models/training/training.dart';
 import '../models/training/training_report.dart';
 import '../services/api_client.dart';
 import '../services/fetch_juniors_news.dart';
+import '../services/talent_calculator.dart';
 import '../utils/app_state_converters.dart';
+import '../utils/calculate_skill_growth.dart';
 
 class StoreAction {
   final StoreActionTypes type;
@@ -114,8 +117,13 @@ Squad setSquadData(
   );
 }
 
-Future<SquadTraining?> setTrainingData(ApiClient apiClient, bool plus,
-    int? week, SquadTraining? stateData, dynamic data) async {
+Future<SquadTraining?> setTrainingData(
+    ApiClient apiClient,
+    bool plus,
+    int? week,
+    SquadTraining? stateData,
+    dynamic data,
+    List<Trainer> trainers) async {
   final players = data['players'] ?? [];
 
   if (players.isEmpty) {
@@ -127,10 +135,11 @@ Future<SquadTraining?> setTrainingData(ApiClient apiClient, bool plus,
   if (!plus) {
     for (var player in players) {
       final report = TrainingReport.fromJson(player['report']);
+      final playerInfo = PlayerInfo.fromJson(player['player']);
 
       final playerTrainingReport = PlayerTrainingReport(
         id: player['id'],
-        player: PlayerInfo.fromJson(player['player']),
+        player: playerInfo,
         report: [report],
       );
 
@@ -139,6 +148,12 @@ Future<SquadTraining?> setTrainingData(ApiClient apiClient, bool plus,
             .indexWhere((tplayer) => tplayer.id == player['id']);
 
         if (tIndex != -1) {
+          final skillGrowth =
+              calculateSkillGrowth(training.players[tIndex].report);
+          final updatedSkillProgress =
+              PlayerSkillProgress.calculateSkillProgress(
+                  training.players[tIndex], trainers, skillGrowth);
+
           if (training.players[tIndex].report[0].week != week) {
             training.players[tIndex].report.insert(0, report);
           }
@@ -149,7 +164,8 @@ Future<SquadTraining?> setTrainingData(ApiClient apiClient, bool plus,
 
           training.players[tIndex] = PlayerTrainingReport(
             id: training.players[tIndex].id,
-            player: training.players[tIndex].player,
+            player: training.players[tIndex].player
+                .copyWith(skillProgress: updatedSkillProgress),
             report: sortedReports,
           );
         } else {
@@ -159,7 +175,6 @@ Future<SquadTraining?> setTrainingData(ApiClient apiClient, bool plus,
         training.players.add(playerTrainingReport);
       }
     }
-
     return training;
   }
 
@@ -175,12 +190,18 @@ Future<SquadTraining?> setTrainingData(ApiClient apiClient, bool plus,
     final reports = tResponse[i]['reports'] ?? [];
     bool playerFound = false;
 
-    for (var statePlayerReport in training.players) {
+    for (int tIndex = 0; tIndex < training.players.length; tIndex++) {
+      final statePlayerReport = training.players[tIndex];
+
       if (statePlayerReport.id == player['id']) {
         playerFound = true;
 
         final Set<int> weeksInFirstList =
             statePlayerReport.report.map((report) => report.week).toSet();
+
+        final skillGrowth = calculateSkillGrowth(statePlayerReport.report);
+        final updatedSkillProgress = PlayerSkillProgress.calculateSkillProgress(
+            statePlayerReport, trainers, skillGrowth);
 
         for (final report in reports) {
           final trainingReport = TrainingReport.fromJson(report);
@@ -189,6 +210,14 @@ Future<SquadTraining?> setTrainingData(ApiClient apiClient, bool plus,
             statePlayerReport.report.insert(0, trainingReport);
           }
         }
+        statePlayerReport.report.sort((a, b) => b.week.compareTo(a.week));
+
+        training.players[tIndex] = PlayerTrainingReport(
+          id: statePlayerReport.id,
+          player: training.players[tIndex].player
+              .copyWith(skillProgress: updatedSkillProgress),
+          report: statePlayerReport.report,
+        );
 
         break;
       }
@@ -198,6 +227,8 @@ Future<SquadTraining?> setTrainingData(ApiClient apiClient, bool plus,
       final newReports = reports
           .map<TrainingReport>((report) => TrainingReport.fromJson(report))
           .toList();
+
+      newReports.sort((a, b) => b.week.compareTo(a.week));
 
       final playerTrainingReport = PlayerTrainingReport(
         id: player['id'],

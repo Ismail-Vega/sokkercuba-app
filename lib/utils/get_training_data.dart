@@ -10,18 +10,3 @@ TrainingReport? getPlayerTrainingReport(
   final reportIndex = playerReport.indexWhere((rep) => rep.week == week);
   return reportIndex > -1 ? playerReport[reportIndex] : null;
 }
-
-List<PlayerTrainingReport>? getPlayerTrainingReports(
-    Map<String, PlayerTrainingReport>? players, int id) {
-  if (players == null) return null;
-
-  List<PlayerTrainingReport> result = [];
-
-  players.forEach((key, value) {
-    if (value.id == id) {
-      return result.add(value);
-    }
-  });
-
-  return result;
-}

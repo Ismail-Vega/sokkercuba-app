@@ -45,8 +45,11 @@ class _TrainingState extends State<Training> {
     }
   }
 
-  List<TableRow> generateRows() {
+  List<TableRow> generateRows(int playerIndex) {
+    String lastDisplayedAge = "";
     final filteredReport = getSelectedPlayerReport();
+    final skillsHistory =
+        playerIndex > -1 ? players[playerIndex].skillsHistory : null;
 
     return selectedPlayer != null
         ? filteredReport.report.map((report) {
@@ -57,8 +60,28 @@ class _TrainingState extends State<Training> {
             final games =
                 '${report.games.minutesOfficial}/${report.games.minutesFriendly}/${report.games.minutesNational}';
 
-            return TableRow(
+            final age = skillsHistory != null
+                ? skillsHistory[report.week]
+                        ?.info
+                        ?.characteristics
+                        .age
+                        .toString() ??
+                    'N/A'
+                : 'N/A';
+
+            TableRow row = TableRow(
+              decoration: BoxDecoration(
+                border: lastDisplayedAge != 'N/A' && lastDisplayedAge != age
+                    ? const Border(top: BorderSide(color: Colors.lightBlue))
+                    : null,
+              ),
               children: [
+                TableCell(
+                  child: Padding(
+                    padding: const EdgeInsets.all(4.0),
+                    child: Center(child: Text(age)),
+                  ),
+                ),
                 TableCell(
                   child: Padding(
                     padding: const EdgeInsets.all(4.0),
@@ -206,6 +229,8 @@ class _TrainingState extends State<Training> {
                 ),
               ],
             );
+            lastDisplayedAge = age;
+            return row;
           }).toList()
         : [
             const TableRow(
@@ -291,7 +316,8 @@ class _TrainingState extends State<Training> {
                     ),
                   ),
                   const SizedBox(height: 8),
-                  if (selectedPlayer != null)
+                  if (selectedPlayer != null &&
+                      selectedPlayer!.info.characteristics.age < 25)
                     GrowthDisplay(
                         growth: calculateSkillGrowth(
                             getSelectedPlayerReport().report)),
@@ -314,6 +340,15 @@ class _TrainingState extends State<Training> {
                                     children: [
                                       const TableRow(
                                         children: [
+                                          Padding(
+                                            padding: EdgeInsets.symmetric(
+                                                horizontal: 8.0),
+                                            child: Text('Age',
+                                                textAlign: TextAlign.center,
+                                                style: TextStyle(
+                                                    fontWeight:
+                                                        FontWeight.bold)),
+                                          ),
                                           Padding(
                                             padding: EdgeInsets.symmetric(
                                                 horizontal: 8.0),
@@ -442,7 +477,7 @@ class _TrainingState extends State<Training> {
                                           ),
                                         ],
                                       ),
-                                      ...generateRows()
+                                      ...generateRows(playerIndex)
                                           .skip(currentPage * rowsPerPage)
                                           .take(rowsPerPage),
                                     ],

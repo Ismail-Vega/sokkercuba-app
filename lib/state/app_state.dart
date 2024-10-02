@@ -1,5 +1,6 @@
 import 'dart:ui';
 
+import '../models/coach/trainer.dart';
 import '../models/juniors/juniors.dart';
 import '../models/juniors/juniors_training.dart';
 import '../models/news/news.dart';
@@ -29,6 +30,7 @@ class AppState {
   final String? dataUpdatedOn;
   final Locale locale;
   final List<TeamPlayer> observedPlayers;
+  final List<Trainer> trainers;
 
   AppState({
     this.error = false,
@@ -49,6 +51,7 @@ class AppState {
     this.dataUpdatedOn,
     this.locale = const Locale('en', 'us'),
     this.observedPlayers = const [],
+    this.trainers = const [],
   });
 
   AppState copyWith(
@@ -69,6 +72,7 @@ class AppState {
       SquadTraining? training,
       String? dataUpdatedOn,
       List<TeamPlayer>? observedPlayers,
+      List<Trainer>? trainers,
       Locale? locale}) {
     return AppState(
       error: error ?? this.error,
@@ -88,6 +92,7 @@ class AppState {
       training: training ?? this.training,
       dataUpdatedOn: dataUpdatedOn ?? this.dataUpdatedOn,
       observedPlayers: observedPlayers ?? this.observedPlayers,
+      trainers: trainers ?? this.trainers,
       locale: locale ?? this.locale,
     );
   }
@@ -112,6 +117,7 @@ class AppState {
       dataUpdatedOn: payload['dataUpdatedOn'] ?? dataUpdatedOn,
       locale: payload['locale'] ?? locale,
       observedPlayers: payload['observedPlayers'] ?? observedPlayers,
+      trainers: payload['trainers'] ?? trainers,
     );
   }
 
@@ -139,6 +145,7 @@ class AppState {
       },
       'observedPlayers':
           observedPlayers.map((player) => player.toJson()).toList(),
+      'trainers': trainers.map((trainer) => trainer.toJson()).toList(),
     };
   }
 
@@ -174,6 +181,10 @@ class AppState {
           : const Locale('en', 'US'),
       observedPlayers: (json['observedPlayers'] as List<dynamic>?)
               ?.map((e) => TeamPlayer.fromJson(e as Map<String, dynamic>))
+              .toList() ??
+          [],
+      trainers: (json['trainers'] as List<dynamic>?)
+              ?.map((e) => Trainer.fromJson(e as Map<String, dynamic>))
               .toList() ??
           [],
     );
