@@ -48,6 +48,11 @@ class AppStateNotifier extends ChangeNotifier {
       if (downloadsDirectory != null) {
         final filePath = '$downloadsDirectory/sokker_data.json';
         final file = File(filePath);
+
+        if (await file.exists()) {
+          await file.delete();
+        }
+
         await file.writeAsString(stateJson);
 
         toastService.showToastWithCloseButton(
@@ -118,7 +123,7 @@ class AppStateNotifier extends ChangeNotifier {
       }
     } else {
       toastService.showToast(
-        "There was an error while trying to read the file!",
+        "Import canceled or no directory selected!",
         backgroundColor: Colors.red,
       );
     }
