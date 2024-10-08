@@ -36,9 +36,10 @@ PlayerInfo _$PlayerInfoFromJson(Map<String, dynamic> json) => PlayerInfo(
       youthTeamId: (json['youthTeamId'] as num?)?.toInt(),
       injury: Injury.fromJson(json['injury'] as Map<String, dynamic>),
       nationalSharing: json['nationalSharing'] as bool,
-      skillProgress: (json['skillProgress'] as Map<String, dynamic>?)?.map(
-        (k, e) => MapEntry(k, (e as num).toDouble()),
-      ),
+      skillProgress: json['skillProgress'] == null
+          ? null
+          : SkillProgress.fromJson(
+              json['skillProgress'] as Map<String, dynamic>),
     );
 
 Map<String, dynamic> _$PlayerInfoToJson(PlayerInfo instance) =>

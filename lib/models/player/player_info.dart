@@ -9,6 +9,7 @@ import 'injury.dart';
 import 'player_name.dart';
 import 'player_value.dart';
 import 'player_wage.dart';
+import 'skill_progress.dart';
 import 'skills.dart';
 import 'skills_change.dart';
 import 'stats.dart';
@@ -36,7 +37,7 @@ class PlayerInfo with SkillMethods {
   final int? youthTeamId;
   final Injury injury;
   final bool nationalSharing;
-  final Map<String, double> skillProgress;
+  final SkillProgress skillProgress;
 
   PlayerInfo({
     required this.name,
@@ -56,27 +57,23 @@ class PlayerInfo with SkillMethods {
     required this.youthTeamId,
     required this.injury,
     required this.nationalSharing,
-    Map<String, double>? skillProgress,
+    SkillProgress? skillProgress,
   }) : skillProgress = skillProgress ??
-            {
-              'form': 0.0,
-              'tacticalDiscipline': 0.0,
-              'teamwork': 0.0,
-              'experience': 0.0,
-              'stamina': 0.0,
-              'keeper': 0.0,
-              'playmaking': 0.0,
-              'passing': 0.0,
-              'technique': 0.0,
-              'defending': 0.0,
-              'striker': 0.0,
-              'pace': 0.0,
-            };
+            SkillProgress(
+              stamina: SkillValue(current: 0.0, next: 0.0),
+              keeper: SkillValue(current: 0.0, next: 0.0),
+              playmaking: SkillValue(current: 0.0, next: 0.0),
+              passing: SkillValue(current: 0.0, next: 0.0),
+              technique: SkillValue(current: 0.0, next: 0.0),
+              defending: SkillValue(current: 0.0, next: 0.0),
+              striker: SkillValue(current: 0.0, next: 0.0),
+              pace: SkillValue(current: 0.0, next: 0.0),
+            );
 
   PlayerInfo copyWith({
     Skills? skills,
     SkillsChange? skillsChange,
-    Map<String, double>? skillProgress,
+    SkillProgress? skillProgress,
   }) {
     return PlayerInfo(
       name: name,

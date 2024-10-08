@@ -1,5 +1,6 @@
 import '../models/coach/trainer.dart';
 import '../models/player/player_info.dart';
+import '../models/player/skill_progress.dart';
 import '../models/training/training.dart';
 import '../models/training/training_report.dart';
 
@@ -7,8 +8,8 @@ class PlayerSkillProgress {
   static const int baseGoalValue = 100;
   static const int agePenaltyStart = 27;
   static const double baseAgeDecayFactor = 0.05;
-  static const double headCoachWeight = 0.7;
-  static const double assistantsWeight = 0.3;
+  static const double headCoachWeight = 0.8;
+  static const double assistantsWeight = 0.20;
 
   static const skillDifficultyModifiers = {
     'pace': 2.0,
@@ -22,7 +23,7 @@ class PlayerSkillProgress {
   };
 
   static double calculateTalentFactor(double averageWeeksPop) {
-    return averageWeeksPop > 0 ? 1 / averageWeeksPop : 1;
+    return averageWeeksPop > 0 ? 1 + (1 / averageWeeksPop) : 1;
   }
 
   static double calculateAgeFactor(int age) {
@@ -39,9 +40,9 @@ class PlayerSkillProgress {
     if (currentSkillValue >= 1 && currentSkillValue <= 9) {
       return 1 + (currentSkillValue * 0.05);
     } else if (currentSkillValue >= 10 && currentSkillValue <= 13) {
-      return 1 + (currentSkillValue * 0.15);
+      return 1 + (currentSkillValue * 0.18);
     } else if (currentSkillValue >= 14 && currentSkillValue <= 16) {
-      return 2;
+      return 2.5;
     } else if (currentSkillValue >= 17) {
       return 3;
     }
@@ -104,21 +105,20 @@ class PlayerSkillProgress {
     required int currentSkillValue,
     required bool isMainTraining,
   }) {
-    double skillModifier = skillDifficultyModifiers[skill] ?? 1.0;
-    double ageFactor = calculateAgeFactor(age);
-    double coachEffectiveness =
-        calculateCoachEffectiveness(trainers, skill) / 100;
-    double skillLevelFactor = calculateSkillLevelFactor(currentSkillValue);
-
+    double coachEffectiveness = calculateCoachEffectiveness(trainers, skill);
     double trainingMultiplier = isMainTraining ? 1.0 : 0.1;
 
-    return trainingIntensity *
-        talentFactor *
-        (1 / skillModifier) *
-        (1 / ageFactor) *
-        (1 / skillLevelFactor) *
-        coachEffectiveness *
-        trainingMultiplier;
+    double ageFactor = calculateAgeFactor(age);
+    double skillModifier = skillDifficultyModifiers[skill] ?? 1.0;
+    double skillLevelFactor = calculateSkillLevelFactor(currentSkillValue);
+    double trainingValue = (trainingIntensity + coachEffectiveness) / 2;
+    double positiveContributions =
+        trainingValue * talentFactor * trainingMultiplier;
+
+    double negativeContributions =
+        (1 / skillModifier) * (1 / ageFactor) * (1 / skillLevelFactor);
+
+    return positiveContributions * negativeContributions;
   }
 
   static List<TrainingReport> getReportsSinceLastIncrease(
@@ -133,9 +133,7 @@ class PlayerSkillProgress {
       final kind = report.kind.name;
       final intensity = report.intensity;
 
-      if (report.type.name == skillName &&
-          kind != 'missing' &&
-          intensity >= 50) {
+      if (kind != 'missing' && intensity >= 50) {
         final currentSkillValue = report.getSkill(skillName);
 
         if (i < reports.length - 1) {
@@ -155,7 +153,7 @@ class PlayerSkillProgress {
     return reportsSinceLastIncrease;
   }
 
-  static Map<String, double> calculateSkillProgress(
+  static SkillProgress calculateSkillProgress(
       PlayerTrainingReport playerTrainingReport,
       List<Trainer> trainers,
       Map<String, double> skillGrowth) {
@@ -173,18 +171,30 @@ class PlayerSkillProgress {
       'striker'
     ];
 
-    Map<String, double> updatedSkillProgress = {};
+    SkillProgress updatedSkillProgress = SkillProgress(
+      stamina: SkillValue(current: 0.0, next: 0.0),
+      keeper: SkillValue(current: 0.0, next: 0.0),
+      playmaking: SkillValue(current: 0.0, next: 0.0),
+      passing: SkillValue(current: 0.0, next: 0.0),
+      technique: SkillValue(current: 0.0, next: 0.0),
+      defending: SkillValue(current: 0.0, next: 0.0),
+      striker: SkillValue(current: 0.0, next: 0.0),
+      pace: SkillValue(current: 0.0, next: 0.0),
+    );
 
     for (String skillName in skillNames) {
       List<TrainingReport> reportsSinceIncrease = getReportsSinceLastIncrease(
         trainingReports,
         skillName,
       );
-      double accumulatedProgress = playerInfo.skillProgress[skillName] ?? 0.0;
+      double nextValue = 0.0;
+      double accumulatedProgress = 0.0;
       double talentFactor = calculateTalentFactor(skillGrowth[skillName] ?? 0);
 
-      for (TrainingReport report in reportsSinceIncrease) {
+      for (int i = 0; i < reportsSinceIncrease.length; i++) {
+        TrainingReport report = reportsSinceIncrease[i];
         int? skillValue = report.getSkill(skillName);
+
         if (skillValue == null ||
             report.kind.name == 'missing' ||
             report.intensity < 50) {
@@ -202,17 +212,69 @@ class PlayerSkillProgress {
           currentSkillValue: skillValue,
           isMainTraining: isMainTraining,
         );
-
         accumulatedProgress += weeklyProgress;
 
         if (accumulatedProgress >= baseGoalValue) {
-          accumulatedProgress -= baseGoalValue;
+          accumulatedProgress -= weeklyProgress;
+        }
+
+        if (i == reportsSinceIncrease.length - 1) {
+          nextValue = weeklyProgress;
         }
       }
 
-      updatedSkillProgress[skillName] = accumulatedProgress;
+      updatedSkillProgress = updateSkillProgress(
+        updatedSkillProgress,
+        skillName,
+        accumulatedProgress,
+        nextValue,
+      );
     }
 
     return updatedSkillProgress;
+  }
+
+  static SkillProgress updateSkillProgress(
+    SkillProgress progress,
+    String skillName,
+    double accumulatedProgress,
+    double nextValue,
+  ) {
+    switch (skillName) {
+      case 'stamina':
+        return progress.copyWith(
+          stamina: SkillValue(current: accumulatedProgress, next: nextValue),
+        );
+      case 'keeper':
+        return progress.copyWith(
+          keeper: SkillValue(current: accumulatedProgress, next: nextValue),
+        );
+      case 'playmaking':
+        return progress.copyWith(
+          playmaking: SkillValue(current: accumulatedProgress, next: nextValue),
+        );
+      case 'passing':
+        return progress.copyWith(
+          passing: SkillValue(current: accumulatedProgress, next: nextValue),
+        );
+      case 'technique':
+        return progress.copyWith(
+          technique: SkillValue(current: accumulatedProgress, next: nextValue),
+        );
+      case 'defending':
+        return progress.copyWith(
+          defending: SkillValue(current: accumulatedProgress, next: nextValue),
+        );
+      case 'striker':
+        return progress.copyWith(
+          striker: SkillValue(current: accumulatedProgress, next: nextValue),
+        );
+      case 'pace':
+        return progress.copyWith(
+          pace: SkillValue(current: accumulatedProgress, next: nextValue),
+        );
+      default:
+        return progress;
+    }
   }
 }

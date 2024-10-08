@@ -3,7 +3,9 @@ import 'package:provider/provider.dart';
 
 import '../../constants/squad.dart';
 import '../../models/player/player.dart';
+import '../../models/training/training.dart';
 import '../../state/app_state_notifier.dart';
+import '../../utils/get_training_data.dart';
 import '../noData/no_data_screen.dart';
 import 'player_card.dart';
 import 'player_sort.dart';
@@ -54,19 +56,25 @@ class _SquadScreenState extends State<SquadScreen>
     int crossAxisCount = 1;
     double childAspectRatio = 1;
 
-    if (screenWidth <= 390) {
-      childAspectRatio = 1.05;
+    if (screenWidth <= 420) {
+      childAspectRatio = 0.98;
     } else if (screenWidth < 600) {
-      childAspectRatio = 1.05;
+      childAspectRatio = 1.04;
     } else if (screenWidth >= 600 && screenWidth <= 764) {
       crossAxisCount = 2;
-      childAspectRatio = 0.85;
+      childAspectRatio = 0.80;
     } else if (screenWidth > 764 && screenWidth <= 1200) {
       crossAxisCount = 2;
-      childAspectRatio = 1;
-    } else if (screenWidth > 1200) {
+      childAspectRatio = 0.90;
+    } else if (screenWidth > 1200 && screenWidth <= 1365) {
       crossAxisCount = 3;
-      childAspectRatio = 0.9;
+      childAspectRatio = 0.85;
+    } else if (screenWidth > 1365 && screenWidth <= 1599) {
+      crossAxisCount = 3;
+      childAspectRatio = 0.90;
+    } else if (screenWidth > 1600) {
+      crossAxisCount = 3;
+      childAspectRatio = 1;
     }
 
     return Scaffold(
@@ -75,7 +83,7 @@ class _SquadScreenState extends State<SquadScreen>
         children: [
           TabBar(
             controller: _tabController,
-            tabs: const [
+            tabs: [
               Tab(text: 'Squad'),
               Tab(text: 'Previous Players'),
             ],
@@ -133,12 +141,15 @@ class _SquadScreenState extends State<SquadScreen>
     final appStateNotifier =
         Provider.of<AppStateNotifier>(context, listen: false);
     final squad = appStateNotifier.state.players?.players;
+    final trainingPlayers = appStateNotifier.state.training?.players;
+    final trainingWeek = appStateNotifier.state.trainingWeek;
 
-    if (squad == null) return;
+    if (squad == null || trainingPlayers == null || trainingWeek == null) {
+      return;
+    }
 
     List<TeamPlayer> sortedSquad = List.from(squad);
-    _sortPlayers(sortedSquad);
-
+    _sortPlayers(sortedSquad, trainingPlayers, trainingWeek);
     setState(() {
       _sortedSquad = sortedSquad;
     });
@@ -152,21 +163,40 @@ class _SquadScreenState extends State<SquadScreen>
     if (prevSquad == null) return;
 
     List<TeamPlayer> sortedPrevSquad = List.from(prevSquad);
-    _sortPlayers(sortedPrevSquad);
+    _sortPlayers(sortedPrevSquad, null, null);
 
     setState(() {
       _sortedPrevSquad = sortedPrevSquad;
     });
   }
 
-  void _sortPlayers(List<TeamPlayer> players) {
+  void _sortPlayers(List<TeamPlayer> players,
+      List<PlayerTrainingReport>? trainingPlayers, int? trainingWeek) {
     switch (_sortCriteria) {
       case SortCriteria.hasSkillChanges:
+        if (trainingPlayers == null || trainingWeek == null) return;
+
         players.sort((a, b) {
+          final aReports = getPlayerTrainingReport(trainingPlayers, a.id);
+          final bReports = getPlayerTrainingReport(trainingPlayers, b.id);
+
+          final reportIndexA =
+              aReports?.report.indexWhere((rep) => rep.week == trainingWeek);
+          final reportIndexB =
+              bReports?.report.indexWhere((rep) => rep.week == trainingWeek);
+
+          final aReport = reportIndexA != null && reportIndexA > -1
+              ? aReports?.report[reportIndexA]
+              : null;
+          final bReport = reportIndexB != null && reportIndexB > -1
+              ? bReports?.report[reportIndexB]
+              : null;
+
           final aHasChanges =
-              a.info.skillsChange?.up != 0 || a.info.skillsChange?.down != 0;
+              aReport?.skillsChange.up != 0 || aReport?.skillsChange.down != 0;
           final bHasChanges =
-              b.info.skillsChange?.up != 0 || b.info.skillsChange?.down != 0;
+              bReport?.skillsChange.up != 0 || bReport?.skillsChange.down != 0;
+
           if (aHasChanges && !bHasChanges) return -1;
           if (!aHasChanges && bHasChanges) return 1;
           return 0;
