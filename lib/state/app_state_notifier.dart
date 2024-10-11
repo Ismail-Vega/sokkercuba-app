@@ -173,31 +173,18 @@ class AppStateNotifier extends ChangeNotifier {
       case StoreActionTypes.setTraining:
         _state = _state.copyWith(training: action.payload);
         break;
-      case StoreActionTypes.addObservedPlayer:
-        final TeamPlayer newPlayer = TeamPlayer(
-            id: action.payload.id,
-            info: action.payload.info,
-            isObserved: true,
-            transfer: null);
-
+      case StoreActionTypes.updateObservedPlayers:
+        final List<TeamPlayer> fetchedPlayers =
+            action.payload as List<TeamPlayer>;
         final List<TeamPlayer> updatedObservedPlayers =
             List.from(_state.observedPlayers);
 
-        if (!updatedObservedPlayers
-            .any((player) => player.id == newPlayer.id)) {
-          updatedObservedPlayers.add(newPlayer);
+        for (var newPlayer in fetchedPlayers) {
+          if (!updatedObservedPlayers
+              .any((player) => player.id == newPlayer.id)) {
+            updatedObservedPlayers.add(newPlayer);
+          }
         }
-
-        _state = _state.copyWith(observedPlayers: updatedObservedPlayers);
-        break;
-
-      case StoreActionTypes.delObservedPlayer:
-        final TeamPlayer playerToRemove = action.payload as TeamPlayer;
-        final List<TeamPlayer> updatedObservedPlayers =
-            List.from(_state.observedPlayers);
-
-        updatedObservedPlayers
-            .removeWhere((player) => player.id == playerToRemove.id);
 
         _state = _state.copyWith(observedPlayers: updatedObservedPlayers);
         break;

@@ -44,7 +44,7 @@ class _LoginScreenState extends State<LoginScreen> {
         await apiClient.initCookieJar();
 
         final response = await apiClient.sendData(
-          '/auth/login',
+          '/api/auth/login',
           {'login': login, 'password': password, 'remember': true},
         );
 

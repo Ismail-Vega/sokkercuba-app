@@ -13,7 +13,7 @@ Future<List<TeamPlayer>> fetchTransfersByCountry(
 
   while (hasMoreData) {
     final endpoint =
-        '/transfer?filter[offset]=$offset&filter[limit]=$limit&filter[includeEnded]=true';
+        '/api/transfer?filter[offset]=$offset&filter[limit]=$limit&filter[includeEnded]=true';
 
     final response = await apiClient.fetchData(endpoint);
     if (response != null &&

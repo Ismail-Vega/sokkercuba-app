@@ -203,7 +203,7 @@ class _DrawerContentState extends State<DrawerContent> {
                     await apiClient.initCookieJar();
 
                     final response =
-                        await apiClient.sendData('/auth/logout', {});
+                        await apiClient.sendData('/api/auth/logout', {});
 
                     if (response != null && context.mounted) {
                       Navigator.pushNamed(context, '/login');

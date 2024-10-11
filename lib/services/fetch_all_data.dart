@@ -18,7 +18,7 @@ Future<Map<String, dynamic>> fetchAllData(ApiClient apiClient,
   final toastService = ToastService(context);
 
   try {
-    final user = await apiClient.fetchData('/current');
+    final user = await apiClient.fetchData(userUrl);
     final state = appStateNotifier.state;
 
     if (user != null) {
@@ -42,7 +42,7 @@ Future<Map<String, dynamic>> fetchAllData(ApiClient apiClient,
         apiClient.fetchData(getTeamPlayersURL(teamId)),
         apiClient.fetchData(getTeamStatsURL(teamId)),
         apiClient.fetchData(newsUrl),
-        apiClient.fetchData('/trainer'),
+        apiClient.fetchData('/api/trainer'),
       ];
 
       final responses = await Future.wait(initialPromises);

@@ -8,6 +8,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sokker_pro/screens/training/training_screen.dart';
 
 import 'components/responsive_drawer.dart';
+import 'constants/constants.dart';
 import 'models/team/user.dart';
 import 'screens/contact/contact_screen.dart';
 import 'screens/home/welcome_screen.dart';
@@ -51,7 +52,7 @@ void main() async {
   await apiClient.initCookieJar();
 
   try {
-    final currentResponse = await apiClient.fetchData('/current');
+    final currentResponse = await apiClient.fetchData(userUrl);
     if (currentResponse != null) {
       initialState = initialState.copyWith(
           loggedIn: true, user: User.fromJson(currentResponse));

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../components/future_progress_bar.dart';
 import '../../constants/constants.dart';
@@ -127,13 +128,24 @@ class _PlayerCardState extends State<PlayerCard> {
               child: Row(
                 children: [
                   Expanded(
-                    child: Text(
-                      player.name.full,
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: customTheme.mediumFontSize,
+                    child: GestureDetector(
+                      onTap: () async {
+                        final url = Uri.parse(
+                            'https://sokker.org/player/PID/${widget.player.id}');
+                        if (await canLaunchUrl(url)) {
+                          await launchUrl(url);
+                        } else {
+                          return;
+                        }
+                      },
+                      child: Text(
+                        player.name.full,
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: customTheme.mediumFontSize,
+                        ),
+                        overflow: TextOverflow.ellipsis,
                       ),
-                      overflow: TextOverflow.ellipsis,
                     ),
                   ),
                   const SizedBox(width: 8),

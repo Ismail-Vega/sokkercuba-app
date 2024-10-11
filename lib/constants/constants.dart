@@ -80,41 +80,41 @@ const List<String> skillsLevelsList = [
   'Superdivine'
 ];
 
-const String userUrl = '/current';
-const String juniorsUrl = '/junior';
-const String trainingUrl = '/training';
-const String tsummaryUrl = '/training/summary';
+const String userUrl = '/api/current';
+const String juniorsUrl = '/api/junior';
+const String trainingUrl = '/api/training';
+const String tsummaryUrl = '/api/training/summary';
 
 String getPlayerFullReportURL(int playerId) {
-  return '/training/$playerId/report';
+  return '/api/training/$playerId/report';
 }
 
 String getTeamPlayersURL(int teamId) {
-  return '/player?filter[team]=$teamId&filter[limit]=200&filter[offset]=0';
+  return '/api/player?filter[team]=$teamId&filter[limit]=200&filter[offset]=0';
 }
 
 String getTeamStatsURL(int teamId) {
-  return '/team/$teamId/stats';
+  return '/api/team/$teamId/stats';
 }
 
 String getJuniorGraphUrl(int juniorId) {
-  return '/junior/$juniorId/graph';
+  return '/api/junior/$juniorId/graph';
 }
 
-const newsUrl = '/news?filter[limit]=200';
+const newsUrl = '/api/news?filter[limit]=200';
 
 String getJuniorNewsURL(int newsId) {
-  return '/news/$newsId';
+  return '/api/news/$newsId';
 }
 
 String getNtDeleteURL(int id) {
-  return '/national?action=removeplayer&PID=$id';
+  return '/api/national?action=removeplayer&PID=$id';
 }
 
 String getNtAddURL(int id) {
-  return '/national?action=addplayer&PID=$id';
+  return '/api/national?action=addplayer&PID=$id';
 }
 
 String getNtObserveURL(int id) {
-  return '/national?action=observe&PID=$id';
+  return '/api/national?action=observe&PID=$id';
 }

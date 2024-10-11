@@ -83,7 +83,7 @@ class _SquadScreenState extends State<SquadScreen>
         children: [
           TabBar(
             controller: _tabController,
-            tabs: [
+            tabs: const [
               Tab(text: 'Squad'),
               Tab(text: 'Previous Players'),
             ],

@@ -39,8 +39,7 @@ enum StoreActionTypes {
   setSummary,
   setTeam,
   setTraining,
-  addObservedPlayer,
-  delObservedPlayer,
+  updateObservedPlayers,
   setAll,
 }
 
