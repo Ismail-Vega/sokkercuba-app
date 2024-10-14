@@ -12,7 +12,7 @@ class PlayerSkillProgress {
   static const double assistantsWeight = 0.20;
 
   static const skillDifficultyModifiers = {
-    'pace': 2.0,
+    'pace': 2.25,
     'defending': 1.5,
     'striker': 1.5,
     'keeper': 1.5,
@@ -33,7 +33,7 @@ class PlayerSkillProgress {
     if (age > 23 && age <= 27) {
       return 1 - (0.05 * (age - 23));
     }
-    return 1 - (0.1 * (age - 27));
+    return 1 - (0.2 * (age - 27));
   }
 
   static double calculateSkillLevelFactor(int currentSkillValue) {

@@ -154,7 +154,6 @@ class _DrawerContentState extends State<DrawerContent> {
                   setState(() {
                     isLoading = false;
                   });
-                  widget.closeDrawer();
                 },
               ),
               ListTile(
@@ -170,7 +169,6 @@ class _DrawerContentState extends State<DrawerContent> {
                   setState(() {
                     isLoading = false;
                   });
-                  widget.closeDrawer();
                 },
               ),
               ListTile(

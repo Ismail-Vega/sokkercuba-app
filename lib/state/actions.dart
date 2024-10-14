@@ -10,6 +10,7 @@ import '../models/player/player_info.dart';
 import '../models/squad/squad.dart';
 import '../models/training/training.dart';
 import '../models/training/training_report.dart';
+import '../models/tsummary/tsummary.dart';
 import '../services/api_client.dart';
 import '../services/fetch_juniors_news.dart';
 import '../services/talent_calculator.dart';
@@ -268,4 +269,22 @@ Future<News> setNewsData(
       news: currentNews.isEmpty ? newsData : newNews,
       juniors: newJuniors,
       total: currentNews.isEmpty ? newsData.length : newNews.length);
+}
+
+TSummary setTSummaryData(TSummary? stateSummary, Map<String, dynamic> data) {
+  final List<Week> newWeeksData = (data['weeks'] as List<dynamic>?)
+          ?.map((weekData) => Week.fromJson(weekData))
+          .toList() ??
+      [];
+
+  final List<Week> existingWeeks = stateSummary?.weeks ?? [];
+  final Set<int> existingWeeksNumbers =
+      existingWeeks.map((week) => week.week).toSet();
+
+  final List<Week> newWeeksToAdd = newWeeksData
+      .where((week) => !existingWeeksNumbers.contains(week.week))
+      .toList();
+
+  final List<Week> updatedWeeks = [...existingWeeks, ...newWeeksToAdd];
+  return TSummary(weeks: updatedWeeks);
 }
