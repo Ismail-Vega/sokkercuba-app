@@ -149,6 +149,9 @@ class AppStateNotifier extends ChangeNotifier {
       case StoreActionTypes.setLoading:
         _state = _state.copyWith(loading: action.payload);
         break;
+      case StoreActionTypes.setTransfersLoading:
+        _state = _state.copyWith(transfersLoading: action.payload);
+        break;
       case StoreActionTypes.setLogin:
         _state = _state.copyWith(loggedIn: action.payload);
         break;
@@ -186,6 +189,13 @@ class AppStateNotifier extends ChangeNotifier {
           }
         }
 
+        _state = _state.copyWith(observedPlayers: updatedObservedPlayers);
+        break;
+      case StoreActionTypes.delObservedPlayer:
+        final int playerId = action.payload;
+        final List<TeamPlayer> updatedObservedPlayers =
+            List.from(_state.observedPlayers);
+        updatedObservedPlayers.removeWhere((player) => player.id == playerId);
         _state = _state.copyWith(observedPlayers: updatedObservedPlayers);
         break;
       case StoreActionTypes.setAll:

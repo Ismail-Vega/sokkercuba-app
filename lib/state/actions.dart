@@ -32,6 +32,7 @@ enum StoreActionTypes {
   setTrainingWeek,
   setLoading,
   setLogin,
+  setTransfersLoading,
   setUser,
   setUserStats,
   setJuniors,
@@ -40,6 +41,7 @@ enum StoreActionTypes {
   setTeam,
   setTraining,
   updateObservedPlayers,
+  delObservedPlayer,
   setAll,
 }
 

@@ -18,6 +18,7 @@ class AppState {
   final int? teamId;
   final int? trainingWeek;
   final bool loading;
+  final bool transfersLoading;
   final bool loggedIn;
   final User? user;
   final News? news;
@@ -39,6 +40,7 @@ class AppState {
     this.teamId,
     this.trainingWeek,
     this.loading = false,
+    this.transfersLoading = false,
     this.loggedIn = false,
     this.user,
     this.news,
@@ -61,6 +63,7 @@ class AppState {
       int? teamId,
       int? trainingWeek,
       bool? loading,
+      bool? transfersLoading,
       bool? loggedIn,
       User? user,
       News? news,
@@ -81,6 +84,7 @@ class AppState {
       teamId: teamId ?? this.teamId,
       trainingWeek: trainingWeek ?? this.trainingWeek,
       loading: loading ?? this.loading,
+      transfersLoading: transfersLoading ?? this.transfersLoading,
       loggedIn: loggedIn ?? this.loggedIn,
       user: user ?? this.user,
       news: news ?? this.news,
@@ -105,6 +109,7 @@ class AppState {
       teamId: payload['teamId'] ?? teamId,
       trainingWeek: payload['trainingWeek'] ?? trainingWeek,
       loading: payload['loading'] ?? loading,
+      transfersLoading: payload['transfersLoading'] ?? transfersLoading,
       loggedIn: payload['loggedIn'] ?? loggedIn,
       user: payload['user'] ?? user,
       news: payload['news'] ?? news,
@@ -129,6 +134,7 @@ class AppState {
       'teamId': teamId,
       'trainingWeek': trainingWeek,
       'loading': loading,
+      'transfersLoading': transfersLoading,
       'loggedIn': loggedIn,
       'user': user?.toJson(),
       'news': news?.toJson(),
@@ -157,6 +163,7 @@ class AppState {
       teamId: json['teamId'],
       trainingWeek: json['trainingWeek'],
       loading: json['loading'] ?? false,
+      transfersLoading: json['transfersLoading'] ?? false,
       loggedIn: json['loggedIn'] ?? false,
       user: json['user'] != null ? User.fromJson(json['user']) : null,
       news: json['news'] != null ? News.fromJson(json['news']) : null,
