@@ -110,24 +110,30 @@ class _SokkerProState extends State<SokkerPro> {
     final scheduledTime = tz.TZDateTime.local(now.year, now.month, now.day, 8);
 
     if (lastTransfersFetchDate != null) {
-      final lastFetchDate =
-          tz.TZDateTime.parse(tz.local, lastTransfersFetchDate);
-      if (now.difference(lastFetchDate).inDays < 1 &&
-          now.isBefore(scheduledTime)) {
-        return;
+      try {
+        final lastFetchDate =
+            tz.TZDateTime.parse(tz.local, lastTransfersFetchDate);
+        if (now.difference(lastFetchDate).inDays < 1 &&
+            now.isBefore(scheduledTime)) {
+          return;
+        }
+      } catch (e) {
+        if (kDebugMode) {
+          print("Error parsing lastTransfersFetchDate: $e");
+        }
       }
     }
 
     await _fetchTransfers(appStateNotifier);
-    await prefs.setString(
-        'lastTransfersFetchDate', '${now.year}-${now.month}-${now.day}');
+    await prefs.setString('lastTransfersFetchDate',
+        '${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}');
 
     final durationUntil8AM =
         scheduledTime.add(const Duration(days: 1)).difference(now);
     Timer(durationUntil8AM, () async {
       await _fetchTransfers(appStateNotifier);
-      await prefs.setString(
-          'lastTransfersFetchDate', '${now.year}-${now.month}-${now.day}');
+      await prefs.setString('lastTransfersFetchDate',
+          '${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}');
     });
   }
 

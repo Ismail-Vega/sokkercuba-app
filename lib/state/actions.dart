@@ -272,19 +272,21 @@ Future<News> setNewsData(
 }
 
 TSummary setTSummaryData(TSummary? stateSummary, Map<String, dynamic> data) {
+  final List<Week> existingWeeks = stateSummary?.weeks ?? [];
   final List<Week> newWeeksData = (data['weeks'] as List<dynamic>?)
           ?.map((weekData) => Week.fromJson(weekData))
           .toList() ??
       [];
-
-  final List<Week> existingWeeks = stateSummary?.weeks ?? [];
   final Set<int> existingWeeksNumbers =
-      existingWeeks.map((week) => week.week).toSet();
+      newWeeksData.map((week) => week.week).toSet();
 
-  final List<Week> newWeeksToAdd = newWeeksData
+  final List<Week> oldWeeks = existingWeeks
       .where((week) => !existingWeeksNumbers.contains(week.week))
       .toList();
 
-  final List<Week> updatedWeeks = [...existingWeeks, ...newWeeksToAdd];
+  final List<Week> updatedWeeks = [...newWeeksData, ...oldWeeks];
+
+  updatedWeeks.sort((a, b) => b.week.compareTo(a.week));
+
   return TSummary(weeks: updatedWeeks);
 }

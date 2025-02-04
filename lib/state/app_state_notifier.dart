@@ -183,8 +183,12 @@ class AppStateNotifier extends ChangeNotifier {
             List.from(_state.observedPlayers);
 
         for (var newPlayer in fetchedPlayers) {
-          if (!updatedObservedPlayers
-              .any((player) => player.id == newPlayer.id)) {
+          final int existingPlayerIndex = updatedObservedPlayers
+              .indexWhere((player) => player.id == newPlayer.id);
+
+          if (existingPlayerIndex != -1) {
+            updatedObservedPlayers[existingPlayerIndex] = newPlayer;
+          } else {
             updatedObservedPlayers.add(newPlayer);
           }
         }

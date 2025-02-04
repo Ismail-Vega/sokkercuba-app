@@ -16,7 +16,7 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
 # In Windows, build-name is used as the major, minor, and patch parts
 # of the product and file versions while build-number is used as the build suffix.
-version: 1.0.1+11
+version: 1.0.0+25
 
 environment:
   sdk: '>=3.3.4 <4.0.0'
@@ -54,6 +54,8 @@ dependencies:
   window_manager: ^0.4.0
   file_picker: ^8.1.2
   flutter_localization: ^0.2.2
+  timezone: ^0.9.4
+  url_launcher: ^6.3.1
 
 dev_dependencies:
   flutter_test:
@@ -69,6 +71,7 @@ dev_dependencies:
   build_runner: ^2.4.11
   json_serializable: ^6.8.0
   build_web_compilers: ^4.0.11
+  msix: ^3.16.8
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
@@ -109,5 +112,17 @@ flutter:
 flutter_launcher_icons:
   android: "launcher_icon"
   ios: true
-  image_path: "assets/images/icon/launcher_icon.png"
+  image_path: "assets/images/icon/favicon.png"
   remove_alpha_ios: true
+
+msix_config:
+  display_name: Sokker Pro
+  publisher_display_name: SokkerCuba
+  identity_name: SokkerCuba.SokkerPro
+  msix_version: 1.0.1.0
+  logo_path: C:\Users\ismai\StudioProjects\sokkercuba\assets\images\icon\launcher_icon.png
+  capabilities: internetClient
+  publisher: CN=4424CBB2-9630-49CC-B670-0AEE9D66B44A
+  sign_msix: false
+  languages: en-us
+  store: true
