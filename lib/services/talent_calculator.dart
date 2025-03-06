@@ -27,13 +27,16 @@ class PlayerSkillProgress {
   }
 
   static double calculateAgeFactor(int age) {
+    double rawFactor;
     if (age <= 23) {
-      return 1.2;
+      rawFactor = 1.2;
     }
     if (age > 23 && age <= 27) {
-      return 1 - (0.05 * (age - 23));
+      rawFactor = 1 - (0.05 * (age - 23));
+    } else {
+      rawFactor = 1 - (0.1 * (age - 27));
     }
-    return 1 - (0.2 * (age - 27));
+    return rawFactor == 0 ? 0.05 : rawFactor;
   }
 
   static double calculateSkillLevelFactor(int currentSkillValue) {

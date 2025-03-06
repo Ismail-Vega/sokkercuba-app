@@ -226,11 +226,11 @@ Future<SquadTraining?> setTrainingData(
     }
 
     if (!playerFound) {
-      final newReports = reports
+      final List<TrainingReport> newReports = reports
           .map<TrainingReport>((report) => TrainingReport.fromJson(report))
           .toList();
 
-      newReports.sort((a, b) => b.week.compareTo(a.week));
+      newReports.sort((TrainingReport a, TrainingReport b) => b.week.compareTo(a.week));
 
       final playerTrainingReport = PlayerTrainingReport(
         id: player['id'],

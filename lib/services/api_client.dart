@@ -49,6 +49,7 @@ class ApiClient {
 
   Future<dynamic> sendData(String endpoint, dynamic data,
       {Map<String, String>? headers}) async {
+    await _ensureInitialized();
     try {
       final cookies =
           await _cookieJar.loadForRequest(Uri.parse('https://sokker.org/api'));
