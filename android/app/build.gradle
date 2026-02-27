@@ -31,8 +31,8 @@ if (keystorePropertiesFile.exists()) {
 
 android {
     namespace "sokkercuba.com.sokkercuba"
-    compileSdk flutter.compileSdkVersion
-    ndkVersion flutter.ndkVersion
+    compileSdk 36
+    ndkVersion "29.0.14033849"
 
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_17
@@ -49,8 +49,8 @@ android {
 
     defaultConfig {
         applicationId "sokkercuba.com.sokkercuba"
-        minSdkVersion flutter.minSdkVersion
-        targetSdkVersion flutter.targetSdkVersion
+        minSdkVersion 23
+        targetSdkVersion 36
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
     }
