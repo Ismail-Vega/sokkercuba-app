@@ -87,7 +87,7 @@ class _FutureProgressBarState extends State<FutureProgressBar>
                 height: barHeight,
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(8),
-                  color: Colors.green.withOpacity(0.5),
+                  color: Colors.green.withValues(alpha: 0.5),
                 ),
               ),
             );
