@@ -200,10 +200,11 @@ class _DrawerContentState extends State<DrawerContent> {
                     final apiClient = ApiClient();
                     await apiClient.initCookieJar();
 
-                    final response =
-                        await apiClient.sendData('/api/auth/logout', {});
+                    await apiClient.fetchData('/index/action/start');
 
-                    if (response != null && context.mounted) {
+                    await apiClient.clearSession();
+
+                    if (context.mounted) {
                       Navigator.pushNamed(context, '/login');
                       appStateNotifier.dispatch(
                           StoreAction(StoreActionTypes.setLogin, false));

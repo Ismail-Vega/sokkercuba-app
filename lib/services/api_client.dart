@@ -47,7 +47,11 @@ class ApiClient {
     }
   }
 
-  Future<dynamic> sendData(String endpoint, dynamic data,
+  Future<void> clearSession() async {
+    await _cookieJar.deleteAll();
+  }
+
+  Future<Response<dynamic>?> sendData(String endpoint, dynamic data,
       {Map<String, String>? headers}) async {
     await _ensureInitialized();
     try {
@@ -63,8 +67,17 @@ class ApiClient {
 
       final isLogin = endpoint == '/api/auth/login';
 
+      if (kDebugMode) {
+        print('➡️ Sending $endpoint with data: $data');
+      }
+
       final response = await _dio.post(endpoint,
           data: data, options: isLogin ? null : options);
+
+      if (kDebugMode) {
+        print('⬅️ Response from $endpoint: ${response.statusCode}');
+        print('⬅️ Response body: ${response.data}');
+      }
 
       final setCookies = response.headers.map['set-cookie'];
 
@@ -75,7 +88,7 @@ class ApiClient {
       return response;
     } catch (e) {
       if (kDebugMode) {
-        print('Exception while sending data: $e');
+        print('Exception while sending data to $endpoint: $e');
       }
       return null;
     }

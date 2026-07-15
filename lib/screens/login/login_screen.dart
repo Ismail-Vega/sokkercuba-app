@@ -48,7 +48,9 @@ class _LoginScreenState extends State<LoginScreen> {
           {'login': login, 'password': password, 'remember': true},
         );
 
-        if (response != null && response.statusCode == 200 && mounted) {
+        final statusCode = response?.statusCode;
+
+        if (statusCode == 200 && mounted) {
           final appStateNotifier =
               Provider.of<AppStateNotifier>(context, listen: false);
           final result =
@@ -70,7 +72,12 @@ class _LoginScreenState extends State<LoginScreen> {
           if (!mounted) return;
           Navigator.pushNamed(context, '/');
         } else {
-          if (response.statusCode == 401) {
+          if (kDebugMode) {
+            print('Login failed with statusCode: $statusCode');
+            print('Login response body: ${response?.data}');
+          }
+
+          if (statusCode == 401) {
             toastService.showToast(
               "Incorrect login info, please try again!",
               backgroundColor: Colors.red,
