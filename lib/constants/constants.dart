@@ -80,6 +80,7 @@ const List<String> skillsLevelsList = [
   'Superdivine'
 ];
 
+const String loginUrl = '/api/auth/login';
 const String userUrl = '/api/current';
 const String juniorsUrl = '/api/junior';
 const String trainingUrl = '/api/training';

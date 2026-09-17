@@ -1,10 +1,13 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../models/navigation/nav_bar_item_model.dart';
 import '../screens/footer/footer_screen.dart';
 import '../services/api_client.dart';
+import '../services/browser/browser_session.dart';
 import '../services/fetch_all_data.dart';
+import '../services/sokker_session.dart';
 import '../services/toast_service.dart';
 import '../state/actions.dart';
 import '../state/app_state_notifier.dart';
@@ -37,7 +40,22 @@ class _DrawerContentState extends State<DrawerContent> {
     final apiClient = ApiClient();
     await apiClient.initCookieJar();
 
+    // If Cloudflare is blocking the native client this opens the browser
+    // session and waits for the user, instead of failing the refresh.
+    final hasSession = await ensureSokkerSession(apiClient);
+
     if (!context.mounted) return;
+
+    if (!hasSession) {
+      toastService.showToast(
+        'Your Sokker session has expired. Please sign in again.',
+        backgroundColor: Colors.red,
+      );
+      setState(() {
+        isLoading = false;
+      });
+      return;
+    }
 
     final appStateNotifier =
         Provider.of<AppStateNotifier>(context, listen: false);
@@ -192,30 +210,34 @@ class _DrawerContentState extends State<DrawerContent> {
                 onTap: () async {
                   final appStateNotifier =
                       Provider.of<AppStateNotifier>(context, listen: false);
+                  final navigator = Navigator.of(context);
 
                   try {
                     appStateNotifier.dispatch(
                         StoreAction(StoreActionTypes.setLoading, true));
 
+                    // Clear both sessions locally. No sign-out request is sent:
+                    // when the session is browser-only a native call would just
+                    // hit Cloudflare, and dropping the WebView's cookies (and
+                    // the native jar) ends the session on this device either
+                    // way.
+                    await BrowserSession.instance.signOut();
+
                     final apiClient = ApiClient();
-                    await apiClient.initCookieJar();
-
-                    await apiClient.fetchData('/index/action/start');
-
                     await apiClient.clearSession();
 
-                    if (context.mounted) {
-                      Navigator.pushNamed(context, '/login');
-                      appStateNotifier.dispatch(
-                          StoreAction(StoreActionTypes.setLogin, false));
-                    }
+                    appStateNotifier.dispatch(
+                        StoreAction(StoreActionTypes.setLogin, false));
+                    navigator.pushNamedAndRemoveUntil(
+                        '/login', (Route<dynamic> route) => false);
                   } catch (error) {
-                    if (context.mounted) {
-                      Navigator.pushNamed(context, '/login');
-                      appStateNotifier.dispatch(
-                          StoreAction(StoreActionTypes.setLogin, false));
+                    if (kDebugMode) {
+                      debugPrint('[logout] failed: ${error.runtimeType}');
                     }
-                    throw Exception('Failed to logout: $error');
+                    appStateNotifier.dispatch(
+                        StoreAction(StoreActionTypes.setLogin, false));
+                    navigator.pushNamedAndRemoveUntil(
+                        '/login', (Route<dynamic> route) => false);
                   } finally {
                     appStateNotifier.dispatch(
                         StoreAction(StoreActionTypes.setLoading, false));

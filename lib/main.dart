@@ -9,8 +9,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:timezone/data/latest.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
 
+import 'components/browser_session_host.dart';
 import 'components/responsive_drawer.dart';
-import 'constants/constants.dart';
 import 'models/player/player.dart';
 import 'models/team/user.dart';
 import 'screens/contact/contact_screen.dart';
@@ -61,19 +61,29 @@ void main() async {
   final apiClient = ApiClient();
   await apiClient.initCookieJar();
 
+  // Classify the native session instead of treating every failure as a
+  // sign-out: a Cloudflare block says nothing about whether the account is
+  // still signed in, so the persisted state must survive it. The user keeps
+  // their cached data and the next refresh opens the browser session.
   try {
-    final currentResponse = await apiClient.fetchData(userUrl);
-    if (currentResponse != null) {
-      initialState = initialState.copyWith(
-        loggedIn: true,
-        user: User.fromJson(currentResponse),
-      );
-    } else {
-      initialState = initialState.copyWith(loggedIn: false);
+    final probe = await apiClient.probeNativeSession();
+    switch (probe.status) {
+      case NativeSessionStatus.authenticated:
+        initialState = initialState.copyWith(
+          loggedIn: true,
+          user: User.fromJson(probe.user!),
+        );
+        break;
+      case NativeSessionStatus.unauthenticated:
+        initialState = initialState.copyWith(loggedIn: false);
+        break;
+      case NativeSessionStatus.cloudflareBlocked:
+      case NativeSessionStatus.networkError:
+        break;
     }
-  } catch (e) {
+  } catch (error) {
     if (kDebugMode) {
-      print('Exception while checking api auth: $e');
+      debugPrint('[startup] session probe failed: ${error.runtimeType}');
     }
   }
 
@@ -172,7 +182,13 @@ class _SokkerProState extends State<SokkerPro> {
         final customTheme = CustomThemeExtension.of(context);
 
         return MaterialApp(
-          builder: FToastBuilder(),
+          // The Sokker browser session lives above the Navigator so it stays
+          // alive across routes and is never something the user has to close
+          // to get back to the app. Toasts stay above it.
+          builder: (context, child) => FToastBuilder()(
+            context,
+            BrowserSessionHost(child: child ?? const SizedBox.shrink()),
+          ),
           navigatorKey: navigatorKey,
           title: 'Sokker Pro App',
           theme: ThemeData.light().copyWith(

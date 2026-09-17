@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 
 import '../../constants/constants.dart';
 import '../../services/api_client.dart';
+import '../../services/browser/browser_session.dart';
 import '../../services/fetch_all_data.dart';
 import '../../services/toast_service.dart';
 import '../../state/actions.dart';
@@ -24,18 +25,22 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen> {
   bool showSpinner = false;
-  late String login;
-  late String password;
+  bool _submitting = false;
+  String login = '';
+  String password = '';
   final _formKey = GlobalKey<FormState>();
 
   void _toggleSpinner(bool value) {
+    if (!mounted || showSpinner == value) return;
     setState(() {
       showSpinner = value;
     });
   }
 
   Future<void> _handleLogin() async {
+    if (_submitting) return;
     if (_formKey.currentState!.validate()) {
+      _submitting = true;
       _toggleSpinner(true);
       final toastService = ToastService(context);
 
@@ -44,9 +49,26 @@ class _LoginScreenState extends State<LoginScreen> {
         await apiClient.initCookieJar();
 
         final response = await apiClient.sendData(
-          '/api/auth/login',
+          loginUrl,
           {'login': login, 'password': password, 'remember': true},
         );
+
+        // Cloudflare is standing between the native client and the API. Hand
+        // the session over to the in-app browser, which owns the protected
+        // session; it takes over the screen and drives the rest of the flow,
+        // including the initial data load. Nothing comes back here.
+        if (response != null && apiClient.isCloudflareChallenge(response)) {
+          _toggleSpinner(false);
+          await BrowserSession.instance.ensureReady();
+          if (!mounted) return;
+          if (!BrowserSession.instance.isReady) {
+            toastService.showToast(
+              'Sign-in was not completed. You can try again.',
+              backgroundColor: Colors.orange,
+            );
+          }
+          return;
+        }
 
         final statusCode = response?.statusCode;
 
@@ -72,11 +94,6 @@ class _LoginScreenState extends State<LoginScreen> {
           if (!mounted) return;
           Navigator.pushNamed(context, '/');
         } else {
-          if (kDebugMode) {
-            print('Login failed with statusCode: $statusCode');
-            print('Login response body: ${response?.data}');
-          }
-
           if (statusCode == 401) {
             toastService.showToast(
               "Incorrect login info, please try again!",
@@ -89,16 +106,17 @@ class _LoginScreenState extends State<LoginScreen> {
             );
           }
         }
-      } catch (e) {
+      } catch (error) {
         if (kDebugMode) {
-          print('catch: $e');
+          debugPrint('[login] failed: ${error.runtimeType}');
         }
         toastService.showToast(
           "There was an error while logging you in!",
           backgroundColor: Colors.red,
         );
       } finally {
-        _toggleSpinner(false);
+        _submitting = false;
+        if (mounted) _toggleSpinner(false);
       }
     }
   }
@@ -182,7 +200,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         RoundedButton(
                           title: 'Log In',
                           colour: Colors.blue,
-                          onPressed: _handleLogin,
+                          onPressed: showSpinner ? null : _handleLogin,
                         ),
                       ],
                     ),
